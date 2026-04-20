@@ -29,3 +29,7 @@
 |-- requirements.txt # 项目依赖
 |-- .gitignore # Git 忽略文件配置
 ```
+
+## 协作规范
+
+- 三人协作流程文档：三人协作流程.md
