@@ -2,7 +2,7 @@
   <nav class="top-nav">
     <div class="nav-inner">
       <button type="button" class="nav-brand" @click="emit('brand-click')">
-        <img src="/brand-placeholder.svg" alt="TS" class="brand-mark nav-mark" />
+        <img src="/brand-mark.png" alt="TS" class="brand-mark nav-mark" />
         <span class="nav-text">
           <strong>{{ t('app.brand') }}</strong>
           <small>{{ t('app.subBrand') }}</small>
