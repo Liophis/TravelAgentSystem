@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 """初始化脚本 - 创建示例数据"""
 
-from sqlalchemy.orm import Session
-
 from app.db.database import SessionLocal, engine
 from app.db.models import Base, POI, User, Facility, TravelDiary
 

@@ -6,7 +6,6 @@ package at the repository root (`app`). It adjusts `sys.path`
 so the original `app` package is discoverable from the new
 `backend` package layout.
 """
-import os
 import sys
 from pathlib import Path
 

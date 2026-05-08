@@ -2,7 +2,6 @@
 """简单的 API 测试脚本"""
 
 import requests
-import json
 
 BASE_URL = "http://127.0.0.1:8001/api"
 

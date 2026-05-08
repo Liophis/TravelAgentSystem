@@ -3,8 +3,20 @@ from sqlalchemy.orm import Session
 
 from app.db import crud
 from app.db.database import get_db
-from app.models import POISchema, POIListResponse, UserSchema, TravelDiarySchema, TravelDiaryListResponse
-from app.services import POIService, RouteService, RecommendationService, DiaryService
+from app.models import (
+    POISchema,
+    POIListResponse,
+    UserSchema,
+    TravelDiarySchema,
+    TravelDiaryListResponse,
+)
+
+from app.services import (
+    POIService,
+    RouteService,
+    RecommendationService,
+    DiaryService,
+)
 
 router = APIRouter(prefix="/api", tags=["Travel System API"])
 
@@ -46,7 +58,11 @@ def list_pois(skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=1000)
 
 
 @router.get("/pois/search", response_model=list[POISchema], tags=["POI"])
-def search_pois(keyword: str = Query(..., min_length=1), limit: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
+def search_pois(
+    keyword: str = Query(..., min_length=1),
+    limit: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
     """Search POIs by keyword using Trie index"""
     poi_service.initialize_poi_index(db)
     return poi_service.search_poi(db, keyword, limit)
