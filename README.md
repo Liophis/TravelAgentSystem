@@ -1,35 +1,23 @@
 
 
-```
-|-- /app
-| |-- /api
-| | |-- init.py
-| | |-- routes.py # 存放所有 API 路由接口
-| |
-| |-- /core
-| | |-- init.py
-| | |-- graph.py # 【手写】图数据结构与寻路算法
-| | |-- heap.py # 【手写】用于 Top-K 推荐的堆
-| | |-- trie.py # 【手写】用于名称模糊搜索的字典树
-| |
-| |-- /models
-| | |-- init.py
-| | |-- poi.py # POI（兴趣点）的 Pydantic 数据模型
-| | |-- user.py # 用户的 Pydantic 数据模型
-| |
-| |-- /db
-| | |-- init.py
-| | |-- database.py # 数据库连接（SQLAlchemy）与会话管理
-| | |-- crud.py # 封装所有数据库的增删改查（CRUD）操作
-| | |-- models.py # 定义所有数据库表的 SQLAlchemy 模型
-| |
-| |-- init.py
-| |-- main.py # FastAPI 应用的入口文件
-|
-|-- requirements.txt # 项目依赖
-|-- .gitignore # Git 忽略文件配置
-```
+# TravelAgentSystem
 
-## 协作规范
+这是一个前后端分离的个性化旅游系统，当前开发说明、实现状态和后续任务已经合并到主交接文档中。
 
-- 三人协作流程文档：三人协作流程.md
+## 主要文档
+
+- [项目总览与执行说明.md](项目总览与执行说明.md)：当前最完整的统一说明，后续 agent 优先读取。
+- [项目计划.md](项目计划.md)：原项目计划，现为历史索引。
+- [项目计划书.md](项目计划书.md)：原项目计划书，现为历史索引。
+- [三人协作流程.md](三人协作流程.md)：协作规范索引。
+
+## 目录概览
+
+```text
+|-- app/           后端核心代码
+|-- backend/       另一套后端入口与服务
+|-- frontend/      Vue 3 前端
+|-- backups/       数据库备份
+|-- README.md      仓库入口说明
+|-- 项目总览与执行说明.md  当前主交接文档
+```
