@@ -110,10 +110,5 @@
       "replyFallback": "No valid reply was received for now.",
       "networkError": "Network request failed. Please try again later."
     }
-  },
-  "app": {
-    "language": {
-      "label": "Language"
     }
-  }
 }
