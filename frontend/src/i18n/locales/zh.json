@@ -110,10 +110,5 @@
       "replyFallback": "暂时没有收到有效回复。",
       "networkError": "网络请求失败，请稍后重试。"
     }
-  },
-  "app": {
-    "language": {
-      "label": "语言"
     }
-  }
 }
