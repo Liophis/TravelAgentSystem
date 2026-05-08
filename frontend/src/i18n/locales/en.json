@@ -1,0 +1,114 @@
+{
+  "app": {
+    "title": "Travel Agent System",
+    "brand": "Travel Agent System",
+    "subBrand": "TripStar-inspired travel planning",
+    "badge": "View Result",
+    "footerBrand": "Travel Agent System",
+    "footerCopy": "© {year} Travel Agent System. All rights reserved.",
+    "language": {
+      "label": "Switch language",
+      "zh": "Chinese",
+      "ja": "Japanese",
+      "en": "English"
+    }
+  },
+  "common": {
+    "viewMore": "View more",
+    "noData": "No data available",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "dayNumber": "Day {day}"
+  },
+  "nav": {
+    "cta": "Start planning"
+  },
+  "home": {
+    "heroBadge": "TripStar-style frontend scaffold",
+    "titleLine1": "Build your next",
+    "titleLine2": "city travel story",
+    "heroDesc": "This frontend mirrors TripStar's layout structure with landing, form, result, and multilingual support so it can later connect to real itinerary-generation APIs.",
+    "step1": "Basic info",
+    "step2": "Preferences",
+    "step3": "Extra needs",
+    "cityLabel": "Destination",
+    "cityPlaceholder": "Enter a city or attraction",
+    "travelDaysLabel": "Trip days",
+    "travelDaysUnit": "days",
+    "startDateLabel": "Start date",
+    "startDatePlaceholder": "Select start date",
+    "endDateLabel": "End date",
+    "endDatePlaceholder": "Select end date",
+    "transportationLabel": "Transportation",
+    "accommodationLabel": "Accommodation",
+    "interestsLabel": "Interest tags",
+    "specialNeedsPlaceholder": "For example: family-friendly, budget-conscious, relaxed pace, food and culture focused",
+    "submit": "Generate travel ideas",
+    "submitting": "Generating",
+    "cityRequired": "Please enter a destination",
+    "startDateRequired": "Please select a start date",
+    "endDateRequired": "Please select an end date",
+    "transportation": {
+      "public": "Public transport",
+      "drive": "Drive",
+      "walk": "Walk",
+      "mixed": "Mixed"
+    },
+    "accommodation": {
+      "budget": "Budget hotel",
+      "comfort": "Comfort hotel",
+      "luxury": "Luxury hotel",
+      "homestay": "Homestay"
+    },
+    "interests": {
+      "history": "History",
+      "nature": "Nature",
+      "food": "Food",
+      "shopping": "Shopping",
+      "art": "Art",
+      "leisure": "Leisure"
+    }
+  },
+  "result": {
+    "side": {
+      "overview": "Overview",
+      "budget": "Budget",
+      "map": "Map",
+      "days": "Days",
+      "graph": "Knowledge graph",
+      "weather": "Weather"
+    },
+    "editTrip": "Edit trip",
+    "saveChanges": "Save",
+    "cancelEdit": "Cancel edit",
+    "exportTrip": "Export",
+    "exportImage": "Export image",
+    "exportPdf": "Export PDF",
+    "dateRange": "{start} - {end}",
+    "overview": {
+      "title": "Trip overview",
+      "subtitle": "High-level result area",
+      "empty": "No trip content to display yet."
+    },
+    "budget": {
+      "title": "Budget overview",
+      "attraction": "Attractions",
+      "hotel": "Hotels",
+      "meal": "Meals",
+      "transport": "Transport"
+    },
+    "chat": {
+      "welcome": "The intelligent chat panel is ready and can later connect to your backend chat API.",
+      "placeholder": "Ask the trip assistant...",
+      "quickPriceLabel": "Is the budget reasonable?",
+      "quickPriceQuestion": "Help me judge whether this trip budget is reasonable.",
+      "quickSuitabilityLabel": "Is this a good fit?",
+      "quickSuitabilityQuestion": "Is this itinerary a good fit for my preferences?",
+      "quickMealLabel": "Meal ideas",
+      "quickMealQuestion": "Give me some food suggestions along the route.",
+      "replyFallback": "No valid reply was received for now.",
+      "networkError": "Network request failed. Please try again later."
+    }
+    }
+}

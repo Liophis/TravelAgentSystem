@@ -1,0 +1,114 @@
+{
+  "app": {
+    "title": "Travel Agent System",
+    "brand": "Travel Agent System",
+    "subBrand": "TripStar-inspired travel planning",
+    "badge": "查看结果",
+    "footerBrand": "Travel Agent System",
+    "footerCopy": "© {year} Travel Agent System. All rights reserved.",
+    "language": {
+      "label": "切换语言",
+      "zh": "中文",
+      "ja": "日语",
+      "en": "English"
+    }
+  },
+  "common": {
+    "viewMore": "查看更多",
+    "noData": "暂无数据",
+    "submit": "提交",
+    "cancel": "取消",
+    "delete": "删除",
+    "dayNumber": "第 {day} 天"
+  },
+  "nav": {
+    "cta": "开始规划"
+  },
+  "home": {
+    "heroBadge": "TripStar 风格前端骨架",
+    "titleLine1": "构建你的下一段",
+    "titleLine2": "城市旅行故事",
+    "heroDesc": "这是一个对齐 TripStar 页面结构的前端骨架，保留了落地页、表单页、结果页与多语言能力，便于后续接入真实行程生成接口。",
+    "step1": "基础信息",
+    "step2": "偏好设置",
+    "step3": "额外需求",
+    "cityLabel": "目的地",
+    "cityPlaceholder": "输入城市或景点",
+    "travelDaysLabel": "行程天数",
+    "travelDaysUnit": "天",
+    "startDateLabel": "开始日期",
+    "startDatePlaceholder": "选择开始日期",
+    "endDateLabel": "结束日期",
+    "endDatePlaceholder": "选择结束日期",
+    "transportationLabel": "交通方式",
+    "accommodationLabel": "住宿偏好",
+    "interestsLabel": "兴趣标签",
+    "specialNeedsPlaceholder": "例如：亲子友好、预算有限、节奏放松、偏好人文与美食",
+    "submit": "生成旅行建议",
+    "submitting": "正在生成",
+    "cityRequired": "请输入目的地",
+    "startDateRequired": "请选择开始日期",
+    "endDateRequired": "请选择结束日期",
+    "transportation": {
+      "public": "公共交通",
+      "drive": "自驾",
+      "walk": "步行",
+      "mixed": "混合"
+    },
+    "accommodation": {
+      "budget": "经济型酒店",
+      "comfort": "舒适型酒店",
+      "luxury": "豪华酒店",
+      "homestay": "民宿"
+    },
+    "interests": {
+      "history": "历史文化",
+      "nature": "自然风光",
+      "food": "美食",
+      "shopping": "购物",
+      "art": "艺术",
+      "leisure": "休闲"
+    }
+  },
+  "result": {
+    "side": {
+      "overview": "概览",
+      "budget": "预算",
+      "map": "地图",
+      "days": "每日行程",
+      "graph": "知识图谱",
+      "weather": "天气"
+    },
+    "editTrip": "编辑行程",
+    "saveChanges": "保存",
+    "cancelEdit": "取消编辑",
+    "exportTrip": "导出",
+    "exportImage": "导出图片",
+    "exportPdf": "导出 PDF",
+    "dateRange": "{start} - {end}",
+    "overview": {
+      "title": "行程概览",
+      "subtitle": "高层结果展示区",
+      "empty": "暂无可展示的行程内容。"
+    },
+    "budget": {
+      "title": "预算总览",
+      "attraction": "景点",
+      "hotel": "酒店",
+      "meal": "餐饮",
+      "transport": "交通"
+    },
+    "chat": {
+      "welcome": "智能问答面板已准备就绪，可在这里承接后端聊天接口。",
+      "placeholder": "向行程助手提问...",
+      "quickPriceLabel": "预算是否合理？",
+      "quickPriceQuestion": "帮我判断这份行程预算是否合理。",
+      "quickSuitabilityLabel": "适合我吗？",
+      "quickSuitabilityQuestion": "这份行程是否适合当前偏好？",
+      "quickMealLabel": "餐饮推荐",
+      "quickMealQuestion": "给我一些沿途餐饮建议。",
+      "replyFallback": "暂时没有收到有效回复。",
+      "networkError": "网络请求失败，请稍后重试。"
+    }
+    }
+}
