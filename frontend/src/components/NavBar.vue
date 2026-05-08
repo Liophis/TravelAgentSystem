@@ -10,11 +10,6 @@
       </button>
 
       <div class="nav-actions">
-        <a-select v-model:value="locale" size="small" class="nav-locale" :aria-label="t('app.language.label')">
-          <a-select-option value="zh-CN">{{ t('app.language.zh') }}</a-select-option>
-          <a-select-option value="ja-JP">{{ t('app.language.ja') }}</a-select-option>
-          <a-select-option value="en-US">{{ t('app.language.en') }}</a-select-option>
-        </a-select>
         <a-button type="primary" class="nav-cta" @click="emit('cta-click')">
           {{ t('nav.cta') }}
         </a-button>
