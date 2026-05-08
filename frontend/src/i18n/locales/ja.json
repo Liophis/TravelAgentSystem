@@ -1,0 +1,119 @@
+{
+  "app": {
+    "title": "Travel Agent System",
+    "brand": "Travel Agent System",
+    "subBrand": "TripStar-inspired travel planning",
+    "badge": "結果を見る",
+    "footerBrand": "Travel Agent System",
+    "footerCopy": "© {year} Travel Agent System. All rights reserved.",
+    "language": {
+      "label": "言語を切り替え",
+      "zh": "中国語",
+      "ja": "日本語",
+      "en": "英語"
+    }
+  },
+  "common": {
+    "viewMore": "もっと見る",
+    "noData": "データがありません",
+    "submit": "送信",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "dayNumber": "{day}日目"
+  },
+  "nav": {
+    "cta": "プランを作成"
+  },
+  "home": {
+    "heroBadge": "TripStar 風のフロントエンド骨組み",
+    "titleLine1": "次の",
+    "titleLine2": "旅の物語を作る",
+    "heroDesc": "TripStar のレイアウト構成に合わせたフロントエンド骨組みです。ランディング、フォーム、結果ページ、多言語を保持し、後で実APIへ接続できます。",
+    "step1": "基本情報",
+    "step2": "好み設定",
+    "step3": "追加要望",
+    "cityLabel": "目的地",
+    "cityPlaceholder": "都市や観光地を入力",
+    "travelDaysLabel": "旅行日数",
+    "travelDaysUnit": "日",
+    "startDateLabel": "開始日",
+    "startDatePlaceholder": "開始日を選択",
+    "endDateLabel": "終了日",
+    "endDatePlaceholder": "終了日を選択",
+    "transportationLabel": "移動手段",
+    "accommodationLabel": "宿泊タイプ",
+    "interestsLabel": "興味タグ",
+    "specialNeedsPlaceholder": "例: 家族向け、予算重視、ゆったり、食と文化を重視",
+    "submit": "旅行案を生成",
+    "submitting": "生成中",
+    "cityRequired": "目的地を入力してください",
+    "startDateRequired": "開始日を選択してください",
+    "endDateRequired": "終了日を選択してください",
+    "transportation": {
+      "public": "公共交通",
+      "drive": "自家用車",
+      "walk": "徒歩",
+      "mixed": "複合"
+    },
+    "accommodation": {
+      "budget": "エコノミーホテル",
+      "comfort": "快適ホテル",
+      "luxury": "高級ホテル",
+      "homestay": "民宿"
+    },
+    "interests": {
+      "history": "歴史文化",
+      "nature": "自然景観",
+      "food": "グルメ",
+      "shopping": "ショッピング",
+      "art": "アート",
+      "leisure": "リラックス"
+    }
+  },
+  "result": {
+    "side": {
+      "overview": "概要",
+      "budget": "予算",
+      "map": "地図",
+      "days": "日程",
+      "graph": "知識グラフ",
+      "weather": "天気"
+    },
+    "editTrip": "旅程を編集",
+    "saveChanges": "保存",
+    "cancelEdit": "編集をキャンセル",
+    "exportTrip": "エクスポート",
+    "exportImage": "画像として出力",
+    "exportPdf": "PDFとして出力",
+    "dateRange": "{start} - {end}",
+    "overview": {
+      "title": "旅程概要",
+      "subtitle": "上位結果の表示エリア",
+      "empty": "表示できる旅程データがまだありません。"
+    },
+    "budget": {
+      "title": "予算概要",
+      "attraction": "観光",
+      "hotel": "宿泊",
+      "meal": "食事",
+      "transport": "交通"
+    },
+    "chat": {
+      "welcome": "インテリジェントチャットは準備完了です。後でバックエンド API に接続できます。",
+      "placeholder": "旅のアシスタントに質問...",
+      "quickPriceLabel": "予算は妥当？",
+      "quickPriceQuestion": "この旅程予算が妥当かどうか判断してください。",
+      "quickSuitabilityLabel": "自分に合う？",
+      "quickSuitabilityQuestion": "この旅程は私の好みに合っていますか？",
+      "quickMealLabel": "食事の提案",
+      "quickMealQuestion": "ルート沿いの食事候補を教えてください。",
+      "replyFallback": "有効な返信を受け取れませんでした。",
+      "networkError": "ネットワークエラーが発生しました。後でもう一度お試しください。"
+    }
+  },
+  "app": {
+    "language": {
+      "label": "言語"
+    }
+  }
+}
