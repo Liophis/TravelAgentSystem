@@ -4,7 +4,7 @@
       <a-layout-header class="shell-header">
         <div class="shell-header-inner">
           <button type="button" class="brand" @click="$router.push('/')">
-            <span class="brand-mark">TS</span>
+            <img src="/brand-placeholder.svg" alt="TS" class="brand-mark" />
             <span class="brand-copy">
               <strong>{{ t('app.brand') }}</strong>
               <small>{{ t('app.subBrand') }}</small>
