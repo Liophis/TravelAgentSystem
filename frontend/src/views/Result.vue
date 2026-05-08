@@ -1,6 +1,6 @@
 <template>
   <main class="result-page">
-    <NavBar @brand-click="goHome" @cta-click="goHome" />
+    <!-- Header is provided by App.vue; remove duplicate NavBar to avoid UI duplication -->
 
     <div class="result-shell">
       <section class="result-hero">
@@ -73,7 +73,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import NavBar from '@/components/NavBar.vue'
+// NavBar removed to prevent duplicate header
 import AIChat from '@/components/AIChat.vue'
 import OverviewAttractionCard from '@/components/OverviewAttractionCard.vue'
 import type { ChatMessage } from '@/types'

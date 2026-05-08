@@ -1,6 +1,6 @@
 <template>
   <main class="landing-page">
-    <NavBar @brand-click="scrollToTop" @cta-click="scrollToForm" />
+    <!-- Header is provided by App.vue; remove duplicate NavBar to avoid UI duplication -->
 
     <section class="landing-hero">
       <div class="landing-hero-inner">
@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import NavBar from '@/components/NavBar.vue'
+// NavBar removed to prevent duplicate header
 import Home from './Home.vue'
 
 const { t } = useI18n()
