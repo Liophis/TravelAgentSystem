@@ -4,15 +4,21 @@ export interface Location {
 }
 
 export interface Attraction {
+  id: number
   name: string
+  type?: string
+  category?: string
   address: string
   location: Location
+  latitude?: number
+  longitude?: number
   visit_duration: number
   description: string
-  category?: string
   rating?: number
   image_url?: string
   ticket_price?: number
+  estimated_cost?: number
+  dayArrayIndex?: number
 }
 
 export interface Meal {
@@ -41,6 +47,17 @@ export interface Budget {
   total_meals: number
   total_transportation: number
   total: number
+}
+
+export interface RequestSummary {
+  city: string
+  travel_days: number
+  transportation: string
+  accommodation: string
+  preferences: string[]
+  free_text_input: string
+  data_mode: 'city_match' | 'sample_fallback'
+  data_note: string
 }
 
 export interface DayPlan {
@@ -72,6 +89,7 @@ export interface TripPlan {
   weather_info: WeatherInfo[]
   overall_suggestions: string
   budget?: Budget
+  request_summary?: RequestSummary
 }
 
 export interface TripFormData {
@@ -129,6 +147,7 @@ export interface RuntimeSettingsResponse {
 export interface PoiSummary {
   id: number
   name: string
+  city: string
   type: string
   latitude: number
   longitude: number

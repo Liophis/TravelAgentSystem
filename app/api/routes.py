@@ -1,9 +1,12 @@
+from datetime import datetime, timedelta
+from math import asin, cos, radians, sin, sqrt
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
+from app.core.heap import top_k
 from app.db import crud
 from app.db.database import get_db, SessionLocal
 from app.config import get_runtime_settings, update_runtime_settings
@@ -42,6 +45,190 @@ class RuntimeSettingsPayload(BaseModel):
     openai_base_url: Optional[str] = Field(default=None, description="OpenAI Base URL")
     openai_model: Optional[str] = Field(default=None, description="OpenAI Model")
     log_level: Optional[str] = Field(default=None, description="Log level")
+
+
+INTEREST_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "历史文化": ("历史", "文化", "博物", "皇家", "建筑", "故宫", "长城", "广场"),
+    "自然风光": ("自然", "风景", "公园", "园林", "长城"),
+    "美食": ("美食", "餐", "小吃"),
+    "购物": ("购物", "商场", "市集"),
+    "艺术": ("艺术", "展览", "博物"),
+    "休闲": ("休闲", "公园", "动物园", "漫步"),
+}
+
+CITY_ALIASES: dict[str, tuple[str, ...]] = {
+    "beijing": ("beijing", "北京"),
+    "tokyo": ("tokyo", "东京"),
+    "xi'an": ("xian", "xi'an", "西安"),
+}
+
+
+def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    dlat = radians(lat2 - lat1)
+    dlon = radians(lon2 - lon1)
+    a = sin(dlat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    return 6371.0 * c
+
+
+def _expand_city_tokens(city: str) -> set[str]:
+    normalized = city.strip().lower()
+    tokens = {normalized, city.strip()}
+    aliases = CITY_ALIASES.get(normalized, ())
+    tokens.update(aliases)
+    return {token for token in tokens if token}
+
+
+def _normalize_preference_tokens(preferences: list[str] | None, free_text_input: str | None) -> list[str]:
+    tokens = list(preferences or [])
+    if free_text_input:
+        tokens.extend(part for part in free_text_input.replace("，", " ").replace(",", " ").split() if part)
+    return tokens
+
+
+def _score_poi_for_trip(poi, city: str, preference_tokens: list[str]) -> float:
+    haystack = " ".join(filter(None, [poi.name, poi.type, poi.description or ""])).lower()
+    score = 20.0
+
+    city_tokens = _expand_city_tokens(city)
+    if any(token.lower() in haystack for token in city_tokens):
+        score += 50.0
+
+    for token in preference_tokens:
+        token_lower = token.lower()
+        if token_lower in haystack:
+            score += 20.0
+
+        for interest, keywords in INTEREST_KEYWORDS.items():
+            if interest == token and any(keyword.lower() in haystack for keyword in keywords):
+                score += 18.0
+
+    if poi.type in {"景区", "景点"}:
+        score += 8.0
+    elif poi.type in {"公园", "动物园"}:
+        score += 5.0
+
+    score += max(0.0, 3.0 - poi.id * 0.01)
+    return score
+
+
+def _order_pois_for_route(pois: list[object], score_map: dict[int, float]) -> list[object]:
+    if not pois:
+        return []
+
+    remaining = list(pois)
+    remaining.sort(key=lambda item: score_map.get(item.id, 0.0), reverse=True)
+    ordered = [remaining.pop(0)]
+
+    while remaining:
+        current = ordered[-1]
+        next_poi = min(
+            remaining,
+            key=lambda item: _haversine_km(current.latitude, current.longitude, item.latitude, item.longitude),
+        )
+        ordered.append(next_poi)
+        remaining.remove(next_poi)
+
+    return ordered
+
+
+def _build_trip_attraction(poi, city: str) -> dict:
+    return {
+        "id": poi.id,
+        "name": poi.name,
+        "type": poi.type,
+        "category": poi.type,
+        "address": f"{city} · {poi.name}",
+        "latitude": poi.latitude,
+        "longitude": poi.longitude,
+        "location": {
+            "latitude": poi.latitude,
+            "longitude": poi.longitude,
+        },
+        "visit_duration": 90,
+        "description": poi.description or "暂无景点描述",
+        "ticket_price": 80 if poi.type in {"景区", "景点"} else 50,
+        "estimated_cost": 80 if poi.type in {"景区", "景点"} else 50,
+    }
+
+
+def _estimate_trip_budget(days: list[dict], accommodation: str, transportation: str) -> dict:
+    accommodation_cost_map = {
+        "经济型酒店": 220,
+        "舒适型酒店": 360,
+        "豪华酒店": 680,
+        "民宿": 300,
+    }
+    transportation_multiplier = {
+        "步行": 0.3,
+        "公共交通": 0.8,
+        "自驾": 1.3,
+        "混合": 1.0,
+    }
+
+    total_attractions = int(
+        sum(attraction.get("ticket_price", 0) for day in days for attraction in day.get("attractions", []))
+    )
+    total_meals = len(days) * 120
+    total_hotels = len(days) * accommodation_cost_map.get(accommodation, 300)
+
+    total_distance = 0.0
+    for day in days:
+        attractions = day.get("attractions", [])
+        for current, nxt in zip(attractions, attractions[1:]):
+            total_distance += _haversine_km(
+                current["latitude"],
+                current["longitude"],
+                nxt["latitude"],
+                nxt["longitude"],
+            )
+
+    total_transportation = int(max(30, total_distance * 12 * transportation_multiplier.get(transportation, 1.0)))
+    total = total_attractions + total_hotels + total_meals + total_transportation
+
+    return {
+        "total_attractions": total_attractions,
+        "total_hotels": total_hotels,
+        "total_meals": total_meals,
+        "total_transportation": total_transportation,
+        "total": total,
+    }
+
+
+def _build_trip_suggestion(city: str, selected_pois: list[object], requested_city_matched: bool) -> str:
+    attraction_names = "、".join(poi.name for poi in selected_pois[:4]) if selected_pois else "暂无景点"
+    if requested_city_matched:
+        return f"本次为你优先围绕 {city} 生成了轻量行程，重点包含 {attraction_names}。"
+    return (
+        f"当前本地样例数据暂未完整覆盖 {city}，系统已使用现有景点样例为你生成可演示闭环。"
+        f" 当前重点景点包括 {attraction_names}。"
+    )
+
+
+def _build_request_summary(
+    *,
+    city: str,
+    actual_days: int,
+    transportation: str,
+    accommodation: str,
+    preferences: list[str] | None,
+    free_text_input: str | None,
+    requested_city_matched: bool,
+) -> dict:
+    return {
+        "city": city,
+        "travel_days": actual_days,
+        "transportation": transportation,
+        "accommodation": accommodation,
+        "preferences": preferences or [],
+        "free_text_input": free_text_input or "",
+        "data_mode": "city_match" if requested_city_matched else "sample_fallback",
+        "data_note": (
+            f"已按 {city} 本地样例景点生成计划。"
+            if requested_city_matched
+            else f"{city} 当前没有完整本地景点库，已回退到现有样例数据生成计划。"
+        ),
+    }
 
 
 @router.on_event("startup")
@@ -86,6 +273,7 @@ def list_pois(skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=1000)
             POISchema(
                 id=poi.id,
                 name=poi.name,
+                city=poi.city,
                 type=poi.type,
                 latitude=poi.latitude,
                 longitude=poi.longitude,
@@ -145,76 +333,97 @@ def generate_trip(
     travel_days: int = Query(1, ge=1),
     transportation: str = Query(None),
     accommodation: str = Query(None),
-    preferences: str | None = Query(None),
+    preferences: list[str] | None = Query(None),
     free_text_input: str | None = Query(None),
     db: Session = Depends(get_db),
 ):
-    """Generate a simple trip plan with real POI data from database.
+    """Generate a lightweight real trip plan from current local POI data."""
+    pois = crud.get_all_pois(db, skip=0, limit=200)
+    if not pois:
+        raise HTTPException(status_code=404, detail="No POI data available")
 
-    This endpoint fetches POIs from DB and creates a demo plan with attractions.
-    Can be enhanced later to use `POIService`, `RouteService` and external
-    LLM/knowledge graph services.
-    """
-    # Load POIs from database to populate attractions
-    pois = crud.get_all_pois(db, skip=0, limit=10)
-    attractions = [
-        {
-            "id": poi.id,
-            "name": poi.name,
-            "type": poi.type,
-            "latitude": poi.latitude,
-            "longitude": poi.longitude,
-            "description": poi.description,
-        }
-        for poi in pois
+    try:
+        parsed_start = datetime.strptime(start_date, "%Y-%m-%d")
+        parsed_end = datetime.strptime(end_date, "%Y-%m-%d")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail="Invalid date format, expected YYYY-MM-DD") from exc
+
+    requested_days = max(1, travel_days)
+    date_span_days = max(1, (parsed_end - parsed_start).days + 1)
+    actual_days = min(requested_days, date_span_days)
+
+    preference_tokens = _normalize_preference_tokens(preferences, free_text_input)
+    city_tokens = _expand_city_tokens(city)
+    city_matched_pois = [
+        poi for poi in pois
+        if poi.city.lower() in {token.lower() for token in city_tokens}
     ]
-    
-    # Distribute attractions across days
-    attractions_per_day = max(1, len(attractions) // travel_days)
-    days = []
-    
-    from datetime import datetime, timedelta
-    current_date = datetime.strptime(start_date, "%Y-%m-%d")
-    
-    for day_idx in range(travel_days):
-        day_attractions = attractions[day_idx * attractions_per_day : (day_idx + 1) * attractions_per_day]
-        # If last day, include remaining attractions
-        if day_idx == travel_days - 1:
-            day_attractions = attractions[day_idx * attractions_per_day :]
-        
+    candidate_pois = city_matched_pois or pois
+    requested_city_matched = bool(city_matched_pois)
+
+    scored_candidates = [
+        (_score_poi_for_trip(poi, city, preference_tokens), poi)
+        for poi in candidate_pois
+    ]
+    selected_count = min(len(candidate_pois), max(actual_days * 2, actual_days))
+    selected_ranked = top_k(scored_candidates, selected_count)
+    selected_pois = [poi for _, poi in selected_ranked]
+    score_map = {poi.id: score for score, poi in selected_ranked}
+    ordered_pois = _order_pois_for_route(selected_pois, score_map)
+
+    bucket_sizes = [len(ordered_pois) // actual_days] * actual_days
+    for index in range(len(ordered_pois) % actual_days):
+        bucket_sizes[index] += 1
+
+    days: list[dict] = []
+    cursor = 0
+    current_date = parsed_start
+    normalized_transportation = transportation or "混合"
+    normalized_accommodation = accommodation or "舒适型酒店"
+
+    for day_index, bucket_size in enumerate(bucket_sizes):
+        day_pois = ordered_pois[cursor: cursor + bucket_size]
+        cursor += bucket_size
+        attractions = [_build_trip_attraction(poi, city) for poi in day_pois]
+        attraction_names = "、".join(item["name"] for item in attractions) if attractions else "自由活动"
+
         days.append({
             "date": current_date.strftime("%Y-%m-%d"),
-            "day_index": day_idx,
-            "description": f"第 {day_idx + 1} 天: 游览 {len(day_attractions)} 个景点",
-            "transportation": transportation or "混合",
-            "accommodation": accommodation or "舒适型酒店",
-            "attractions": day_attractions,
+            "day_index": day_index,
+            "description": f"第 {day_index + 1} 天重点安排：{attraction_names}",
+            "transportation": normalized_transportation,
+            "accommodation": normalized_accommodation,
+            "attractions": attractions,
             "meals": [],
         })
-        
         current_date += timedelta(days=1)
-    
-    # Build response
-    demo = {
+
+    budget = _estimate_trip_budget(days, normalized_accommodation, normalized_transportation)
+    overall_suggestions = _build_trip_suggestion(city, ordered_pois, requested_city_matched)
+    request_summary = _build_request_summary(
+        city=city,
+        actual_days=actual_days,
+        transportation=normalized_transportation,
+        accommodation=normalized_accommodation,
+        preferences=preferences,
+        free_text_input=free_text_input,
+        requested_city_matched=requested_city_matched,
+    )
+
+    return {
         "success": True,
         "message": "generated",
         "data": {
             "city": city,
             "start_date": start_date,
             "end_date": end_date,
-            "overall_suggestions": f"这是一个包含 {len(attractions)} 个景点的 {travel_days} 天行程",
+            "overall_suggestions": overall_suggestions,
             "weather_info": [],
-            "budget": {
-                "total_attractions": len(attractions) * 100,
-                "total_hotels": travel_days * 300,
-                "total_meals": travel_days * 100,
-                "total_transportation": 200,
-                "total": len(attractions) * 100 + travel_days * 300 + travel_days * 100 + 200,
-            },
+            "budget": budget,
+            "request_summary": request_summary,
             "days": days,
         },
     }
-    return demo
 
 
 @router.post("/chat/ask", response_model=TripChatResponse, tags=["Trip Chat"])

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 from dotenv import load_dotenv
-from pydantic import AliasChoices, Field
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -48,6 +48,19 @@ class Settings(BaseSettings):
     openai_base_url: str = Field(default="https://api.openai.com/v1", validation_alias=AliasChoices("OPENAI_BASE_URL", "LLM_BASE_URL"))
     openai_model: str = Field(default="gpt-4o-mini", validation_alias=AliasChoices("OPENAI_MODEL", "LLM_MODEL_ID"))
     log_level: str = "INFO"
+
+    @field_validator("debug", mode="before")
+    @classmethod
+    def normalize_debug_value(cls, value: Any) -> Any:
+        if isinstance(value, bool):
+            return value
+
+        normalized = str(value).strip().lower()
+        if normalized in {"1", "true", "yes", "on", "debug", "dev", "development"}:
+            return True
+        if normalized in {"0", "false", "no", "off", "release", "prod", "production", ""}:
+            return False
+        return value
 
     def get_cors_origins_list(self) -> list[str]:
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]

@@ -19,9 +19,6 @@ const normalizeBaseUrl = (value: string | null | undefined): string => normalize
 const resolveDefaultApiBaseUrl = (): string => {
   const fromEnv = normalizeBaseUrl(apiBase)
   if (fromEnv) return fromEnv
-  if (typeof window !== 'undefined' && window.location) {
-    return normalizeBaseUrl(window.location.origin) || ''
-  }
   return 'http://localhost:8000'
 }
 

@@ -59,7 +59,7 @@ TravelAgentSystem/
 ├── requirements.txt            # Python 依赖列表
 ├── docker-compose.yaml         # Docker 组合配置
 ├── Dockerfile                  # Docker 镜像定义
-├── start.sh                    # 启动脚本
+├── start.sh                    # 启动脚本（当前使用 uvicorn 启动 app.main:app）
 ├── .env                        # 环境变量模板（已脱敏）
 ├── .env.example                # 环境变量示例
 ├── .gitignore                  # Git 忽略规则
