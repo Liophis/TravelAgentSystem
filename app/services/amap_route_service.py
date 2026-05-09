@@ -98,34 +98,54 @@ class AmapRouteService:
 
             print(f"✅ 路线规划成功: {distance}m, {duration}秒, {len(steps)} 步")
 
-            # 从 steps 中提取所有的转折点坐标
+            # 关键优化：只提取每个 step 的关键点（起始点），而不是 polyline 中的所有坐标
+            # 这样可以将 900+ 个点减少到 50-100 个关键转折点
             waypoints = []
             
             # 添加起点
             waypoints.append({
                 "lng": start_lon,
                 "lat": start_lat,
-                "action": "开始"
+                "action": "开始",
+                "distance": 0,
+                "duration": 0
             })
 
-            # 从每个 step 中提取转折点
+            # 从每个 step 中智能提取关键点
+            accumulated_distance = 0
+            accumulated_duration = 0
+            
             for step_idx, step in enumerate(steps):
                 polyline = step.get("polyline", "")
+                instruction = step.get("instruction", "")
+                step_distance = int(step.get("distance", 0))
+                step_duration = int(step.get("duration", 0))
+                
+                accumulated_distance += step_distance
+                accumulated_duration += step_duration
+                
                 if polyline:
                     coords = polyline.split(";")
-                    for coord_idx, coord in enumerate(coords):
+                    # 只提取每个 step 的第一个和最后一个点（关键转折点）
+                    key_coords = [coords[0]] if coords else []
+                    if len(coords) > 1:
+                        key_coords.append(coords[-1])
+                    
+                    for coord in key_coords:
                         if "," in coord:
                             parts = coord.split(",")
                             if len(parts) >= 2:
                                 try:
                                     lat = float(parts[0])
                                     lng = float(parts[1])
-                                    # 避免重复
+                                    # 避免重复和微小的移动
                                     if not waypoints or (waypoints[-1]["lat"], waypoints[-1]["lng"]) != (lat, lng):
                                         waypoints.append({
                                             "lat": lat,
                                             "lng": lng,
-                                            "action": step.get("instruction", f"Step {step_idx + 1}")
+                                            "action": instruction or f"转向点 {len(waypoints)}",
+                                            "distance": step_distance,
+                                            "duration": step_duration
                                         })
                                 except ValueError:
                                     pass
@@ -135,10 +155,12 @@ class AmapRouteService:
                 waypoints.append({
                     "lng": end_lon,
                     "lat": end_lat,
-                    "action": "到达"
+                    "action": "到达",
+                    "distance": 0,
+                    "duration": 0
                 })
 
-            print(f"📌 提取了 {len(waypoints)} 个途经点")
+            print(f"📌 优化后提取了 {len(waypoints)} 个关键转折点（原始 {len(steps)} 步）")
 
             return {
                 "success": True,

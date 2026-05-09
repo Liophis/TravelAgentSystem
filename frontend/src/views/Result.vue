@@ -149,18 +149,31 @@ const initAMap = async () => {
             path: coords,
             borderWeight: 2,
             strokeColor: '#1890ff',
-            lineJoin: 'round'
+            lineJoin: 'round',
+            isOutline: true,
+            outlineColor: '#ffffff',
+            outlineWeight: 1
           })
           map.value.add(polyline)
 
-          // 为每个途经点添加标记
+          // 优化：只为关键点创建标记（起点、终点、每 10 个点取一个）
+          // 而不是为所有 50+ 个转折点创建标记
+          const keyMarkerIndices = [0, pathNodes.length - 1] // 起点和终点
+          // 添加中间的均匀采样点，每 10 个点取一个
+          for (let i = 10; i < pathNodes.length - 1; i += Math.max(1, Math.floor((pathNodes.length - 2) / 5))) {
+            if (!keyMarkerIndices.includes(i)) {
+              keyMarkerIndices.push(i)
+            }
+          }
+          keyMarkerIndices.sort((a, b) => a - b)
+
           const markers: any[] = []
           const infoWindows: any[] = []
 
-          pathNodes.forEach((node: any, idx: number) => {
+          keyMarkerIndices.forEach((idx: number) => {
+            const node = pathNodes[idx]
             const isStart = idx === 0
             const isEnd = idx === pathNodes.length - 1
-            const color = isStart ? '#00AA00' : isEnd ? '#FF0000' : '#0066CC'
 
             const marker = new AMap.Marker({
               position: [node.longitude, node.latitude],
@@ -174,11 +187,13 @@ const initAMap = async () => {
               // 关闭其他窗口
               infoWindows.forEach((iw: any) => iw.close())
 
-              const content = `<div style="padding:8px;">
-                <div style="font-weight:bold;">${node.name}</div>
-                <div style="font-size:12px; margin-top:4px;">坐标: ${node.latitude.toFixed(4)}, ${node.longitude.toFixed(4)}</div>
-                ${isStart ? '<div style="color:green; font-size:12px;">起点</div>' : ''}
-                ${isEnd ? '<div style="color:red; font-size:12px;">终点</div>' : ''}
+              const content = `<div style="padding:8px; background:#f5f5f5; border-radius:4px;">
+                <div style="font-weight:bold; margin-bottom:4px;">${node.name}</div>
+                <div style="font-size:12px;">Lat: ${node.latitude.toFixed(5)}</div>
+                <div style="font-size:12px;">Lon: ${node.longitude.toFixed(5)}</div>
+                ${node.distance ? `<div style="font-size:12px;">距离: ${node.distance}m</div>` : ''}
+                ${isStart ? '<div style="color:green; font-weight:bold;">📍 起点</div>' : ''}
+                ${isEnd ? '<div style="color:red; font-weight:bold;">🎯 终点</div>' : ''}
               </div>`
 
               const infoWindow = new AMap.InfoWindow({
@@ -193,8 +208,15 @@ const initAMap = async () => {
 
           map.value.add(markers)
 
-          // 自适应视野
-          map.value.setFitView(markers, true, [50, 50, 50, 50])
+          // 自适应视野到折线范围
+          if (markers.length > 0) {
+            map.value.setFitView(markers, true, [50, 50, 50, 50])
+          } else {
+            map.value.setFitView([polyline])
+          }
+
+          // 显示路线统计信息
+          console.log(`✅ 路线绘制完成: ${coords.length} 个点, ${distance.toFixed(2)}km, 约 ${(estimatedHours * 60).toFixed(0)} 分钟`)
         } else if (items.length >= 2) {
           // 降级：只有起终点
           const coords = [[start.longitude, start.latitude], [end.longitude, end.latitude]]
