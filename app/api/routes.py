@@ -177,13 +177,52 @@ def generate_trip(
     free_text_input: str | None = Query(None),
     db: Session = Depends(get_db),
 ):
-    """Generate a simple trip plan. Currently returns a lightweight demo plan.
+    """Generate a simple trip plan with real POI data from database.
 
-    This endpoint is a placeholder that frontend can call. Replace with
-    a richer planner that uses `POIService`, `RouteService` and external
-    LLM/knowledge graph services as needed.
+    This endpoint fetches POIs from DB and creates a demo plan with attractions.
+    Can be enhanced later to use `POIService`, `RouteService` and external
+    LLM/knowledge graph services.
     """
-    # Minimal demo response structure matching frontend expectations
+    # Load POIs from database to populate attractions
+    pois = crud.get_all_pois(db, skip=0, limit=10)
+    attractions = [
+        {
+            "id": poi.id,
+            "name": poi.name,
+            "type": poi.type,
+            "latitude": poi.latitude,
+            "longitude": poi.longitude,
+            "description": poi.description,
+        }
+        for poi in pois
+    ]
+    
+    # Distribute attractions across days
+    attractions_per_day = max(1, len(attractions) // travel_days)
+    days = []
+    
+    from datetime import datetime, timedelta
+    current_date = datetime.strptime(start_date, "%Y-%m-%d")
+    
+    for day_idx in range(travel_days):
+        day_attractions = attractions[day_idx * attractions_per_day : (day_idx + 1) * attractions_per_day]
+        # If last day, include remaining attractions
+        if day_idx == travel_days - 1:
+            day_attractions = attractions[day_idx * attractions_per_day :]
+        
+        days.append({
+            "date": current_date.strftime("%Y-%m-%d"),
+            "day_index": day_idx,
+            "description": f"第 {day_idx + 1} 天: 游览 {len(day_attractions)} 个景点",
+            "transportation": transportation or "混合",
+            "accommodation": accommodation or "舒适型酒店",
+            "attractions": day_attractions,
+            "meals": [],
+        })
+        
+        current_date += timedelta(days=1)
+    
+    # Build response
     demo = {
         "success": True,
         "message": "generated",
@@ -191,26 +230,16 @@ def generate_trip(
             "city": city,
             "start_date": start_date,
             "end_date": end_date,
-            "overall_suggestions": "这是一个来自后端的演示行程（可替换为真实生成器）",
+            "overall_suggestions": f"这是一个包含 {len(attractions)} 个景点的 {travel_days} 天行程",
             "weather_info": [],
             "budget": {
-                "total_attractions": 1000,
-                "total_hotels": 1500,
-                "total_meals": 600,
+                "total_attractions": len(attractions) * 100,
+                "total_hotels": travel_days * 300,
+                "total_meals": travel_days * 100,
                 "total_transportation": 200,
-                "total": 3300,
+                "total": len(attractions) * 100 + travel_days * 300 + travel_days * 100 + 200,
             },
-            "days": [
-                {
-                    "date": start_date,
-                    "day_index": 0,
-                    "description": "到达并简单游览",
-                    "transportation": transportation or "混合",
-                    "accommodation": accommodation or "舒适型酒店",
-                    "attractions": [],
-                    "meals": [],
-                }
-            ],
+            "days": days,
         },
     }
     return demo
