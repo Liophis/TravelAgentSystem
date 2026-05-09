@@ -1,22 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.config import get_settings
+
 from app.api.routes import router
 from app.db.database import engine
 from app.db.models import Base
 
 
 Base.metadata.create_all(bind=engine)
+settings = get_settings()
 
 app = FastAPI(
-    title="Travel Agent System",
+    title=settings.app_name,
     description="Personalized travel planning backend powered by FastAPI.",
-    version="0.1.0",
+    version=settings.app_version,
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.get_cors_origins_list(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

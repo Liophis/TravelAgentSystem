@@ -30,7 +30,7 @@
           <a-button type="default" block @click="emit('quick-question', t('result.chat.quickSuitabilityQuestion'))">
             {{ t('result.chat.quickSuitabilityLabel') }}
           </a-button>
-          <a-button type="primary" block :disabled="!inputValue.trim()" @click="emit('send', inputValue)">
+          <a-button type="primary" block :disabled="!draft.trim()" @click="handleSend">
             {{ t('common.submit') }}
           </a-button>
         </div>
@@ -65,4 +65,11 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const handleSend = () => {
+  const value = draft.value.trim()
+  if (!value) return
+  emit('send', value)
+  draft.value = ''
+}
 </script>
