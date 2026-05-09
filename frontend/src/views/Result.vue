@@ -61,6 +61,38 @@
             <h2>{{ t('result.side.overview') }}</h2>
             <span>{{ dateRangeText }}</span>
           </div>
+          <div v-if="planAvailable" class="overview-hero-grid">
+            <article class="overview-stat-card">
+              <span class="overview-stat-label">城市</span>
+              <strong>{{ requestSummary?.city || plan?.city }}</strong>
+            </article>
+            <article class="overview-stat-card">
+              <span class="overview-stat-label">天数</span>
+              <strong>{{ requestSummary?.travel_days || days.length }} 天</strong>
+            </article>
+            <article class="overview-stat-card">
+              <span class="overview-stat-label">景点数</span>
+              <strong>{{ attractions.length }}</strong>
+            </article>
+            <article class="overview-stat-card">
+              <span class="overview-stat-label">预算</span>
+              <strong>{{ budget ? `¥${budget.total}` : '待生成' }}</strong>
+            </article>
+          </div>
+
+          <div v-if="featuredDays.length > 0" class="overview-day-preview">
+            <article v-for="day in featuredDays" :key="day.day_index" class="overview-day-preview-card">
+              <div class="overview-day-preview-head">
+                <strong>{{ t('common.dayNumber', { day: day.day_index + 1 }) }}</strong>
+                <span>{{ day.date }}</span>
+              </div>
+              <p>{{ day.description }}</p>
+              <div class="overview-day-preview-tags">
+                <span v-for="item in day.attractions.slice(0, 3)" :key="`${day.day_index}-${item.id}`">{{ item.name }}</span>
+              </div>
+            </article>
+          </div>
+
           <div v-if="attractions.length > 0" class="overview-list">
             <OverviewAttractionCard
               v-for="item in attractions"
@@ -172,6 +204,7 @@ const attractions = computed(() => {
 })
 const budget = computed(() => plan.value?.budget)
 const requestSummary = computed(() => plan.value?.request_summary)
+const featuredDays = computed(() => days.value.slice(0, 2))
 const panels = computed<Array<{ key: ResultPanelKey; label: string }>>(() => [
   { key: 'overview', label: t('result.side.overview') },
   { key: 'days', label: t('result.side.days') },
