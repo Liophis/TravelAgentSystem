@@ -14,6 +14,7 @@ class POI(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), unique=True, nullable=False)
+    city = Column(String(100), nullable=False, default="北京", index=True)
     type = Column(String(100), nullable=False)  # e.g., 景区、建筑、餐厅
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)

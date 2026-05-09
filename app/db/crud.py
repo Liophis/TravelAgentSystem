@@ -20,10 +20,16 @@ def get_all_pois(db: Session, skip: int = 0, limit: int = 100) -> list[POI]:
     return db.query(POI).offset(skip).limit(limit).all()
 
 
+def get_pois_by_city(db: Session, city: str, skip: int = 0, limit: int = 100) -> list[POI]:
+    """Get POIs filtered by city."""
+    return db.query(POI).filter(POI.city == city).offset(skip).limit(limit).all()
+
+
 def create_poi(db: Session, poi: POISchema) -> POI:
     """Create and persist a new POI record."""
     db_poi = POI(
         name=poi.name,
+        city=poi.city,
         type=poi.type,
         latitude=poi.latitude,
         longitude=poi.longitude,

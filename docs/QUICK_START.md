@@ -69,12 +69,12 @@ pip install -r requirements.txt
 
 ```bash
 # 从项目根目录运行
-uvicorn app.main:app --reload --port 8001
+uvicorn app.main:app --reload --port 8000
 ```
 
 ### 4. 访问 API
 
-浏览器访问：`http://127.0.0.1:8001/docs`
+浏览器访问：`http://127.0.0.1:8000/docs`
 
 这会打开 FastAPI 的 Swagger UI，可以在线测试所有 API 端点。
 
