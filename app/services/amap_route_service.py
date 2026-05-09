@@ -1,8 +1,10 @@
 """高德地图路线规划服务 - 获取真实的途经点"""
 
-import os
 from typing import Optional
+
 import requests
+
+from app.config import get_settings
 
 
 class AmapRouteService:
@@ -15,16 +17,8 @@ class AmapRouteService:
         Args:
             api_key: 高德地图 Web API Key（可从环境变量或参数获取）
         """
-        # 从 TripStar 同步的 key
-        self.api_key = api_key or os.getenv("AMAP_WEB_API_KEY", "")
-        if not self.api_key:
-            # 如果环境变量没有，尝试从 .env 文件读取
-            try:
-                from app.config import get_settings
-                settings = get_settings()
-                self.api_key = getattr(settings, 'amap_web_api_key', '') or os.getenv("AMAP_WEB_API_KEY", "")
-            except:
-                pass
+        settings = get_settings()
+        self.api_key = api_key or settings.amap_web_api_key or settings.vite_amap_web_js_key
         
         self.base_url = "https://restapi.amap.com/v3/direction/driving"
 
@@ -136,8 +130,9 @@ class AmapRouteService:
                             parts = coord.split(",")
                             if len(parts) >= 2:
                                 try:
-                                    lat = float(parts[0])
-                                    lng = float(parts[1])
+                                    # 高德 polyline 的格式是 "lng,lat"
+                                    lng = float(parts[0])
+                                    lat = float(parts[1])
                                     # 避免重复和微小的移动
                                     if not waypoints or (waypoints[-1]["lat"], waypoints[-1]["lng"]) != (lat, lng):
                                         waypoints.append({

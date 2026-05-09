@@ -107,6 +107,25 @@ export interface TripChatResponse {
   reply: string
 }
 
+export interface RuntimeSettings {
+  api_base_url: string
+  amap_web_api_key: string
+  vite_amap_web_js_key: string
+  google_maps_api_key: string
+  google_maps_proxy: string
+  xhs_cookie: string
+  openai_api_key: string
+  openai_base_url: string
+  openai_model: string
+  log_level?: string
+}
+
+export interface RuntimeSettingsResponse {
+  success: boolean
+  message: string
+  data?: RuntimeSettings
+}
+
 export interface PoiSummary {
   id: number
   name: string

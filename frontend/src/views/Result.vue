@@ -64,7 +64,7 @@
     </div>
 
     <div v-if="showChat" class="chat-drawer">
-      <AIChat :messages="chatMessages" input-value="" @close="showChat = false" @send="noop" @quick-question="noop" />
+      <AIChat :messages="chatMessages" input-value="" @close="showChat = false" @send="sendChat" @quick-question="handleQuickQuestion" />
     </div>
   </main>
 </template>
@@ -76,17 +76,17 @@ import { useI18n } from 'vue-i18n'
 // NavBar removed to prevent duplicate header
 import AIChat from '@/components/AIChat.vue'
 import OverviewAttractionCard from '@/components/OverviewAttractionCard.vue'
-import type { ChatMessage } from '@/types'
+import type { ChatMessage, TripPlan } from '@/types'
 
 const router = useRouter()
 const { t } = useI18n()
 const showChat = ref(false)
 const chatMessages = ref<ChatMessage[]>([])
+const chatPending = ref(false)
 
 import { getCurrentPlan, setCurrentPlan } from '@/services/store'
-import { generateDemoPlan } from '@/services/api'
+import { askTripChat, findRoute, generateDemoPlan, listPois } from '@/services/api'
 import AMapLoader from '@amap/amap-jsapi-loader'
-import axios from 'axios'
 
 const planRef = getCurrentPlan()
 
@@ -106,13 +106,46 @@ const days = computed(() => {
 const goHome = () => void router.push('/')
 const noop = () => undefined
 
+const sendChat = async (message: string) => {
+  const content = message.trim()
+  if (!content || !planRef.value || chatPending.value) return
+
+  chatMessages.value.push({ role: 'user', content })
+  chatPending.value = true
+
+  try {
+    const response = await askTripChat({
+      message: content,
+      trip_plan: planRef.value,
+      history: chatMessages.value,
+    })
+
+    chatMessages.value.push({
+      role: 'assistant',
+      content: response.reply || '暂时没有生成回复，请稍后再试。',
+    })
+  } catch (error) {
+    console.error('[AI Chat] 请求失败:', error)
+    chatMessages.value.push({
+      role: 'assistant',
+      content: '当前问答服务暂时不可用，请稍后重试。',
+    })
+  } finally {
+    chatPending.value = false
+  }
+}
+
+const handleQuickQuestion = (message: string) => {
+  void sendChat(message)
+}
+
 const map = ref<any>(null)
 
 const initAMap = async () => {
   await nextTick()
   const mapJsKey = import.meta.env.VITE_AMAP_WEB_JS_KEY || ''
   if (!mapJsKey) {
-    console.error('高德地图 JS Key 未配置，请在 .env 中设置 VITE_AMAP_WEB_JS_KEY')
+    console.error('高德地图 JS Key 未配置，请在 .env.local 中设置 VITE_AMAP_WEB_JS_KEY')
     return
   }
 
@@ -134,11 +167,11 @@ const initAMap = async () => {
       const start = items[0]
       const end = items[items.length - 1]
       try {
-        const res = await axios.get(`/api/routes/${start.id}/${end.id}`)
-        const pathNodes = res.data.path_nodes || []
-        const distance = res.data.distance || 0
-        const estimatedHours = res.data.estimated_time_hours || 0
-        const source = res.data.source || 'unknown'
+        const res = await findRoute(start.id, end.id)
+        const pathNodes = (res as any).path_nodes || []
+        const distance = (res as any).distance || 0
+        const estimatedHours = (res as any).estimated_time_hours || 0
+        const source = (res as any).source || 'unknown'
 
         console.log(`[路线规划] 来源: ${source}, 距离: ${distance}km, 耗时: ${estimatedHours}h, 途经点: ${pathNodes.length}`)
 
@@ -248,16 +281,21 @@ onMounted(() => {
           const hasAttractions = Array.isArray(res.data.days) && res.data.days.some((d: any) => (d.attractions || []).length > 0)
           if (!hasAttractions) {
             // fetch first two POIs from API and build a tiny plan
-            return axios.get('/api/pois?skip=0&limit=2').then((r) => {
-              const pois = r.data.items || r.data || []
+            return listPois({ skip: 0, limit: 2 }).then((pois) => {
               if (Array.isArray(pois) && pois.length >= 2) {
                 const demo = {
                   city: 'DemoCity',
                   start_date: '2026-05-01',
                   end_date: '2026-05-02',
+                  weather_info: [],
+                  overall_suggestions: 'Demo plan generated locally for route preview.',
                   days: [
                     {
+                      date: '2026-05-01',
                       day_index: 0,
+                      description: 'Local demo itinerary for route preview.',
+                      transportation: 'Walk',
+                      accommodation: 'Demo hotel',
                       attractions: [
                         {
                           id: pois[0].id,
@@ -272,9 +310,10 @@ onMounted(() => {
                           longitude: pois[1].longitude,
                         },
                       ],
+                      meals: [],
                     },
                   ],
-                }
+                } as unknown as TripPlan
                 setCurrentPlan(demo)
                 initAMap()
                 return

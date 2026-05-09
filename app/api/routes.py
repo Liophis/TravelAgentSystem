@@ -1,32 +1,47 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.db import crud
 from app.db.database import get_db, SessionLocal
+from app.config import get_runtime_settings, update_runtime_settings
 from app.models import (
+    TripChatRequest,
+    TripChatResponse,
     POISchema,
     POIListResponse,
-    UserSchema,
-    TravelDiarySchema,
-    TravelDiaryListResponse,
 )
 
 from app.services import (
+    answer_trip_question,
     POIService,
     RouteService,
-    RecommendationService,
-    DiaryService,
 )
 
 router = APIRouter(prefix="/api", tags=["Travel System API"])
 
 # Initialize services
 poi_service = POIService()
-diary_service = DiaryService()
-recommendation_service = RecommendationService()
 
 # Initialize route service with global graph
 route_service = RouteService(poi_service.graph)
+
+
+class RuntimeSettingsPayload(BaseModel):
+    """Runtime settings editable from the frontend."""
+
+    api_base_url: Optional[str] = Field(default=None, description="Frontend API base URL")
+    amap_web_api_key: Optional[str] = Field(default=None, description="AMap Web Service Key")
+    vite_amap_web_js_key: Optional[str] = Field(default=None, description="AMap Web JS Key")
+    google_maps_api_key: Optional[str] = Field(default=None, description="Google Maps API Key")
+    google_maps_proxy: Optional[str] = Field(default=None, description="Google Maps Proxy")
+    xhs_cookie: Optional[str] = Field(default=None, description="XHS Cookie")
+    openai_api_key: Optional[str] = Field(default=None, description="OpenAI API Key")
+    openai_base_url: Optional[str] = Field(default=None, description="OpenAI Base URL")
+    openai_model: Optional[str] = Field(default=None, description="OpenAI Model")
+    log_level: Optional[str] = Field(default=None, description="Log level")
 
 
 @router.on_event("startup")
@@ -38,6 +53,26 @@ async def startup_event(db: Session = Depends(get_db)):
         poi_service.initialize_poi_index(db)
     finally:
         db.close()
+
+
+# ==================== Runtime Settings ====================
+@router.get("/settings")
+def read_runtime_settings():
+    return {
+        "success": True,
+        "message": "ok",
+        "data": get_runtime_settings(),
+    }
+
+
+@router.put("/settings")
+def save_runtime_settings(payload: RuntimeSettingsPayload):
+    updated = update_runtime_settings(payload.model_dump(exclude_unset=True))
+    return {
+        "success": True,
+        "message": "配置已保存并立即生效",
+        "data": updated,
+    }
 
 
 # ==================== POI Endpoints ====================
@@ -101,70 +136,7 @@ def find_route(start_poi_id: int, end_poi_id: int, db: Session = Depends(get_db)
     return route
 
 
-# ==================== User Endpoints ====================
-@router.post("/users", response_model=UserSchema, tags=["User"])
-def create_user(user: UserSchema, db: Session = Depends(get_db)):
-    """Create a new user"""
-    existing = crud.get_user_by_username(db, user.username)
-    if existing:
-        raise HTTPException(status_code=400, detail="Username already exists")
-    return crud.create_user(db, user)
-
-
-@router.get("/users/{user_id}", response_model=UserSchema, tags=["User"])
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    """Get user details by ID"""
-    user = crud.get_user_by_id(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return UserSchema.from_attributes(user) if hasattr(user, "__dict__") else user
-
-
-# ==================== Diary Endpoints ====================
-@router.post("/diaries", response_model=TravelDiarySchema, tags=["Diary"])
-def create_diary(
-    user_id: int = Query(..., gt=0),
-    title: str = Query(..., min_length=1),
-    content: str = Query(..., min_length=1),
-    poi_id: int = Query(None),
-    db: Session = Depends(get_db),
-):
-    """Create a new travel diary"""
-    return diary_service.create_diary(db, user_id, title, content, poi_id)
-
-
-@router.get("/diaries/{user_id}", response_model=TravelDiaryListResponse, tags=["Diary"])
-def get_user_diaries(
-    user_id: int,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    db: Session = Depends(get_db),
-):
-    """Get all diaries for a user"""
-    diaries = diary_service.get_user_diaries(db, user_id, skip, limit)
-    return TravelDiaryListResponse(total=len(diaries), items=diaries)
-
-
-@router.get("/diaries/{user_id}/search", response_model=list[TravelDiarySchema], tags=["Diary"])
-def search_diaries(user_id: int, keyword: str = Query(..., min_length=1), db: Session = Depends(get_db)):
-    """Search diaries by keyword"""
-    return diary_service.search_diary_by_keyword(db, user_id, keyword)
-
-
-# ==================== Recommendation Endpoints ====================
-@router.get("/recommendations/top-k", response_model=list[dict], tags=["Recommendation"])
-def get_top_pois(k: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
-    """Get Top-K POIs by score"""
-    return recommendation_service.get_top_k_pois(db, k)
-
-
-@router.get("/recommendations/users/{user_id}", response_model=list[dict], tags=["Recommendation"])
-def recommend_for_user(user_id: int, k: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
-    """Get personalized recommendations for a user"""
-    return recommendation_service.recommend_by_interest(db, user_id, k)
-
-
-# ==================== Trip Generation Endpoint (simple)
+# ==================== Trip Generation Endpoint ====================
 @router.post("/trips", tags=["Trip"])
 def generate_trip(
     city: str = Query(...),
@@ -243,3 +215,14 @@ def generate_trip(
         },
     }
     return demo
+
+
+@router.post("/chat/ask", response_model=TripChatResponse, tags=["Trip Chat"])
+def ask_trip_chat(payload: TripChatRequest):
+    """Answer follow-up questions based on the current trip plan."""
+    reply = answer_trip_question(
+        message=payload.message,
+        trip_plan=payload.trip_plan,
+        history=[item.model_dump() for item in payload.history],
+    )
+    return TripChatResponse(success=True, reply=reply)
