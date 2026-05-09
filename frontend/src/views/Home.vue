@@ -4,15 +4,6 @@
     <div class="hero-glow hero-glow-b"></div>
 
     <div class="hero-content">
-      <div class="hero-copy">
-        <span class="hero-badge">{{ t('home.heroBadge') }}</span>
-        <h1>
-          <span>{{ t('home.titleLine1') }}</span>
-          <strong>{{ t('home.titleLine2') }}</strong>
-        </h1>
-        <p>{{ t('home.heroDesc') }}</p>
-      </div>
-
       <a-card class="hero-card" :bordered="false">
         <a-form layout="vertical" :model="formData" @finish="handleSubmit">
           <div class="grid grid-2">
