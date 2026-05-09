@@ -346,6 +346,50 @@ select {
   margin-bottom: 24px;
 }
 
+.result-summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.summary-chip {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(125, 211, 252, 0.2);
+  color: var(--text-strong);
+  font-size: 13px;
+}
+
+.summary-chip.soft {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.18);
+}
+
+.result-note-card {
+  border: 1.2px solid rgba(236, 243, 250, 0.16);
+  background: rgba(12, 23, 32, 0.42);
+  border-radius: 18px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+}
+
+.result-note-card strong {
+  display: block;
+  color: var(--text-strong);
+  margin-bottom: 8px;
+}
+
+.result-note-card p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.result-note-card p + p {
+  margin-top: 8px;
+}
+
 .result-actions {
   display: flex;
   gap: 12px;
@@ -384,6 +428,11 @@ select {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
+}
+
+.result-empty,
+.budget-summary p {
+  line-height: 1.7;
 }
 
 .overview-card {

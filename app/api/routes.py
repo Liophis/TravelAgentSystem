@@ -205,6 +205,32 @@ def _build_trip_suggestion(city: str, selected_pois: list[object], requested_cit
     )
 
 
+def _build_request_summary(
+    *,
+    city: str,
+    actual_days: int,
+    transportation: str,
+    accommodation: str,
+    preferences: list[str] | None,
+    free_text_input: str | None,
+    requested_city_matched: bool,
+) -> dict:
+    return {
+        "city": city,
+        "travel_days": actual_days,
+        "transportation": transportation,
+        "accommodation": accommodation,
+        "preferences": preferences or [],
+        "free_text_input": free_text_input or "",
+        "data_mode": "city_match" if requested_city_matched else "sample_fallback",
+        "data_note": (
+            f"已按 {city} 本地样例景点生成计划。"
+            if requested_city_matched
+            else f"{city} 当前没有完整本地景点库，已回退到现有样例数据生成计划。"
+        ),
+    }
+
+
 @router.on_event("startup")
 async def startup_event(db: Session = Depends(get_db)):
     """Initialize indexes and data structures on startup"""
@@ -374,6 +400,15 @@ def generate_trip(
 
     budget = _estimate_trip_budget(days, normalized_accommodation, normalized_transportation)
     overall_suggestions = _build_trip_suggestion(city, ordered_pois, requested_city_matched)
+    request_summary = _build_request_summary(
+        city=city,
+        actual_days=actual_days,
+        transportation=normalized_transportation,
+        accommodation=normalized_accommodation,
+        preferences=preferences,
+        free_text_input=free_text_input,
+        requested_city_matched=requested_city_matched,
+    )
 
     return {
         "success": True,
@@ -385,6 +420,7 @@ def generate_trip(
             "overall_suggestions": overall_suggestions,
             "weather_info": [],
             "budget": budget,
+            "request_summary": request_summary,
             "days": days,
         },
     }

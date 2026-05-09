@@ -13,6 +13,20 @@
         </div>
       </section>
 
+      <section v-if="requestSummary" class="result-summary-strip">
+        <div class="summary-chip">{{ requestSummary.city }}</div>
+        <div class="summary-chip">{{ requestSummary.travel_days }} 天</div>
+        <div class="summary-chip">{{ requestSummary.transportation }}</div>
+        <div class="summary-chip">{{ requestSummary.accommodation }}</div>
+        <div v-for="preference in requestSummary.preferences" :key="preference" class="summary-chip soft">{{ preference }}</div>
+      </section>
+
+      <section v-if="requestSummary" class="result-note-card">
+        <strong>数据说明</strong>
+        <p>{{ requestSummary.data_note }}</p>
+        <p v-if="requestSummary.free_text_input">额外需求：{{ requestSummary.free_text_input }}</p>
+      </section>
+
       <section class="result-grid">
         <a-card class="result-panel overview-panel" :bordered="false">
           <div class="panel-head">
@@ -106,6 +120,7 @@ const attractions = computed(() => {
   return days.value.flatMap((day) => day.attractions.map((item) => ({ ...item, dayArrayIndex: day.day_index })))
 })
 const budget = computed(() => plan.value?.budget)
+const requestSummary = computed(() => plan.value?.request_summary)
 const dateRangeText = computed(() => {
   if (!plan.value) return t('common.noData')
   return t('result.dateRange', { start: plan.value.start_date, end: plan.value.end_date })

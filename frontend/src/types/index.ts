@@ -49,6 +49,17 @@ export interface Budget {
   total: number
 }
 
+export interface RequestSummary {
+  city: string
+  travel_days: number
+  transportation: string
+  accommodation: string
+  preferences: string[]
+  free_text_input: string
+  data_mode: 'city_match' | 'sample_fallback'
+  data_note: string
+}
+
 export interface DayPlan {
   date: string
   day_index: number
@@ -78,6 +89,7 @@ export interface TripPlan {
   weather_info: WeatherInfo[]
   overall_suggestions: string
   budget?: Budget
+  request_summary?: RequestSummary
 }
 
 export interface TripFormData {

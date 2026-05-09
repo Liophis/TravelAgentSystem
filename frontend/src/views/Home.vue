@@ -25,11 +25,26 @@
             </a-form-item>
 
             <a-form-item :label="t('home.startDateLabel')" name="start_date" :rules="[{ required: true, message: t('home.startDateRequired') }]">
-              <a-input v-model:value="formData.start_date" :placeholder="t('home.startDatePlaceholder')" />
+              <a-date-picker
+                v-model:value="formData.start_date"
+                value-format="YYYY-MM-DD"
+                format="YYYY-MM-DD"
+                style="width: 100%"
+                :placeholder="t('home.startDatePlaceholder')"
+                @change="handleStartDateChange"
+              />
             </a-form-item>
 
             <a-form-item :label="t('home.endDateLabel')" name="end_date" :rules="[{ required: true, message: t('home.endDateRequired') }]">
-              <a-input v-model:value="formData.end_date" :placeholder="t('home.endDatePlaceholder')" />
+              <a-date-picker
+                v-model:value="formData.end_date"
+                value-format="YYYY-MM-DD"
+                format="YYYY-MM-DD"
+                style="width: 100%"
+                :placeholder="t('home.endDatePlaceholder')"
+                :disabled-date="disableEndDate"
+                @change="handleEndDateChange"
+              />
             </a-form-item>
           </div>
 
@@ -73,7 +88,9 @@
           </a-form-item>
 
           <a-form-item>
-            <a-button type="primary" html-type="submit" size="large" block>{{ t('home.submit') }}</a-button>
+            <a-button type="primary" html-type="submit" size="large" block :loading="submitting">
+              {{ submitting ? t('home.submitting') : t('home.submit') }}
+            </a-button>
           </a-form-item>
         </a-form>
       </a-card>
@@ -82,15 +99,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { message } from 'ant-design-vue'
 import type { TripFormData } from '@/types'
-import { generateTrip } from '@/services/api'
+import dayjs, { type Dayjs } from 'dayjs'
+import { generateTrip, getRuntimeApiBaseUrl } from '@/services/api'
 import { setCurrentPlan } from '@/services/store'
 
 const router = useRouter()
 const { t } = useI18n()
+const submitting = ref(false)
 
 const interests = [
   { value: '历史文化', labelKey: 'home.interests.history' },
@@ -122,7 +142,33 @@ const toggleInterest = (value: string) => {
   formData.preferences.splice(index, 1)
 }
 
+const handleStartDateChange = (value: string | null) => {
+  formData.start_date = value || ''
+  if (formData.start_date && formData.end_date) {
+    const days = dayjs(formData.end_date).diff(dayjs(formData.start_date), 'day') + 1
+    if (days > 0) {
+      formData.travel_days = Math.min(days, 30)
+    }
+  }
+}
+
+const handleEndDateChange = (value: string | null) => {
+  formData.end_date = value || ''
+  if (formData.start_date && formData.end_date) {
+    const days = dayjs(formData.end_date).diff(dayjs(formData.start_date), 'day') + 1
+    if (days > 0) {
+      formData.travel_days = Math.min(days, 30)
+    }
+  }
+}
+
+const disableEndDate = (current: Dayjs) => {
+  if (!formData.start_date) return false
+  return current.isBefore(dayjs(formData.start_date), 'day')
+}
+
 const handleSubmit = async () => {
+  if (submitting.value) return
   const payload = {
     city: formData.city,
     start_date: formData.start_date,
@@ -135,13 +181,20 @@ const handleSubmit = async () => {
   }
 
   try {
+    submitting.value = true
     const res = await generateTrip(payload)
     if (res?.success && res.data) {
       setCurrentPlan(res.data)
+      message.success('旅行建议已生成，正在进入结果页')
       void router.push('/result')
+      return
     }
+    message.error('当前没有生成有效的行程结果，请稍后再试')
   } catch (err) {
     console.error('generateTrip error', err)
+    message.error(`生成旅行建议失败，请确认后端已启动且地址配置正确：${getRuntimeApiBaseUrl()}`)
+  } finally {
+    submitting.value = false
   }
 }
 </script>

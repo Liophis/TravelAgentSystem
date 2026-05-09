@@ -6,7 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 
 from app.api.routes import router
+from app.db.bootstrap import sync_sample_pois
 from app.db.database import engine
+from app.db.database import SessionLocal
 from app.db.models import Base
 
 
@@ -22,6 +24,17 @@ def ensure_poi_city_column() -> None:
 
 
 ensure_poi_city_column()
+
+
+def ensure_sample_pois() -> None:
+    db = SessionLocal()
+    try:
+        sync_sample_pois(db)
+    finally:
+        db.close()
+
+
+ensure_sample_pois()
 settings = get_settings()
 
 app = FastAPI(
