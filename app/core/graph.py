@@ -32,5 +32,47 @@ class Graph:
         self.adjacency_list[from_node].append((to_node, weight))
 
     def dijkstra(self, start_node_id: str, end_node_id: str) -> list[str]:
-        """Placeholder implementation for future handwritten algorithm."""
-        return [start_node_id, "模拟中间点", end_node_id]
+        """Return shortest path from start_node_id to end_node_id using Dijkstra's algorithm.
+
+        Returns a list of node ids representing the path. If no path exists, returns an empty list.
+        """
+        import heapq
+
+        if start_node_id not in self.nodes or end_node_id not in self.nodes:
+            return []
+
+        # distances and previous node mapping
+        distances: dict[str, float] = {nid: float("inf") for nid in self.nodes}
+        previous: dict[str, str | None] = {nid: None for nid in self.nodes}
+
+        distances[start_node_id] = 0.0
+
+        # priority queue of (distance, node_id)
+        heap: list[tuple[float, str]] = [(0.0, start_node_id)]
+
+        while heap:
+            current_dist, current = heapq.heappop(heap)
+            if current_dist > distances[current]:
+                continue
+            if current == end_node_id:
+                break
+
+            for neighbor, weight in self.adjacency_list.get(current, []):
+                new_dist = current_dist + weight
+                if new_dist < distances.get(neighbor, float("inf")):
+                    distances[neighbor] = new_dist
+                    previous[neighbor] = current
+                    heapq.heappush(heap, (new_dist, neighbor))
+
+        # reconstruct path
+        if distances[end_node_id] == float("inf"):
+            return []
+
+        path: list[str] = []
+        cur: str | None = end_node_id
+        while cur is not None:
+            path.append(cur)
+            cur = previous[cur]
+
+        path.reverse()
+        return path

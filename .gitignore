@@ -5,23 +5,48 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 .mypy_cache/
+*.pyc
 
 # Virtual environments
 .venv/
 venv/
 env/
+.env.local
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Runtime artifacts
-*.log
+# Database
+*.db
 *.sqlite3
-travel_system.db
 travel_agent.db
+travel_system.db
+*.bak
 
-# Build outputs
+# Runtime and configuration
+runtime_settings.json
+.env.local
+backend/.env.local
+frontend/.env.local
+
+# Build and dependencies
 frontend/dist/
+frontend/node_modules/
 node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.coverage
+htmlcov/
 .DS_Store

@@ -14,8 +14,8 @@ TravelAgentSystem/
 │   │   ├── __init__.py
 │   │   ├── poi_service.py   # 景点查询服务
 │   │   ├── route_service.py # 路线规划服务
-│   │   ├── recommendation_service.py  # 推荐服务
-│   │   └── diary_service.py # 日记管理服务
+│   │   ├── amap_route_service.py # 高德路线服务
+│   │   └── chat_service.py  # 行程问答服务
 │   ├── core/
 │   │   ├── __init__.py
 │   │   ├── graph.py         # 图数据结构（用于路径规划）
@@ -29,9 +29,7 @@ TravelAgentSystem/
 │   └── models/
 │       ├── __init__.py
 │       ├── poi.py           # POI Pydantic 模型
-│       ├── user.py          # 用户 Pydantic 模型
-│       ├── diary.py         # 日记 Pydantic 模型
-│       └── facility.py      # 设施 Pydantic 模型
+│       └── chat.py          # Chat Pydantic 模型
 ├── requirements.txt         # Python 依赖
 └── README.md               # 本文件
 ```
@@ -57,6 +55,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 2.1 环境变量配置
+
+项目现在采用集中式环境配置，参考 TripStar 的管理方式：
+
+- 共享示例文件：`.env.example`、`frontend/.env.example`
+- 本地覆盖文件：`.env.local`、`frontend/.env.local`
+- 运行时优先读取 `.env.local`，再读取 `.env`
+
+启动前请把真实密钥放到本地未提交的 `.env.local` 中，不要直接写进仓库跟踪文件。
+
 ### 3. 运行服务
 
 ```bash
@@ -81,18 +89,9 @@ uvicorn app.main:app --reload --port 8001
 ### 路线规划相关
 - `GET /api/routes/{start_poi_id}/{end_poi_id}` - 规划两点间的最短路线
 
-### 用户相关
-- `POST /api/users` - 创建新用户
-- `GET /api/users/{user_id}` - 获取用户信息
-
-### 日记相关
-- `POST /api/diaries?user_id=1&title=xxx&content=xxx` - 创建日记
-- `GET /api/diaries/{user_id}` - 获取用户所有日记
-- `GET /api/diaries/{user_id}/search?keyword=xxx` - 搜索日记
-
-### 推荐相关
-- `GET /api/recommendations/top-k?k=10` - 获取评分最高的景点
-- `GET /api/recommendations/users/{user_id}?k=10` - 为用户推荐景点
+### 行程生成与问答
+- `POST /api/trips` - 生成旅行计划
+- `POST /api/chat/ask` - 基于当前旅行计划进行问答
 
 ## 核心模块说明
 
@@ -106,16 +105,11 @@ uvicorn app.main:app --reload --port 8001
 
 - **POIService**: 管理景点的 CRUD、搜索、索引
 - **RouteService**: 处理路线规划逻辑
-- **RecommendationService**: 使用堆实现 Top-K 推荐
-- **DiaryService**: 管理旅游日记
+- **Chat Service**: 围绕当前行程生成追问回复
 
 ### 3. 数据库 (app/db/)
 
-- **models.py**: 定义了 4 张表
-  - `pois` - 景点表
-  - `users` - 用户表
-  - `facilities` - 设施表
-  - `travel_diaries` - 日记表
+- **models.py**: 当前主要定义 `pois` 景点表
 - **crud.py**: 提供了对应的增删改查操作
 - **database.py**: SQLite 数据库连接配置
 
@@ -149,17 +143,17 @@ def get_example(id: int, db: Session = Depends(get_db)):
 
 ### 优化算法实现
 
-- Graph 的 dijkstra 方法需要完整的 Dijkstra 算法实现
-- Trie 的搜索可以支持更复杂的模糊匹配
-- 推荐服务可以集成更复杂的评分逻辑
+- Trie 的搜索可以继续增强为更完整的候选补全
+- RouteService 可以继续收敛为更真实的图模型
+- Chat Service 后续可升级为 LLM 驱动问答
 
 ## 下一步任务
 
-1. **完成 Dijkstra 算法**: Graph 类的 dijkstra 方法需要完整实现
-2. **支持距离计算**: 基于坐标计算两点之间的真实距离
-3. **倒排索引**: 实现日记的全文检索功能
-4. **Huffman 编码**: 实现日记内容的无损压缩
-5. **前端集成**: 开发 Vue 3 前端，集成地图展示等
+1. **重构 `/api/trips`**: 从 demo 行程生成器升级为真实闭环入口
+2. **收敛 Result 页**: 移除演示 fallback，全面使用真实数据
+3. **增强路线图模型**: 让 Dijkstra 降级方案更贴近真实路径网络
+4. **扩展 AI 问答**: 从规则化回复升级为 LLM 上下文问答
+5. **第二阶段扩展**: 再接入倒排索引、Huffman、知识图谱等能力
 
 ## 注意事项
 

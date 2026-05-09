@@ -1,39 +1,78 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.db import crud
-from app.db.database import get_db
+from app.db.database import get_db, SessionLocal
+from app.config import get_runtime_settings, update_runtime_settings
 from app.models import (
+    TripChatRequest,
+    TripChatResponse,
     POISchema,
     POIListResponse,
-    UserSchema,
-    TravelDiarySchema,
-    TravelDiaryListResponse,
 )
 
 from app.services import (
+    answer_trip_question,
     POIService,
     RouteService,
-    RecommendationService,
-    DiaryService,
-    llm_service,
 )
 
 router = APIRouter(prefix="/api", tags=["Travel System API"])
 
 # Initialize services
 poi_service = POIService()
-diary_service = DiaryService()
-recommendation_service = RecommendationService()
 
 # Initialize route service with global graph
 route_service = RouteService(poi_service.graph)
 
 
+class RuntimeSettingsPayload(BaseModel):
+    """Runtime settings editable from the frontend."""
+
+    api_base_url: Optional[str] = Field(default=None, description="Frontend API base URL")
+    amap_web_api_key: Optional[str] = Field(default=None, description="AMap Web Service Key")
+    vite_amap_web_js_key: Optional[str] = Field(default=None, description="AMap Web JS Key")
+    google_maps_api_key: Optional[str] = Field(default=None, description="Google Maps API Key")
+    google_maps_proxy: Optional[str] = Field(default=None, description="Google Maps Proxy")
+    xhs_cookie: Optional[str] = Field(default=None, description="XHS Cookie")
+    openai_api_key: Optional[str] = Field(default=None, description="OpenAI API Key")
+    openai_base_url: Optional[str] = Field(default=None, description="OpenAI Base URL")
+    openai_model: Optional[str] = Field(default=None, description="OpenAI Model")
+    log_level: Optional[str] = Field(default=None, description="Log level")
+
+
 @router.on_event("startup")
 async def startup_event(db: Session = Depends(get_db)):
     """Initialize indexes and data structures on startup"""
-    pass
+    # initialize POI index and graph from the database at startup
+    db = SessionLocal()
+    try:
+        poi_service.initialize_poi_index(db)
+    finally:
+        db.close()
+
+
+# ==================== Runtime Settings ====================
+@router.get("/settings")
+def read_runtime_settings():
+    return {
+        "success": True,
+        "message": "ok",
+        "data": get_runtime_settings(),
+    }
+
+
+@router.put("/settings")
+def save_runtime_settings(payload: RuntimeSettingsPayload):
+    updated = update_runtime_settings(payload.model_dump(exclude_unset=True))
+    return {
+        "success": True,
+        "message": "配置已保存并立即生效",
+        "data": updated,
+    }
 
 
 # ==================== POI Endpoints ====================
@@ -97,70 +136,7 @@ def find_route(start_poi_id: int, end_poi_id: int, db: Session = Depends(get_db)
     return route
 
 
-# ==================== User Endpoints ====================
-@router.post("/users", response_model=UserSchema, tags=["User"])
-def create_user(user: UserSchema, db: Session = Depends(get_db)):
-    """Create a new user"""
-    existing = crud.get_user_by_username(db, user.username)
-    if existing:
-        raise HTTPException(status_code=400, detail="Username already exists")
-    return crud.create_user(db, user)
-
-
-@router.get("/users/{user_id}", response_model=UserSchema, tags=["User"])
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    """Get user details by ID"""
-    user = crud.get_user_by_id(db, user_id)
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return UserSchema.from_attributes(user) if hasattr(user, "__dict__") else user
-
-
-# ==================== Diary Endpoints ====================
-@router.post("/diaries", response_model=TravelDiarySchema, tags=["Diary"])
-def create_diary(
-    user_id: int = Query(..., gt=0),
-    title: str = Query(..., min_length=1),
-    content: str = Query(..., min_length=1),
-    poi_id: int = Query(None),
-    db: Session = Depends(get_db),
-):
-    """Create a new travel diary"""
-    return diary_service.create_diary(db, user_id, title, content, poi_id)
-
-
-@router.get("/diaries/{user_id}", response_model=TravelDiaryListResponse, tags=["Diary"])
-def get_user_diaries(
-    user_id: int,
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    db: Session = Depends(get_db),
-):
-    """Get all diaries for a user"""
-    diaries = diary_service.get_user_diaries(db, user_id, skip, limit)
-    return TravelDiaryListResponse(total=len(diaries), items=diaries)
-
-
-@router.get("/diaries/{user_id}/search", response_model=list[TravelDiarySchema], tags=["Diary"])
-def search_diaries(user_id: int, keyword: str = Query(..., min_length=1), db: Session = Depends(get_db)):
-    """Search diaries by keyword"""
-    return diary_service.search_diary_by_keyword(db, user_id, keyword)
-
-
-# ==================== Recommendation Endpoints ====================
-@router.get("/recommendations/top-k", response_model=list[dict], tags=["Recommendation"])
-def get_top_pois(k: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
-    """Get Top-K POIs by score"""
-    return recommendation_service.get_top_k_pois(db, k)
-
-
-@router.get("/recommendations/users/{user_id}", response_model=list[dict], tags=["Recommendation"])
-def recommend_for_user(user_id: int, k: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
-    """Get personalized recommendations for a user"""
-    return recommendation_service.recommend_by_interest(db, user_id, k)
-
-
-# ==================== Trip Generation Endpoint
+# ==================== Trip Generation Endpoint ====================
 @router.post("/trips", tags=["Trip"])
 def generate_trip(
     city: str = Query(...),
@@ -173,62 +149,80 @@ def generate_trip(
     free_text_input: str | None = Query(None),
     db: Session = Depends(get_db),
 ):
-    """Generate a trip plan using LLM. Falls back to demo data if LLM is unavailable."""
+    """Generate a simple trip plan with real POI data from database.
 
-    # Get all POIs for the city (or all POIs if city filter is not available)
-    # For now, we get all POIs from database
-    all_pois = crud.get_all_pois(db, skip=0, limit=1000)
-
-    # Try to generate using LLM
-    if llm_service.is_available():
-        trip_data = llm_service.generate_trip_plan(
-            city=city,
-            start_date=start_date,
-            end_date=end_date,
-            travel_days=travel_days,
-            pois=all_pois,
-            transportation=transportation,
-            accommodation=accommodation,
-            preferences=preferences,
-            free_text_input=free_text_input,
-        )
-
-        if trip_data:
-            return {
-                "success": True,
-                "message": "Generated by AI",
-                "data": trip_data,
-            }
-
-    # Fallback to demo data if LLM is not available or generation failed
+    This endpoint fetches POIs from DB and creates a demo plan with attractions.
+    Can be enhanced later to use `POIService`, `RouteService` and external
+    LLM/knowledge graph services.
+    """
+    # Load POIs from database to populate attractions
+    pois = crud.get_all_pois(db, skip=0, limit=10)
+    attractions = [
+        {
+            "id": poi.id,
+            "name": poi.name,
+            "type": poi.type,
+            "latitude": poi.latitude,
+            "longitude": poi.longitude,
+            "description": poi.description,
+        }
+        for poi in pois
+    ]
+    
+    # Distribute attractions across days
+    attractions_per_day = max(1, len(attractions) // travel_days)
+    days = []
+    
+    from datetime import datetime, timedelta
+    current_date = datetime.strptime(start_date, "%Y-%m-%d")
+    
+    for day_idx in range(travel_days):
+        day_attractions = attractions[day_idx * attractions_per_day : (day_idx + 1) * attractions_per_day]
+        # If last day, include remaining attractions
+        if day_idx == travel_days - 1:
+            day_attractions = attractions[day_idx * attractions_per_day :]
+        
+        days.append({
+            "date": current_date.strftime("%Y-%m-%d"),
+            "day_index": day_idx,
+            "description": f"第 {day_idx + 1} 天: 游览 {len(day_attractions)} 个景点",
+            "transportation": transportation or "混合",
+            "accommodation": accommodation or "舒适型酒店",
+            "attractions": day_attractions,
+            "meals": [],
+        })
+        
+        current_date += timedelta(days=1)
+    
+    # Build response
     demo = {
         "success": True,
-        "message": "Demo mode (LLM not configured or generation failed)",
+        "message": "generated",
         "data": {
             "city": city,
             "start_date": start_date,
             "end_date": end_date,
-            "overall_suggestions": "这是一个演示行程。请配置 OPENAI_API_KEY 环境变量以启用 AI 生成。",
+            "overall_suggestions": f"这是一个包含 {len(attractions)} 个景点的 {travel_days} 天行程",
             "weather_info": [],
             "budget": {
-                "total_attractions": 1000,
-                "total_hotels": 1500,
-                "total_meals": 600,
+                "total_attractions": len(attractions) * 100,
+                "total_hotels": travel_days * 300,
+                "total_meals": travel_days * 100,
                 "total_transportation": 200,
-                "total": 3300,
+                "total": len(attractions) * 100 + travel_days * 300 + travel_days * 100 + 200,
             },
-            "days": [
-                {
-                    "date": start_date,
-                    "day_index": i,
-                    "description": f"第 {i+1} 天行程（演示数据）",
-                    "transportation": transportation or "混合",
-                    "accommodation": accommodation or "舒适型酒店",
-                    "attractions": [],
-                    "meals": [],
-                }
-                for i in range(travel_days)
-            ],
+            "days": days,
         },
     }
     return demo
+
+
+@router.post("/chat/ask", response_model=TripChatResponse, tags=["Trip Chat"])
+def ask_trip_chat(payload: TripChatRequest):
+    """Answer follow-up questions based on the current trip plan."""
+    reply = answer_trip_question(
+        message=payload.message,
+        trip_plan=payload.trip_plan,
+        history=[item.model_dump() for item in payload.history],
+    )
+    return TripChatResponse(success=True, reply=reply)
