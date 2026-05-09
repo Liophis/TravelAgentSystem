@@ -138,11 +138,10 @@ const handleSubmit = async () => {
     const res = await generateTrip(payload)
     if (res?.success && res.data) {
       setCurrentPlan(res.data)
+      void router.push('/result')
     }
   } catch (err) {
     console.error('generateTrip error', err)
-  } finally {
-    void router.push('/result')
   }
 }
 </script>

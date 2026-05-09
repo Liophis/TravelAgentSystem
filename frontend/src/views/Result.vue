@@ -1,17 +1,15 @@
 <template>
   <main class="result-page">
-    <!-- Header is provided by App.vue; remove duplicate NavBar to avoid UI duplication -->
-
     <div class="result-shell">
       <section class="result-hero">
         <div>
           <p class="result-kicker">{{ t('result.overview.subtitle') }}</p>
           <h1>{{ t('result.overview.title') }}</h1>
-          <p class="result-desc">{{ t('result.overview.empty') }}</p>
+          <p class="result-desc">{{ overviewText }}</p>
         </div>
         <div class="result-actions">
           <a-button type="primary" @click="goHome">{{ t('nav.cta') }}</a-button>
-          <a-button @click="showChat = !showChat">AI Chat</a-button>
+          <a-button :disabled="!planAvailable" @click="showChat = !showChat">AI Chat</a-button>
         </div>
       </section>
 
@@ -19,46 +17,57 @@
         <a-card class="result-panel overview-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.overview') }}</h2>
-            <span>{{ t('result.dateRange', { start: '2026-05-01', end: '2026-05-03' }) }}</span>
+            <span>{{ dateRangeText }}</span>
           </div>
-          <div class="overview-list">
+          <div v-if="attractions.length > 0" class="overview-list">
             <OverviewAttractionCard
               v-for="item in attractions"
-              :key="item.name"
+              :key="`${item.id}-${item.name}`"
               :item="item"
-              :image-src="item.imageSrc"
+              :image-src="item.image_url || ''"
               :active="false"
               @hover="noop"
               @select-day="noop"
               @image-error="noop"
             />
           </div>
+          <p v-else class="result-empty">{{ t('result.overview.empty') }}</p>
         </a-card>
 
         <a-card class="result-panel map-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.map') }}</h2>
           </div>
-          <div id="amap-container" style="width: 100%; height: 400px"></div>
+          <div v-if="planAvailable" id="amap-container" style="width: 100%; height: 400px"></div>
+          <div v-else class="graph-placeholder">请先返回首页生成行程，再查看地图路线。</div>
         </a-card>
 
         <a-card class="result-panel days-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.days') }}</h2>
           </div>
-          <a-timeline>
+          <a-timeline v-if="days.length > 0">
             <a-timeline-item v-for="day in days" :key="day.day_index">
               <strong>{{ t('common.dayNumber', { day: day.day_index + 1 }) }}</strong>
               <p>{{ day.description }}</p>
+              <p>{{ day.attractions.map((item) => item.name).join('、') || t('common.noData') }}</p>
             </a-timeline-item>
           </a-timeline>
+          <p v-else class="result-empty">{{ t('result.overview.empty') }}</p>
         </a-card>
 
         <a-card class="result-panel graph-panel" :bordered="false">
           <div class="panel-head">
-            <h2>{{ t('result.side.graph') }}</h2>
+            <h2>{{ t('result.side.budget') }}</h2>
           </div>
-          <div class="graph-placeholder">Knowledge graph placeholder</div>
+          <div v-if="budget" class="budget-summary">
+            <p>{{ t('result.budget.attraction') }}: {{ budget.total_attractions }}</p>
+            <p>{{ t('result.budget.hotel') }}: {{ budget.total_hotels }}</p>
+            <p>{{ t('result.budget.meal') }}: {{ budget.total_meals }}</p>
+            <p>{{ t('result.budget.transport') }}: {{ budget.total_transportation }}</p>
+            <p><strong>Total: {{ budget.total }}</strong></p>
+          </div>
+          <p v-else class="result-empty">{{ t('common.noData') }}</p>
         </a-card>
       </section>
     </div>
@@ -70,37 +79,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-// NavBar removed to prevent duplicate header
+import AMapLoader from '@amap/amap-jsapi-loader'
+
 import AIChat from '@/components/AIChat.vue'
 import OverviewAttractionCard from '@/components/OverviewAttractionCard.vue'
-import type { ChatMessage, TripPlan } from '@/types'
+import { askTripChat, findRoute } from '@/services/api'
+import { getCurrentPlan } from '@/services/store'
+import type { ChatMessage } from '@/types'
 
 const router = useRouter()
 const { t } = useI18n()
 const showChat = ref(false)
 const chatMessages = ref<ChatMessage[]>([])
 const chatPending = ref(false)
-
-import { getCurrentPlan, setCurrentPlan } from '@/services/store'
-import { askTripChat, findRoute, generateDemoPlan, listPois } from '@/services/api'
-import AMapLoader from '@amap/amap-jsapi-loader'
+const map = ref<any>(null)
 
 const planRef = getCurrentPlan()
 
+const plan = computed(() => planRef.value)
+const planAvailable = computed(() => Boolean(plan.value))
+const days = computed(() => plan.value?.days || [])
 const attractions = computed(() => {
-  const plan = planRef.value
-  if (!plan) return []
-  // flatten attractions from days
-  return (plan.days || []).flatMap((d: any) => (d.attractions || []).map((a: any) => ({ ...a, dayArrayIndex: d.day_index })))
+  return days.value.flatMap((day) => day.attractions.map((item) => ({ ...item, dayArrayIndex: day.day_index })))
 })
-
-const days = computed(() => {
-  const plan = planRef.value
-  if (!plan) return []
-  return plan.days || []
+const budget = computed(() => plan.value?.budget)
+const dateRangeText = computed(() => {
+  if (!plan.value) return t('common.noData')
+  return t('result.dateRange', { start: plan.value.start_date, end: plan.value.end_date })
+})
+const overviewText = computed(() => {
+  if (!plan.value) return '当前还没有可展示的行程，请先返回首页生成计划。'
+  return plan.value.overall_suggestions || t('result.overview.empty')
 })
 
 const goHome = () => void router.push('/')
@@ -108,7 +120,7 @@ const noop = () => undefined
 
 const sendChat = async (message: string) => {
   const content = message.trim()
-  if (!content || !planRef.value || chatPending.value) return
+  if (!content || !plan.value || chatPending.value) return
 
   chatMessages.value.push({ role: 'user', content })
   chatPending.value = true
@@ -116,7 +128,7 @@ const sendChat = async (message: string) => {
   try {
     const response = await askTripChat({
       message: content,
-      trip_plan: planRef.value,
+      trip_plan: plan.value,
       history: chatMessages.value,
     })
 
@@ -139,10 +151,10 @@ const handleQuickQuestion = (message: string) => {
   void sendChat(message)
 }
 
-const map = ref<any>(null)
-
 const initAMap = async () => {
   await nextTick()
+  if (!plan.value || attractions.value.length === 0) return
+
   const mapJsKey = import.meta.env.VITE_AMAP_WEB_JS_KEY || ''
   if (!mapJsKey) {
     console.error('高德地图 JS Key 未配置，请在 .env.local 中设置 VITE_AMAP_WEB_JS_KEY')
@@ -153,181 +165,75 @@ const initAMap = async () => {
     const AMap = await AMapLoader.load({
       key: mapJsKey,
       version: '2.0',
-      plugins: ['AMap.Marker', 'AMap.Polyline', 'AMap.InfoWindow']
+      plugins: ['AMap.Marker', 'AMap.Polyline', 'AMap.InfoWindow'],
     })
 
+    const firstAttraction = attractions.value[0]
     map.value = new AMap.Map('amap-container', {
       zoom: 12,
-      center: [116.397128, 39.916527]
+      center: [firstAttraction.longitude, firstAttraction.latitude],
     })
 
-    // 绘制路线（包含所有途经点）
-    const items = attractions.value || []
-    if (items.length >= 2) {
-      const start = items[0]
-      const end = items[items.length - 1]
-      try {
-        const res = await findRoute(start.id, end.id)
-        const pathNodes = (res as any).path_nodes || []
-        const distance = (res as any).distance || 0
-        const estimatedHours = (res as any).estimated_time_hours || 0
-        const source = (res as any).source || 'unknown'
-
-        console.log(`[路线规划] 来源: ${source}, 距离: ${distance}km, 耗时: ${estimatedHours}h, 途经点: ${pathNodes.length}`)
-
-        if (pathNodes && pathNodes.length > 1) {
-          // 绘制完整的路线折线（包含所有途经点）
-          const coords = pathNodes.map((p: any) => [p.longitude, p.latitude])
-          const polyline = new AMap.Polyline({
-            path: coords,
-            borderWeight: 2,
-            strokeColor: '#1890ff',
-            lineJoin: 'round',
-            isOutline: true,
-            outlineColor: '#ffffff',
-            outlineWeight: 1
-          })
-          map.value.add(polyline)
-
-          // 优化：只为关键点创建标记（起点、终点、每 10 个点取一个）
-          // 而不是为所有 50+ 个转折点创建标记
-          const keyMarkerIndices = [0, pathNodes.length - 1] // 起点和终点
-          // 添加中间的均匀采样点，每 10 个点取一个
-          for (let i = 10; i < pathNodes.length - 1; i += Math.max(1, Math.floor((pathNodes.length - 2) / 5))) {
-            if (!keyMarkerIndices.includes(i)) {
-              keyMarkerIndices.push(i)
-            }
-          }
-          keyMarkerIndices.sort((a, b) => a - b)
-
-          const markers: any[] = []
-          const infoWindows: any[] = []
-
-          keyMarkerIndices.forEach((idx: number) => {
-            const node = pathNodes[idx]
-            const isStart = idx === 0
-            const isEnd = idx === pathNodes.length - 1
-
-            const marker = new AMap.Marker({
-              position: [node.longitude, node.latitude],
-              title: node.name,
-              extData: { index: idx }
-            })
-            markers.push(marker)
-
-            // 点击标记显示信息窗口
-            marker.on('click', () => {
-              // 关闭其他窗口
-              infoWindows.forEach((iw: any) => iw.close())
-
-              const content = `<div style="padding:8px; background:#f5f5f5; border-radius:4px;">
-                <div style="font-weight:bold; margin-bottom:4px;">${node.name}</div>
-                <div style="font-size:12px;">Lat: ${node.latitude.toFixed(5)}</div>
-                <div style="font-size:12px;">Lon: ${node.longitude.toFixed(5)}</div>
-                ${node.distance ? `<div style="font-size:12px;">距离: ${node.distance}m</div>` : ''}
-                ${isStart ? '<div style="color:green; font-weight:bold;">📍 起点</div>' : ''}
-                ${isEnd ? '<div style="color:red; font-weight:bold;">🎯 终点</div>' : ''}
-              </div>`
-
-              const infoWindow = new AMap.InfoWindow({
-                content: content,
-                position: [node.longitude, node.latitude],
-                offset: new AMap.Pixel(0, -30)
-              })
-              infoWindow.open(map.value, [node.longitude, node.latitude])
-              infoWindows.push(infoWindow)
-            })
-          })
-
-          map.value.add(markers)
-
-          // 自适应视野到折线范围
-          if (markers.length > 0) {
-            map.value.setFitView(markers, true, [50, 50, 50, 50])
-          } else {
-            map.value.setFitView([polyline])
-          }
-
-          // 显示路线统计信息
-          console.log(`✅ 路线绘制完成: ${coords.length} 个点, ${distance.toFixed(2)}km, 约 ${(estimatedHours * 60).toFixed(0)} 分钟`)
-        } else if (items.length >= 2) {
-          // 降级：只有起终点
-          const coords = [[start.longitude, start.latitude], [end.longitude, end.latitude]]
-          const polyline = new AMap.Polyline({ path: coords, strokeColor: '#1890ff' })
-          map.value.add(polyline)
-
-          const startMarker = new AMap.Marker({ position: coords[0], title: 'Start' })
-          const endMarker = new AMap.Marker({ position: coords[1], title: 'End' })
-          map.value.add([startMarker, endMarker])
-          map.value.setFitView([polyline, startMarker, endMarker])
-        }
-      } catch (e) {
-        console.error('[路线规划] API 调用失败:', e)
-      }
+    if (attractions.value.length === 1) {
+      const marker = new AMap.Marker({
+        position: [firstAttraction.longitude, firstAttraction.latitude],
+        title: firstAttraction.name,
+      })
+      map.value.add(marker)
+      map.value.setFitView([marker])
+      return
     }
-  } catch (err) {
-    console.error('AMap 初始化失败:', err)
+
+    const start = attractions.value[0]
+    const end = attractions.value[attractions.value.length - 1]
+    const res = await findRoute(start.id, end.id)
+    const routeData = res as any
+    const pathNodes = routeData.path_nodes || []
+
+    if (pathNodes.length > 1) {
+      const coords = pathNodes.map((point: any) => [point.longitude, point.latitude])
+      const polyline = new AMap.Polyline({
+        path: coords,
+        borderWeight: 2,
+        strokeColor: '#1890ff',
+        lineJoin: 'round',
+        isOutline: true,
+        outlineColor: '#ffffff',
+        outlineWeight: 1,
+      })
+      map.value.add(polyline)
+
+      const markers = pathNodes
+        .filter((_: any, index: number) => index === 0 || index === pathNodes.length - 1)
+        .map((node: any) => new AMap.Marker({
+          position: [node.longitude, node.latitude],
+          title: node.name,
+        }))
+
+      if (markers.length > 0) {
+        map.value.add(markers)
+        map.value.setFitView([...markers, polyline], true, [50, 50, 50, 50])
+      } else {
+        map.value.setFitView([polyline])
+      }
+      return
+    }
+
+    const fallbackCoords = attractions.value.map((item) => [item.longitude, item.latitude])
+    const fallbackPolyline = new AMap.Polyline({
+      path: fallbackCoords,
+      strokeColor: '#1890ff',
+    })
+    map.value.add(fallbackPolyline)
+    map.value.setFitView([fallbackPolyline])
+  } catch (error) {
+    console.error('AMap 初始化失败:', error)
   }
 }
 
 onMounted(() => {
-  const plan = planRef.value
-  if (!plan) {
-    // fetch demo plan so map has attractions to render
-    generateDemoPlan()
-      .then((res: any) => {
-        if (res && res.data) {
-          // if backend demo has no attractions, fall back to using first two POIs
-          const hasAttractions = Array.isArray(res.data.days) && res.data.days.some((d: any) => (d.attractions || []).length > 0)
-          if (!hasAttractions) {
-            // fetch first two POIs from API and build a tiny plan
-            return listPois({ skip: 0, limit: 2 }).then((pois) => {
-              if (Array.isArray(pois) && pois.length >= 2) {
-                const demo = {
-                  city: 'DemoCity',
-                  start_date: '2026-05-01',
-                  end_date: '2026-05-02',
-                  weather_info: [],
-                  overall_suggestions: 'Demo plan generated locally for route preview.',
-                  days: [
-                    {
-                      date: '2026-05-01',
-                      day_index: 0,
-                      description: 'Local demo itinerary for route preview.',
-                      transportation: 'Walk',
-                      accommodation: 'Demo hotel',
-                      attractions: [
-                        {
-                          id: pois[0].id,
-                          name: pois[0].name,
-                          latitude: pois[0].latitude,
-                          longitude: pois[0].longitude,
-                        },
-                        {
-                          id: pois[1].id,
-                          name: pois[1].name,
-                          latitude: pois[1].latitude,
-                          longitude: pois[1].longitude,
-                        },
-                      ],
-                      meals: [],
-                    },
-                  ],
-                } as unknown as TripPlan
-                setCurrentPlan(demo)
-                initAMap()
-                return
-              }
-              initAMap()
-            })
-          }
-          setCurrentPlan(res.data)
-        }
-        initAMap()
-      })
-      .catch(() => initAMap())
-  } else {
-    initAMap()
+  if (plan.value) {
+    void initAMap()
   }
 })
 </script>

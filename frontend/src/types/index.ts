@@ -4,15 +4,21 @@ export interface Location {
 }
 
 export interface Attraction {
+  id: number
   name: string
+  type?: string
+  category?: string
   address: string
   location: Location
+  latitude?: number
+  longitude?: number
   visit_duration: number
   description: string
-  category?: string
   rating?: number
   image_url?: string
   ticket_price?: number
+  estimated_cost?: number
+  dayArrayIndex?: number
 }
 
 export interface Meal {
@@ -129,6 +135,7 @@ export interface RuntimeSettingsResponse {
 export interface PoiSummary {
   id: number
   name: string
+  city: string
   type: string
   latitude: number
   longitude: number

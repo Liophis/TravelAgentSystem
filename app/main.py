@@ -1,3 +1,5 @@
+from sqlalchemy import text
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -9,6 +11,17 @@ from app.db.models import Base
 
 
 Base.metadata.create_all(bind=engine)
+
+
+def ensure_poi_city_column() -> None:
+    with engine.begin() as connection:
+        columns = connection.execute(text("PRAGMA table_info(pois)")).fetchall()
+        column_names = {row[1] for row in columns}
+        if "city" not in column_names:
+            connection.execute(text("ALTER TABLE pois ADD COLUMN city VARCHAR(100) NOT NULL DEFAULT '北京'"))
+
+
+ensure_poi_city_column()
 settings = get_settings()
 
 app = FastAPI(

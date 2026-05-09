@@ -28,6 +28,7 @@ class POIService:
                 str(poi.id),
                 {
                     "name": poi.name,
+                    "city": poi.city,
                     "type": poi.type,
                     "latitude": poi.latitude,
                     "longitude": poi.longitude,
@@ -48,6 +49,7 @@ class POIService:
                     POISchema(
                         id=poi.id,
                         name=poi.name,
+                        city=poi.city,
                         type=poi.type,
                         latitude=poi.latitude,
                         longitude=poi.longitude,
@@ -66,6 +68,7 @@ class POIService:
         return POISchema(
             id=poi.id,
             name=poi.name,
+            city=poi.city,
             type=poi.type,
             latitude=poi.latitude,
             longitude=poi.longitude,
@@ -83,6 +86,7 @@ class POIService:
             str(db_poi.id),
             {
                 "name": db_poi.name,
+                "city": db_poi.city,
                 "type": db_poi.type,
                 "latitude": db_poi.latitude,
                 "longitude": db_poi.longitude,
@@ -93,6 +97,7 @@ class POIService:
         return POISchema(
             id=db_poi.id,
             name=db_poi.name,
+            city=db_poi.city,
             type=db_poi.type,
             latitude=db_poi.latitude,
             longitude=db_poi.longitude,
