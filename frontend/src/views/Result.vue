@@ -27,8 +27,21 @@
         <p v-if="requestSummary.free_text_input">额外需求：{{ requestSummary.free_text_input }}</p>
       </section>
 
+      <section class="result-switcher">
+        <button
+          v-for="panel in panels"
+          :key="panel.key"
+          type="button"
+          class="result-switcher-btn"
+          :class="{ active: activePanel === panel.key }"
+          @click="activePanel = panel.key"
+        >
+          {{ panel.label }}
+        </button>
+      </section>
+
       <section class="result-grid">
-        <a-card class="result-panel route-panel" :bordered="false">
+        <a-card v-if="activePanel === 'route'" class="result-panel route-panel" :bordered="false">
           <div class="panel-head">
             <h2>路线摘要</h2>
             <span>{{ routeSummary?.sourceLabel || '等待路线生成' }}</span>
@@ -43,7 +56,7 @@
           <p v-else class="result-empty">当前行程还没有足够的景点来生成路线摘要。</p>
         </a-card>
 
-        <a-card class="result-panel overview-panel" :bordered="false">
+        <a-card v-if="activePanel === 'overview'" class="result-panel overview-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.overview') }}</h2>
             <span>{{ dateRangeText }}</span>
@@ -63,7 +76,7 @@
           <p v-else class="result-empty">{{ t('result.overview.empty') }}</p>
         </a-card>
 
-        <a-card class="result-panel map-panel" :bordered="false">
+        <a-card v-if="activePanel === 'map'" class="result-panel map-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.map') }}</h2>
           </div>
@@ -71,7 +84,7 @@
           <div v-else class="graph-placeholder">请先返回首页生成行程，再查看地图路线。</div>
         </a-card>
 
-        <a-card class="result-panel days-panel" :bordered="false">
+        <a-card v-if="activePanel === 'days'" class="result-panel days-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.days') }}</h2>
           </div>
@@ -97,7 +110,7 @@
           <p v-else class="result-empty">{{ t('result.overview.empty') }}</p>
         </a-card>
 
-        <a-card class="result-panel graph-panel" :bordered="false">
+        <a-card v-if="activePanel === 'budget'" class="result-panel graph-panel" :bordered="false">
           <div class="panel-head">
             <h2>{{ t('result.side.budget') }}</h2>
           </div>
@@ -137,6 +150,9 @@ const showChat = ref(false)
 const chatMessages = ref<ChatMessage[]>([])
 const chatPending = ref(false)
 const map = ref<any>(null)
+type ResultPanelKey = 'overview' | 'days' | 'route' | 'map' | 'budget'
+
+const activePanel = ref<ResultPanelKey>('overview')
 const routeSummary = ref<{
   startName: string
   endName: string
@@ -156,6 +172,13 @@ const attractions = computed(() => {
 })
 const budget = computed(() => plan.value?.budget)
 const requestSummary = computed(() => plan.value?.request_summary)
+const panels = computed<Array<{ key: ResultPanelKey; label: string }>>(() => [
+  { key: 'overview', label: t('result.side.overview') },
+  { key: 'days', label: t('result.side.days') },
+  { key: 'route', label: '路线' },
+  { key: 'map', label: t('result.side.map') },
+  { key: 'budget', label: t('result.side.budget') },
+])
 const dateRangeText = computed(() => {
   if (!plan.value) return t('common.noData')
   return t('result.dateRange', { start: plan.value.start_date, end: plan.value.end_date })

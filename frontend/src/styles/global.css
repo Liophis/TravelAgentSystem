@@ -396,10 +396,36 @@ select {
   flex-wrap: wrap;
 }
 
+.result-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.result-switcher-btn {
+  border: 1px solid rgba(236, 243, 250, 0.16);
+  background: rgba(12, 23, 32, 0.38);
+  color: var(--text-soft);
+  border-radius: 999px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.result-switcher-btn:hover {
+  color: var(--text-strong);
+  border-color: rgba(125, 211, 252, 0.35);
+}
+
+.result-switcher-btn.active {
+  color: var(--text-strong);
+  background: rgba(56, 189, 248, 0.16);
+  border-color: rgba(125, 211, 252, 0.45);
+}
+
 .result-grid {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: 1.3fr 1fr;
+  display: block;
 }
 
 .result-panel {
@@ -407,12 +433,12 @@ select {
   min-height: 220px;
 }
 
-.overview-panel {
-  grid-column: 1 / -1;
-}
-
-.route-panel {
-  grid-column: 1 / -1;
+.overview-panel,
+.route-panel,
+.map-panel,
+.days-panel,
+.graph-panel {
+  width: 100%;
 }
 
 .route-summary {
