@@ -170,6 +170,7 @@ def get_example(id: int, db: Session = Depends(get_db)):
 1. 先运行 `python -m unittest tests/test_api_flow.py` 验证后端主闭环。
 2. 启动后端后，再运行 `bash tests/test_e2e_route.sh` 做接口联调。
 3. 若继续开发，请以 `项目总览与执行说明.md` 中的 P0/P1 节奏为准。
+4. P1 小红书内容增强默认可直接运行；若要注入外部样例，可设置 `XHS_SAMPLE_NOTES_PATH`，失败时会自动降级到内置内容。
 
 ## 注意事项
 

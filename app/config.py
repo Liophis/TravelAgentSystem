@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     google_maps_api_key: str = ""
     google_maps_proxy: str = ""
     xhs_cookie: str = ""
+    xhs_sample_notes_path: str = ""
     openai_api_key: str = Field(default="", validation_alias=AliasChoices("OPENAI_API_KEY", "LLM_API_KEY"))
     openai_base_url: str = Field(default="https://api.openai.com/v1", validation_alias=AliasChoices("OPENAI_BASE_URL", "LLM_BASE_URL"))
     openai_model: str = Field(default="gpt-4o-mini", validation_alias=AliasChoices("OPENAI_MODEL", "LLM_MODEL_ID"))
@@ -81,6 +82,7 @@ _RUNTIME_SETTING_KEYS = {
     "google_maps_api_key",
     "google_maps_proxy",
     "xhs_cookie",
+    "xhs_sample_notes_path",
     "openai_api_key",
     "openai_base_url",
     "openai_model",
@@ -121,6 +123,8 @@ def _sync_env_from_settings() -> None:
         os.environ["GOOGLE_MAPS_PROXY"] = settings.google_maps_proxy
     if settings.xhs_cookie:
         os.environ["XHS_COOKIE"] = settings.xhs_cookie
+    if settings.xhs_sample_notes_path:
+        os.environ["XHS_SAMPLE_NOTES_PATH"] = settings.xhs_sample_notes_path
     if settings.openai_api_key:
         os.environ["OPENAI_API_KEY"] = settings.openai_api_key
         os.environ["LLM_API_KEY"] = settings.openai_api_key
@@ -149,6 +153,7 @@ def get_runtime_settings() -> Dict[str, str]:
         "google_maps_api_key": settings.google_maps_api_key or "",
         "google_maps_proxy": settings.google_maps_proxy or "",
         "xhs_cookie": settings.xhs_cookie or "",
+        "xhs_sample_notes_path": settings.xhs_sample_notes_path or "",
         "openai_api_key": settings.openai_api_key or "",
         "openai_base_url": settings.openai_base_url or "",
         "openai_model": settings.openai_model or "",

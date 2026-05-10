@@ -122,6 +122,15 @@
                 <p>{{ budgetDescription }}</p>
               </div>
             </article>
+
+            <article class="overview-insight-card">
+              <h3>内容来源</h3>
+              <ul class="overview-insight-list">
+                <li v-for="source in contentSources" :key="`${source.source_type}-${source.source_label}-${source.origin}`">
+                  {{ source.source_label }} · {{ source.origin === 'external' ? '外部内容' : '本地样例降级' }}
+                </li>
+              </ul>
+            </article>
           </div>
 
           <div v-if="attractions.length > 0" class="overview-list">
@@ -291,6 +300,7 @@ const attractions = computed(() => {
 const budget = computed(() => plan.value?.budget)
 const requestSummary = computed(() => plan.value?.request_summary)
 const previewDays = computed(() => days.value)
+const contentSources = computed(() => plan.value?.content_sources || [])
 const orderedDaysForDisplay = computed(() => {
   if (selectedDayIndex.value == null) return days.value
   const selected = days.value.find((day) => day.day_index === selectedDayIndex.value)
@@ -318,6 +328,9 @@ const attractionsPerDay = computed(() => {
 })
 const recommendationReasons = computed(() => {
   if (!plan.value) return []
+  if (plan.value.recommendation_reasons?.length) {
+    return plan.value.recommendation_reasons
+  }
 
   const reasons = [
     `优先围绕 ${requestSummary.value?.city || plan.value.city} 的可用本地景点数据生成，便于形成真实可展示的闭环。`,

@@ -850,6 +850,13 @@ select {
   padding: 14px;
 }
 
+.overview-card-meta {
+  margin: -4px 0 8px;
+  color: rgba(19, 39, 63, 0.72);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .overview-body h3 {
   margin: 0 0 8px;
   color: var(--text-strong);

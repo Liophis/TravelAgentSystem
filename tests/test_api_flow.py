@@ -16,6 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from app.api import routes
 from app.models import TripChatRequest
 from app.db.models import Base, POI
+from app.services.xhs_content_service import XHSContentService
 
 
 class TravelApiFlowTestCase(unittest.TestCase):
@@ -114,6 +115,10 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertIn("overall_suggestions", payload["data"])
         self.assertGreater(payload["data"]["budget"]["total"], 0)
         self.assertEqual(payload["data"]["days"][0]["attractions"][0]["name"], "故宫博物院")
+        self.assertTrue(payload["data"]["content_sources"])
+        self.assertTrue(payload["data"]["recommendation_reasons"])
+        self.assertTrue(payload["data"]["days"][0]["attractions"][0]["recommendation_reasons"])
+        self.assertEqual(payload["data"]["days"][0]["attractions"][0]["content_sources"][0]["source_label"], "小红书公开内容")
 
     def test_route_endpoint_prefers_amap_payload_shape(self):
         fake_amap_result = {
@@ -178,6 +183,19 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertTrue(payload.success)
         self.assertIn("预算", payload.reply)
         self.assertIn("北京", payload.reply)
+
+    def test_xhs_content_service_falls_back_to_builtin_samples(self):
+        service = XHSContentService()
+        with patch.object(service, "_load_external_candidates", return_value=[]):
+            bundle = service.enrich_trip_plan(
+                city="北京",
+                preferences=["历史文化"],
+                pois=[type("PoiStub", (), {"name": "故宫博物院"})()],
+            )
+
+        self.assertTrue(bundle["uses_fallback"])
+        self.assertTrue(bundle["notes"])
+        self.assertEqual(bundle["sources"][0]["origin"], "local_sample")
 
 
 if __name__ == "__main__":

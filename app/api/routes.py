@@ -21,6 +21,7 @@ from app.services import (
     answer_trip_question,
     POIService,
     RouteService,
+    XHSContentService,
 )
 
 router = APIRouter(prefix="/api", tags=["Travel System API"])
@@ -30,6 +31,7 @@ poi_service = POIService()
 
 # Initialize route service with global graph
 route_service = RouteService(poi_service.graph)
+xhs_content_service = XHSContentService()
 
 
 class RuntimeSettingsPayload(BaseModel):
@@ -149,6 +151,9 @@ def _build_trip_attraction(poi, city: str) -> dict:
         "description": poi.description or "暂无景点描述",
         "ticket_price": 80 if poi.type in {"景区", "景点"} else 50,
         "estimated_cost": 80 if poi.type in {"景区", "景点"} else 50,
+        "content_sources": [],
+        "recommendation_reasons": [],
+        "travel_notes": [],
     }
 
 
@@ -203,6 +208,60 @@ def _build_trip_suggestion(city: str, selected_pois: list[object], requested_cit
         f"当前本地样例数据暂未完整覆盖 {city}，系统已使用现有景点样例为你生成可演示闭环。"
         f" 当前重点景点包括 {attraction_names}。"
     )
+
+
+def _build_attraction_reasons(poi, city: str, preference_tokens: list[str], related_notes: list[dict]) -> list[str]:
+    reasons: list[str] = []
+    if city and city.lower() in str(getattr(poi, "city", "")).lower():
+        reasons.append(f"景点位于 {city} 本地候选范围内，更适合直接纳入当前行程。")
+
+    matched_preferences = [
+        token for token in preference_tokens if token and token.lower() in f"{poi.name} {poi.type} {poi.description or ''}".lower()
+    ]
+    if matched_preferences:
+        reasons.append(f"景点内容与偏好 {'、'.join(dict.fromkeys(matched_preferences[:3]))} 有直接关联。")
+
+    if related_notes:
+        note = related_notes[0]
+        match_reason = str(note.get("match_reason") or "").strip()
+        if match_reason:
+            reasons.append(match_reason)
+        highlights = note.get("highlights") or []
+        if highlights:
+            reasons.append(str(highlights[0]))
+
+    if not reasons:
+        reasons.append("该景点已在当前候选集中按城市、类型与说明信息综合排序。")
+
+    return reasons[:4]
+
+
+def _build_trip_recommendation_reasons(
+    *,
+    city: str,
+    actual_days: int,
+    attraction_count: int,
+    preferences: list[str] | None,
+    requested_city_matched: bool,
+    content_bundle: dict,
+) -> list[str]:
+    reasons = [f"本次先围绕 {city} 的可用景点候选生成 {actual_days} 天行程，当前共安排 {attraction_count} 个景点。"]
+    if preferences:
+        reasons.append(f"推荐时已纳入你的偏好：{'、'.join(preferences)}。")
+    if requested_city_matched:
+        reasons.append("已优先命中目标城市本地景点数据，因此结果更贴近城市内真实游览。")
+    else:
+        reasons.append("目标城市样例暂不完整，系统使用现有本地景点库维持主闭环可用。")
+
+    sources = content_bundle.get("sources") or []
+    if sources:
+        source_labels = "、".join(source.get("source_label", "内容来源") for source in sources)
+        if content_bundle.get("uses_fallback"):
+            reasons.append(f"内容增强当前来自 {source_labels} 的本地样例，外部内容失败时会自动降级，不阻塞行程生成。")
+        else:
+            reasons.append(f"推荐理由已合并 {source_labels} 的内容摘要，用于补充亮点和避坑信息。")
+
+    return reasons[:5]
 
 
 def _build_request_summary(
@@ -360,6 +419,7 @@ def generate_trip(
     ]
     candidate_pois = city_matched_pois or pois
     requested_city_matched = bool(city_matched_pois)
+    content_bundle = xhs_content_service.enrich_trip_plan(city=city, preferences=preferences, pois=candidate_pois)
 
     scored_candidates = [
         (_score_poi_for_trip(poi, city, preference_tokens), poi)
@@ -385,6 +445,24 @@ def generate_trip(
         day_pois = ordered_pois[cursor: cursor + bucket_size]
         cursor += bucket_size
         attractions = [_build_trip_attraction(poi, city) for poi in day_pois]
+        for attraction, poi in zip(attractions, day_pois):
+            related_notes = content_bundle["notes_by_poi"].get(poi.name, [])[:2]
+            attraction["travel_notes"] = related_notes
+            attraction["content_sources"] = [
+                {
+                    "source_type": note.get("source_type", "content"),
+                    "source_label": note.get("source_label", "内容来源"),
+                    "origin": note.get("origin", "local_sample"),
+                }
+                for note in related_notes
+            ]
+            attraction["recommendation_reasons"] = _build_attraction_reasons(poi, city, preference_tokens, related_notes)
+            first_image = next(
+                (image.get("url") for note in related_notes for image in note.get("images", []) if image.get("url")),
+                "",
+            )
+            if first_image:
+                attraction["image_url"] = first_image
         attraction_names = "、".join(item["name"] for item in attractions) if attractions else "自由活动"
 
         days.append({
@@ -400,6 +478,14 @@ def generate_trip(
 
     budget = _estimate_trip_budget(days, normalized_accommodation, normalized_transportation)
     overall_suggestions = _build_trip_suggestion(city, ordered_pois, requested_city_matched)
+    recommendation_reasons = _build_trip_recommendation_reasons(
+        city=city,
+        actual_days=actual_days,
+        attraction_count=len(ordered_pois),
+        preferences=preferences,
+        requested_city_matched=requested_city_matched,
+        content_bundle=content_bundle,
+    )
     request_summary = _build_request_summary(
         city=city,
         actual_days=actual_days,
@@ -421,6 +507,8 @@ def generate_trip(
             "weather_info": [],
             "budget": budget,
             "request_summary": request_summary,
+            "content_sources": content_bundle["sources"],
+            "recommendation_reasons": recommendation_reasons,
             "days": days,
         },
     }

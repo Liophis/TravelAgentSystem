@@ -18,7 +18,39 @@ export interface Attraction {
   image_url?: string
   ticket_price?: number
   estimated_cost?: number
+  content_sources?: ContentSource[]
+  recommendation_reasons?: string[]
+  travel_notes?: TravelContentNote[]
   dayArrayIndex?: number
+}
+
+export interface ContentImage {
+  url: string
+  alt?: string
+}
+
+export interface ContentSource {
+  source_type: string
+  source_label: string
+  origin: 'external' | 'local_sample' | string
+}
+
+export interface TravelContentNote {
+  id: string
+  source_type: string
+  source_label: string
+  origin: 'external' | 'local_sample' | string
+  title: string
+  city: string
+  poi_name: string
+  author?: string
+  tags: string[]
+  images: ContentImage[]
+  highlights: string[]
+  cautions: string[]
+  excerpt?: string
+  match_reason?: string
+  note_url?: string
 }
 
 export interface Meal {
@@ -90,6 +122,8 @@ export interface TripPlan {
   overall_suggestions: string
   budget?: Budget
   request_summary?: RequestSummary
+  content_sources?: ContentSource[]
+  recommendation_reasons?: string[]
 }
 
 export interface TripFormData {
