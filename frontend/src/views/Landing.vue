@@ -5,6 +5,7 @@
     <section class="landing-hero">
       <div class="landing-hero-inner">
         <h1 class="landing-title">{{ t('home.titleLine1') }} <span>{{ t('home.titleLine2') }}</span></h1>
+        <p class="landing-subtitle">A nice trip starts here</p>
       </div>
     </section>
 
