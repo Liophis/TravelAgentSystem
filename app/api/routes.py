@@ -46,6 +46,7 @@ class RuntimeSettingsPayload(BaseModel):
     google_maps_api_key: Optional[str] = Field(default=None, description="Google Maps API Key")
     google_maps_proxy: Optional[str] = Field(default=None, description="Google Maps Proxy")
     xhs_cookie: Optional[str] = Field(default=None, description="XHS Cookie")
+    xhs_rap_param: Optional[str] = Field(default=None, description="XHS x-rap-param header value")
     xhs_sample_notes_path: Optional[str] = Field(default=None, description="XHS sample notes JSON path")
     openai_api_key: Optional[str] = Field(default=None, description="OpenAI API Key")
     openai_base_url: Optional[str] = Field(default=None, description="OpenAI Base URL")
@@ -594,6 +595,15 @@ def refresh_xhs_trip_content(payload: XHSRefreshTripPayload):
             "raw_note_count": refreshed["raw_note_count"],
             "content_source_status": refreshed["status"],
         },
+    }
+
+
+@router.get("/xhs/content-source/debug/latest", tags=["XHS Content"])
+def get_latest_xhs_debug_log():
+    return {
+        "success": True,
+        "message": "ok",
+        "data": xhs_live_fetch_service.get_latest_debug_log(),
     }
 
 

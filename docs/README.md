@@ -121,6 +121,7 @@ TravelAgentSystem/
 - `GET /api/xhs/content-source`
 - `POST /api/xhs/content-source/import`
 - `DELETE /api/xhs/content-source/import`
+- `GET /api/xhs/content-source/debug/latest`
 
 `POST /api/xhs/content-source/import` 当前支持的输入格式：
 - 已规范化的 notes 数组
@@ -141,3 +142,4 @@ TravelAgentSystem/
 - 如需覆盖内置小红书样例，可设置 `XHS_SAMPLE_NOTES_PATH=/abs/path/to/xhs_notes.json`；读取失败会自动回退到内置样例
 - 也可以在前端“运行时设置”中直接导入 JSON 文件，后端会保存为运行时外部样例并优先使用
 - `xhs_cookie` 的格式与 `TripStar` 保持兼容，既支持请求头字符串，也支持浏览器导出的 JSON Cookie 列表
+- 实时刷新链路会把诊断信息落盘到 `TravelAgentSystem/logs/xhs_debug/`，并可通过 `GET /api/xhs/content-source/debug/latest` 读取最近一次调试记录（cookie 会自动打码）

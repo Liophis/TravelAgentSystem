@@ -61,6 +61,9 @@
           <a-form-item label="小红书 Cookie">
             <a-textarea v-model:value="settingsForm.xhs_cookie" :rows="4" allow-clear />
           </a-form-item>
+          <a-form-item label="小红书 x-rap-param">
+            <a-textarea v-model:value="settingsForm.xhs_rap_param" :rows="3" allow-clear />
+          </a-form-item>
           <a-form-item label="小红书样例 JSON 路径">
             <a-input v-model:value="settingsForm.xhs_sample_notes_path" placeholder="例如：/abs/path/to/xhs_notes.json" allow-clear />
           </a-form-item>
@@ -153,6 +156,7 @@ const settingsForm = reactive<RuntimeSettings>({
   google_maps_api_key: '',
   google_maps_proxy: '',
   xhs_cookie: '',
+  xhs_rap_param: '',
   xhs_sample_notes_path: '',
   openai_api_key: '',
   openai_base_url: '',
@@ -167,6 +171,7 @@ const applyRuntimeSettings = (settings: RuntimeSettings) => {
   settingsForm.google_maps_api_key = settings.google_maps_api_key || ''
   settingsForm.google_maps_proxy = settings.google_maps_proxy || ''
   settingsForm.xhs_cookie = settings.xhs_cookie || ''
+  settingsForm.xhs_rap_param = settings.xhs_rap_param || ''
   settingsForm.xhs_sample_notes_path = settings.xhs_sample_notes_path || ''
   settingsForm.openai_api_key = settings.openai_api_key || ''
   settingsForm.openai_base_url = settings.openai_base_url || ''

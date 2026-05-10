@@ -42,6 +42,77 @@ def _emit(payload: dict) -> None:
     sys.stdout.write(json.dumps(payload, ensure_ascii=False))
 
 
+def _mask_cookie_value(value: str) -> str:
+    text = str(value or "")
+    if not text:
+        return ""
+    if len(text) <= 8:
+        return f"<masked:{len(text)} chars>"
+    return f"{text[:4]}...{text[-4:]} ({len(text)} chars)"
+
+
+def _summarize_request_snapshot(snapshot: dict) -> dict:
+    if not isinstance(snapshot, dict):
+        return {}
+
+    headers = snapshot.get("headers") if isinstance(snapshot.get("headers"), dict) else {}
+    cookies = snapshot.get("cookies") if isinstance(snapshot.get("cookies"), dict) else {}
+    interesting_cookie_keys = [
+        "a1",
+        "web_session",
+        "webId",
+        "gid",
+        "xsecappid",
+        "websectiga",
+        "sec_poison_id",
+        "customerClientId",
+        "abRequestId",
+    ]
+
+    return {
+        "url": str(snapshot.get("url") or ""),
+        "method": str(snapshot.get("method") or ""),
+        "header_subset": {
+            key: str(headers.get(key) or "")
+            for key in [
+                "accept",
+                "accept-language",
+                "content-type",
+                "origin",
+                "priority",
+                "referer",
+                "sec-ch-ua",
+                "sec-ch-ua-mobile",
+                "sec-ch-ua-platform",
+                "sec-fetch-dest",
+                "sec-fetch-mode",
+                "sec-fetch-site",
+                "user-agent",
+                "x-b3-traceid",
+                "x-rap-param",
+                "x-mns",
+                "x-s",
+                "x-s-common",
+                "x-t",
+                "x-xray-traceid",
+            ]
+            if headers.get(key) is not None
+        },
+        "cookie_key_count": len(cookies),
+        "cookie_keys": sorted(cookies.keys()),
+        "cookie_presence": {key: key in cookies for key in interesting_cookie_keys},
+        "cookie_preview": {
+            key: _mask_cookie_value(cookies.get(key, ""))
+            for key in interesting_cookie_keys
+            if key in cookies
+        },
+        "body": snapshot.get("body"),
+        "response_summary": snapshot.get("response_summary"),
+        "api": snapshot.get("api"),
+        "error": snapshot.get("error"),
+    }
+
+
 def _build_query_candidates(city: str, keywords: str, poi_names: list[str]) -> list[str]:
     query_city = _pick_query_city(city) or city
     keyword_parts = [part.strip() for part in str(keywords or "").replace("，", " ").replace(",", " ").split() if part.strip()]
@@ -108,6 +179,7 @@ def main() -> int:
     keywords = str(payload.get("keywords") or "").strip()
     poi_names = payload.get("poi_names") if isinstance(payload.get("poi_names"), list) else []
     cookie = str(payload.get("cookie") or "").strip()
+    rap_param = str(payload.get("rap_param") or "").strip()
     max_items = max(1, min(int(payload.get("max_items") or 4), 8))
 
     if not city:
@@ -117,7 +189,7 @@ def main() -> int:
         _emit({"success": False, "message": "cookie 不能为空"})
         return 1
 
-    client = XhsNativeClient(cookie)
+    client = XhsNativeClient(cookie, x_rap_param=rap_param)
     query_candidates = _build_query_candidates(city, keywords, poi_names)
     query = query_candidates[0] if query_candidates else city
     search_response = {}
@@ -180,6 +252,17 @@ def main() -> int:
                 "query_city": _pick_query_city(city) or city,
                 "keywords": keywords,
                 "query_candidates": query_candidates,
+                "request_debug": {
+                    "search": _summarize_request_snapshot(getattr(client, "last_search_request", {})),
+                    "search_attempts": [
+                        _summarize_request_snapshot(item)
+                        for item in getattr(client, "last_search_attempts", [])
+                    ],
+                    "detail_requests": [
+                        _summarize_request_snapshot(item)
+                        for item in getattr(client, "last_detail_requests", [])[: max_items]
+                    ],
+                },
                 "search_item_count": len(items),
                 "search_model_types": model_types[:10],
                 "search_item_preview": preview_items[:5],

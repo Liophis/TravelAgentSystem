@@ -85,6 +85,33 @@ class XHSContentService:
     def _read_json_file(self, path: Path) -> Any:
         return json.loads(path.read_text(encoding="utf-8"))
 
+    def parse_xhs_cookie_pairs(self, cookie: str) -> dict[str, str]:
+        normalized = self.normalize_xhs_cookie(cookie)
+        if not normalized:
+            return {}
+
+        separator = "; " if "; " in normalized else ";"
+        pairs: dict[str, str] = {}
+        for item in normalized.split(separator):
+            key, _, value = item.partition("=")
+            key = key.strip()
+            if key:
+                pairs[key] = value.strip()
+        return pairs
+
+    def get_xhs_cookie_diagnostics(self, cookie: str) -> dict[str, Any]:
+        pairs = self.parse_xhs_cookie_pairs(cookie)
+        recommended_keys = ["a1", "web_session", "webId", "gid", "xsecappid"]
+        missing_required = [key for key in ["a1"] if key not in pairs]
+        missing_recommended = [key for key in recommended_keys if key not in pairs]
+        return {
+            "cookie_key_count": len(pairs),
+            "cookie_keys": sorted(pairs.keys()),
+            "missing_required": missing_required,
+            "missing_recommended": missing_recommended,
+            "has_minimum_required": not missing_required,
+        }
+
     def normalize_xhs_cookie(self, cookie: str) -> str:
         """兼容 TripStar 使用的 Cookie 请求头字符串和浏览器导出的 JSON Cookie 列表。"""
         normalized = str(cookie or "").strip()

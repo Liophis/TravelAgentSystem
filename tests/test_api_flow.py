@@ -108,6 +108,7 @@ class TravelApiFlowTestCase(unittest.TestCase):
         routes.xhs_live_fetch_service.content_service.runtime_notes_path = self.runtime_xhs_notes_path
         routes.xhs_live_fetch_service.content_service.runtime_meta_path = self.runtime_xhs_meta_path
         routes.xhs_live_fetch_service.settings.xhs_cookie = ""
+        routes.xhs_live_fetch_service.settings.xhs_rap_param = ""
 
     def test_generate_trip_returns_structured_plan(self):
         db = self.SessionLocal()
@@ -450,6 +451,56 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertEqual(detail["search_item_count"], 2)
         self.assertEqual(detail["search_model_types"], ["user", "ad"])
 
+    def test_live_fetch_service_writes_debug_log(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
+        routes.xhs_live_fetch_service.settings.xhs_rap_param = "rap-debug-token"
+        routes.xhs_live_fetch_service.debug_dir = Path(self.temp_dir.name) / "xhs_debug"
+        routes.xhs_live_fetch_service.latest_debug_file = routes.xhs_live_fetch_service.debug_dir / "latest.json"
+        helper_payload = {
+            "success": True,
+            "query": "北京 攻略",
+            "raw_note_count": 0,
+            "data": {
+                "city": "北京",
+                "query_candidates": ["北京 攻略"],
+                "request_debug": {
+                    "search": {
+                        "url": "https://edith.xiaohongshu.com/api/sns/web/v1/search/notes",
+                        "method": "POST",
+                        "header_subset": {"user-agent": "Mozilla/5.0 ... Chrome/148.0.0.0", "x-rap-param": "rap-debug-token"},
+                        "cookie_presence": {"a1": True, "web_session": False},
+                        "cookie_preview": {"a1": "test...okie (11 chars)"},
+                        "body": "{\"keyword\":\"北京 攻略\"}",
+                    },
+                    "detail_requests": [],
+                },
+                "search_item_count": 1,
+                "search_model_types": ["user"],
+                "search_item_preview": [{"id": "1", "model_type": "user", "title": "", "keys": ["id", "model_type"]}],
+                "search_response": {"data": {"items": []}},
+                "detail_response": {"data": {"items": []}},
+            },
+        }
+
+        with patch("app.services.xhs_live_fetch_service.subprocess.run") as mocked_run:
+            mocked_run.return_value = subprocess.CompletedProcess(
+                args=["python"],
+                returncode=0,
+                stdout=json.dumps(helper_payload, ensure_ascii=False),
+                stderr="",
+            )
+            with self.assertRaises(Exception):
+                routes.xhs_live_fetch_service.refresh_from_tripstar(city="北京", keywords="", max_items=1)
+
+        latest = routes.xhs_live_fetch_service.get_latest_debug_log()
+        self.assertTrue(latest)
+        self.assertEqual(latest["parsed_response_summary"]["search_item_count"], 1)
+        self.assertEqual(latest["request"]["cookie"], "<masked:14 chars>")
+        self.assertEqual(
+            latest["parsed_response_summary"]["request_debug"]["search"]["url"],
+            "https://edith.xiaohongshu.com/api/sns/web/v1/search/notes",
+        )
+
     def test_refresh_xhs_content_source_requires_cookie(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = ""
         with self.assertRaises(Exception) as ctx:
@@ -457,6 +508,15 @@ class TravelApiFlowTestCase(unittest.TestCase):
                 routes.XHSRefreshPayload(city="北京", keywords="", max_items=1)
             )
         self.assertIn("小红书 Cookie", str(ctx.exception))
+
+    def test_refresh_xhs_content_source_requires_a1_cookie(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "web_session=test-session-only"
+        with self.assertRaises(Exception) as ctx:
+            routes.refresh_xhs_content_source(
+                routes.XHSRefreshPayload(city="北京", keywords="", max_items=1)
+            )
+
+        self.assertIn("缺少关键字段：a1", str(ctx.exception))
 
     def test_refresh_xhs_trip_content_returns_updated_plan(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"

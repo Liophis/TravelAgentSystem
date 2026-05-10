@@ -166,6 +166,7 @@ export interface RuntimeSettings {
   google_maps_api_key: string
   google_maps_proxy: string
   xhs_cookie: string
+  xhs_rap_param: string
   xhs_sample_notes_path: string
   openai_api_key: string
   openai_base_url: string
