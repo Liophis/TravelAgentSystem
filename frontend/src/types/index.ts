@@ -18,7 +18,39 @@ export interface Attraction {
   image_url?: string
   ticket_price?: number
   estimated_cost?: number
+  content_sources?: ContentSource[]
+  recommendation_reasons?: string[]
+  travel_notes?: TravelContentNote[]
   dayArrayIndex?: number
+}
+
+export interface ContentImage {
+  url: string
+  alt?: string
+}
+
+export interface ContentSource {
+  source_type: string
+  source_label: string
+  origin: 'external' | 'local_sample' | string
+}
+
+export interface TravelContentNote {
+  id: string
+  source_type: string
+  source_label: string
+  origin: 'external' | 'local_sample' | string
+  title: string
+  city: string
+  poi_name: string
+  author?: string
+  tags: string[]
+  images: ContentImage[]
+  highlights: string[]
+  cautions: string[]
+  excerpt?: string
+  match_reason?: string
+  note_url?: string
 }
 
 export interface Meal {
@@ -90,6 +122,8 @@ export interface TripPlan {
   overall_suggestions: string
   budget?: Budget
   request_summary?: RequestSummary
+  content_sources?: ContentSource[]
+  recommendation_reasons?: string[]
 }
 
 export interface TripFormData {
@@ -132,6 +166,8 @@ export interface RuntimeSettings {
   google_maps_api_key: string
   google_maps_proxy: string
   xhs_cookie: string
+  xhs_rap_param: string
+  xhs_sample_notes_path: string
   openai_api_key: string
   openai_base_url: string
   openai_model: string
@@ -142,6 +178,37 @@ export interface RuntimeSettingsResponse {
   success: boolean
   message: string
   data?: RuntimeSettings
+}
+
+export interface XHSContentSourceStatus {
+  active_source: 'runtime_import' | 'configured_path' | 'builtin_fallback' | string
+  source_name: string
+  path: string
+  note_count: number
+  format_kind: string
+  updated_at: string
+  uses_builtin_fallback: boolean
+}
+
+export interface XHSContentSourceResponse {
+  success: boolean
+  message: string
+  data?: XHSContentSourceStatus
+  meta?: {
+    query?: string
+    raw_note_count?: number
+  }
+}
+
+export interface XHSRefreshTripResponse {
+  success: boolean
+  message: string
+  data?: TripPlan
+  meta?: {
+    query?: string
+    raw_note_count?: number
+    content_source_status?: XHSContentSourceStatus
+  }
 }
 
 export interface PoiSummary {

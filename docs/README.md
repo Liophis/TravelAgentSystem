@@ -95,6 +95,7 @@ TravelAgentSystem/
 4. **地图展示**：AMap 交互式地图展示路由和景点
 5. **行程问答**：围绕当前计划进行最小 AI Chat 问答
 6. **国际化**：支持中文、英文、日文
+7. **P1 内容增强**：支持小红书内容结构、来源展示与本地样例降级
 
 当前 P0 主闭环已经收敛为：
 `首页表单 -> /api/trips -> Result.vue -> /api/routes -> /api/chat/ask`
@@ -111,6 +112,24 @@ TravelAgentSystem/
 8. `POST /api/trips`
 9. `POST /api/chat/ask`
 
+`POST /api/trips` 当前会附带 P1 内容增强字段：
+- `content_sources`
+- `recommendation_reasons`
+- 每个景点下的 `travel_notes` / `content_sources` / `recommendation_reasons`
+
+当前还提供更真实外部输入接口：
+- `GET /api/xhs/content-source`
+- `POST /api/xhs/content-source/import`
+- `DELETE /api/xhs/content-source/import`
+- `GET /api/xhs/content-source/debug/latest`
+
+`POST /api/xhs/content-source/import` 当前支持的输入格式：
+- 已规范化的 notes 数组
+- 小红书搜索原始响应 `search_response` / `data.items`
+- 小红书详情原始响应 `detail_response` / `data.items`
+- `TripStar` 风格 search/detail bundle
+- 第三方中间数据 `items` / `notes`
+
 ## 开发规范
 
 见 [三人协作流程.md](../三人协作流程.md) 和 [项目总览与执行说明.md](../项目总览与执行说明.md) 第 6-7 章
@@ -120,3 +139,7 @@ TravelAgentSystem/
 - 后端主闭环测试：`python -m unittest tests/test_api_flow.py`
 - 路线联调脚本：`bash tests/test_e2e_route.sh`
 - 前端联调前，请先确认后端服务已启动在 `http://127.0.0.1:8000`，或通过 `BASE_URL` 覆盖脚本默认地址
+- 如需覆盖内置小红书样例，可设置 `XHS_SAMPLE_NOTES_PATH=/abs/path/to/xhs_notes.json`；读取失败会自动回退到内置样例
+- 也可以在前端“运行时设置”中直接导入 JSON 文件，后端会保存为运行时外部样例并优先使用
+- `xhs_cookie` 的格式与 `TripStar` 保持兼容，既支持请求头字符串，也支持浏览器导出的 JSON Cookie 列表
+- 实时刷新链路会把诊断信息落盘到 `TravelAgentSystem/logs/xhs_debug/`，并可通过 `GET /api/xhs/content-source/debug/latest` 读取最近一次调试记录（cookie 会自动打码）

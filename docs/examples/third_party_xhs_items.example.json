@@ -1,0 +1,16 @@
+{
+  "source_label": "第三方采集结果",
+  "items": [
+    {
+      "id": "third-party-001",
+      "title": "颐和园慢游建议",
+      "city": "北京",
+      "poi_name": "颐和园",
+      "content": "更适合安排在节奏放松的一天。",
+      "tags": ["休闲", "园林"],
+      "images": [
+        "https://example.com/yiheyuan.jpg"
+      ]
+    }
+  ]
+}
