@@ -25,6 +25,27 @@ class XHSLiveFetchService:
         self.project_root = Path(__file__).resolve().parents[3]
         self.helper_script = self.project_root / "TravelAgentSystem" / "scripts" / "fetch_tripstar_xhs_bundle.py"
 
+    def _extract_json_from_output(self, raw_output: str) -> dict[str, Any]:
+        content = (raw_output or "").strip()
+        if not content:
+            return {}
+
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            pass
+
+        first_brace = content.find("{")
+        last_brace = content.rfind("}")
+        if first_brace == -1 or last_brace == -1 or first_brace >= last_brace:
+            raise XHSLiveFetchError(f"TripStar helper 返回了不可解析内容：{content[:200]}")
+
+        candidate = content[first_brace:last_brace + 1]
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError as exc:
+            raise XHSLiveFetchError(f"TripStar helper 返回了不可解析内容：{content[:200]}") from exc
+
     def refresh_from_tripstar(self, *, city: str, keywords: str = "", max_items: int = 4) -> dict[str, Any]:
         normalized_cookie = self.content_service.normalize_xhs_cookie(self.settings.xhs_cookie)
         if not normalized_cookie:
@@ -55,10 +76,7 @@ class XHSLiveFetchService:
             message = (result.stderr or "").strip() or "TripStar helper 运行失败。"
             raise XHSLiveFetchError(message)
 
-        try:
-            response = json.loads(raw_output or "{}")
-        except json.JSONDecodeError as exc:
-            raise XHSLiveFetchError(f"TripStar helper 返回了不可解析内容：{raw_output[:200]}") from exc
+        response = self._extract_json_from_output(raw_output)
 
         if not response.get("success"):
             raise XHSLiveFetchError(str(response.get("message") or "TripStar 实时抓取失败。"))

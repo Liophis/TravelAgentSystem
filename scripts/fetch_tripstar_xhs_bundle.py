@@ -7,6 +7,29 @@ import json
 import sys
 from pathlib import Path
 
+CITY_SEGMENT_SEPARATORS = ("-", "·", "/", "|", ",", "，", " ")
+
+
+def _pick_query_city(city: str) -> str:
+    raw = str(city or "").strip()
+    if not raw:
+        return ""
+
+    candidates = [raw]
+    for separator in CITY_SEGMENT_SEPARATORS:
+        next_candidates: list[str] = []
+        for item in candidates:
+            parts = [part.strip() for part in item.split(separator) if part.strip()]
+            if len(parts) > 1:
+                next_candidates.extend(parts)
+        candidates.extend(next_candidates)
+
+    chinese_candidates = [item for item in candidates if any("\u4e00" <= ch <= "\u9fff" for ch in item)]
+    if chinese_candidates:
+        return max(chinese_candidates, key=lambda x: (len(x), x.count("市")))
+
+    return candidates[-1]
+
 
 def _emit(payload: dict) -> None:
     sys.stdout.write(json.dumps(payload, ensure_ascii=False))
@@ -50,7 +73,8 @@ def main() -> int:
         _emit({"success": False, "message": "cookie 不能为空"})
         return 1
 
-    query = f"{city} {keywords} 旅游 景点攻略".strip()
+    query_city = _pick_query_city(city)
+    query = f"{query_city or city} {keywords} 旅游 景点攻略".strip()
     client = XhsNativeClient(cookie)
 
     try:
@@ -85,6 +109,7 @@ def main() -> int:
             "raw_note_count": matched_count,
             "data": {
                 "city": city,
+                "query_city": query_city or city,
                 "keywords": keywords,
                 "search_response": search_response,
                 "detail_response": {"data": {"items": detail_items}},

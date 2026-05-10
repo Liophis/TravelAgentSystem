@@ -325,6 +325,56 @@ class TravelApiFlowTestCase(unittest.TestCase):
         )
         self.assertEqual(bundle["notes"][0]["title"], "故宫实时刷新内容")
 
+    def test_live_fetch_service_parses_noisy_helper_stdout(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
+        helper_payload = {
+            "success": True,
+            "query": "北京 旅游 景点攻略",
+            "raw_note_count": 1,
+            "data": {
+                "city": "北京",
+                "search_response": {
+                    "data": {
+                        "items": [
+                            {
+                                "id": "noisy-note-1",
+                                "model_type": "note",
+                                "note_card": {"display_title": "日志污染下的故宫内容"},
+                            }
+                        ]
+                    }
+                },
+                "detail_response": {
+                    "data": {
+                        "items": [
+                            {
+                                "note_card": {
+                                    "note_id": "noisy-note-1",
+                                    "title": "日志污染下的故宫内容",
+                                    "desc": "即使前面有日志，也应该能解析 JSON。",
+                                    "city": "北京",
+                                    "poi_name": "故宫博物院",
+                                }
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+        noisy_stdout = "[XHS_SIGN] signature JS engine loaded\n" + json.dumps(helper_payload, ensure_ascii=False)
+
+        with patch("app.services.xhs_live_fetch_service.subprocess.run") as mocked_run:
+            mocked_run.return_value = subprocess.CompletedProcess(
+                args=["python"],
+                returncode=0,
+                stdout=noisy_stdout,
+                stderr="",
+            )
+            refreshed = routes.xhs_live_fetch_service.refresh_from_tripstar(city="北京", keywords="", max_items=1)
+
+        self.assertEqual(refreshed["query"], "北京 旅游 景点攻略")
+        self.assertEqual(refreshed["status"]["active_source"], "runtime_import")
+
     def test_refresh_xhs_content_source_requires_cookie(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = ""
         with self.assertRaises(Exception) as ctx:
