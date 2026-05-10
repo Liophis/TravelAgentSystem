@@ -7,6 +7,7 @@ import type {
   TripChatRequest,
   TripChatResponse,
   TripPlanResponse,
+  XHSContentSourceResponse,
 } from '@/types'
 
 const apiBase = import.meta.env.VITE_API_BASE_URL ?? ''
@@ -74,6 +75,7 @@ const normalizeRuntimeSettings = (data?: Partial<RuntimeSettings>): RuntimeSetti
   google_maps_api_key: normalizeText(data?.google_maps_api_key),
   google_maps_proxy: normalizeText(data?.google_maps_proxy),
   xhs_cookie: normalizeText(data?.xhs_cookie),
+  xhs_sample_notes_path: normalizeText(data?.xhs_sample_notes_path),
   openai_api_key: normalizeText(data?.openai_api_key),
   openai_base_url: normalizeText(data?.openai_base_url),
   openai_model: normalizeText(data?.openai_model),
@@ -102,6 +104,7 @@ export const saveRuntimeSettings = async (settings: RuntimeSettings): Promise<Ru
       google_maps_api_key: settings.google_maps_api_key,
       google_maps_proxy: settings.google_maps_proxy,
       xhs_cookie: settings.xhs_cookie,
+      xhs_sample_notes_path: settings.xhs_sample_notes_path,
       openai_api_key: settings.openai_api_key,
       openai_base_url: settings.openai_base_url,
       openai_model: settings.openai_model,
@@ -168,5 +171,20 @@ export const generateTrip = async (payload: {
 
 export const askTripChat = async (payload: TripChatRequest) => {
   const response = await http.post<TripChatResponse>('/api/chat/ask', payload)
+  return response.data
+}
+
+export const getXhsContentSourceStatus = async () => {
+  const response = await http.get<XHSContentSourceResponse>('/api/xhs/content-source')
+  return response.data
+}
+
+export const importXhsContentSource = async (payload: { source_name?: string; notes: object[] }) => {
+  const response = await http.post<XHSContentSourceResponse>('/api/xhs/content-source/import', payload)
+  return response.data
+}
+
+export const clearXhsContentSourceImport = async () => {
+  const response = await http.delete<XHSContentSourceResponse>('/api/xhs/content-source/import')
   return response.data
 }

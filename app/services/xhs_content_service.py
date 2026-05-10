@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+from datetime import datetime, UTC
 
 from app.config import get_settings
 
@@ -76,14 +77,15 @@ class XHSContentService:
 
     def __init__(self) -> None:
         self.settings = get_settings()
+        self.runtime_notes_path = Path(__file__).resolve().parents[2] / "runtime_xhs_notes.json"
+        self.runtime_meta_path = Path(__file__).resolve().parents[2] / "runtime_xhs_notes.meta.json"
 
-    def _load_external_candidates(self) -> list[dict[str, Any]]:
-        sample_path = (self.settings.xhs_sample_notes_path or "").strip()
-        if not sample_path:
-            return []
+    def _read_json_file(self, path: Path) -> Any:
+        return json.loads(path.read_text(encoding="utf-8"))
 
+    def _load_notes_from_file(self, path: Path, *, default_origin: str) -> list[dict[str, Any]]:
         try:
-            payload = json.loads(Path(sample_path).read_text(encoding="utf-8"))
+            payload = self._read_json_file(path)
         except Exception:
             return []
 
@@ -93,8 +95,23 @@ class XHSContentService:
         normalized: list[dict[str, Any]] = []
         for item in payload:
             if isinstance(item, dict):
-                normalized.append(self._normalize_note(item, default_origin="external"))
+                normalized.append(self._normalize_note(item, default_origin=default_origin))
         return normalized
+
+    def _load_runtime_import_candidates(self) -> list[dict[str, Any]]:
+        if not self.runtime_notes_path.exists():
+            return []
+        return self._load_notes_from_file(self.runtime_notes_path, default_origin="external")
+
+    def _load_external_candidates(self) -> list[dict[str, Any]]:
+        imported_notes = self._load_runtime_import_candidates()
+        if imported_notes:
+            return imported_notes
+
+        sample_path = (self.settings.xhs_sample_notes_path or "").strip()
+        if not sample_path:
+            return []
+        return self._load_notes_from_file(Path(sample_path), default_origin="external")
 
     def _normalize_note(self, item: dict[str, Any], *, default_origin: str) -> dict[str, Any]:
         title = str(item.get("title") or item.get("poi_name") or item.get("city") or "旅行内容").strip()
@@ -181,6 +198,88 @@ class XHSContentService:
 
     def _search_builtin_candidates(self, city: str, pois: list[object], keywords: list[str]) -> list[dict[str, Any]]:
         return self._match_notes(BUILTIN_XHS_NOTES, city=city, pois=pois, keywords=keywords)
+
+    def validate_import_payload(self, notes: Any) -> list[dict[str, Any]]:
+        if not isinstance(notes, list) or not notes:
+            raise ValueError("notes 必须是非空 JSON 数组")
+
+        normalized: list[dict[str, Any]] = []
+        for index, item in enumerate(notes):
+            if not isinstance(item, dict):
+                raise ValueError(f"第 {index + 1} 条内容不是对象")
+
+            normalized_note = self._normalize_note(item, default_origin="external")
+            if not normalized_note.get("city"):
+                raise ValueError(f"第 {index + 1} 条内容缺少 city")
+            if not normalized_note.get("title"):
+                raise ValueError(f"第 {index + 1} 条内容缺少 title")
+            normalized.append(normalized_note)
+
+        return normalized
+
+    def import_notes(self, notes: Any, *, source_name: str = "") -> dict[str, Any]:
+        normalized = self.validate_import_payload(notes)
+        self.runtime_notes_path.parent.mkdir(parents=True, exist_ok=True)
+        self.runtime_notes_path.write_text(json.dumps(normalized, ensure_ascii=False, indent=2), encoding="utf-8")
+
+        metadata = {
+            "source_name": source_name.strip() or "uploaded_notes.json",
+            "note_count": len(normalized),
+            "updated_at": datetime.now(UTC).isoformat(),
+            "path": str(self.runtime_notes_path),
+            "active_source": "runtime_import",
+        }
+        self.runtime_meta_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2), encoding="utf-8")
+        return self.get_content_source_status()
+
+    def clear_imported_notes(self) -> dict[str, Any]:
+        if self.runtime_notes_path.exists():
+            self.runtime_notes_path.unlink()
+        if self.runtime_meta_path.exists():
+            self.runtime_meta_path.unlink()
+        return self.get_content_source_status()
+
+    def get_content_source_status(self) -> dict[str, Any]:
+        metadata: dict[str, Any] = {}
+        if self.runtime_meta_path.exists():
+            try:
+                loaded = self._read_json_file(self.runtime_meta_path)
+                if isinstance(loaded, dict):
+                    metadata = loaded
+            except Exception:
+                metadata = {}
+
+        if self.runtime_notes_path.exists():
+            note_count = len(self._load_runtime_import_candidates())
+            return {
+                "active_source": "runtime_import",
+                "source_name": metadata.get("source_name") or self.runtime_notes_path.name,
+                "path": str(self.runtime_notes_path),
+                "note_count": note_count,
+                "updated_at": metadata.get("updated_at") or "",
+                "uses_builtin_fallback": False,
+            }
+
+        sample_path = (self.settings.xhs_sample_notes_path or "").strip()
+        if sample_path:
+            note_count = len(self._load_notes_from_file(Path(sample_path), default_origin="external"))
+            return {
+                "active_source": "configured_path",
+                "source_name": Path(sample_path).name,
+                "path": sample_path,
+                "note_count": note_count,
+                "updated_at": "",
+                "uses_builtin_fallback": note_count == 0,
+            }
+
+        return {
+            "active_source": "builtin_fallback",
+            "source_name": "builtin_xhs_notes",
+            "path": "",
+            "note_count": len(BUILTIN_XHS_NOTES),
+            "updated_at": "",
+            "uses_builtin_fallback": True,
+        }
 
     def get_content_candidates(self, city: str, preferences: list[str] | None, pois: list[object]) -> list[dict[str, Any]]:
         keywords = [city, *(preferences or []), *(str(getattr(poi, "name", "")).strip() for poi in pois)]

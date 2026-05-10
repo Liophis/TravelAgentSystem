@@ -24,6 +24,8 @@ class TravelApiFlowTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.temp_dir = tempfile.TemporaryDirectory()
         cls.db_path = Path(cls.temp_dir.name) / "test_travel_agent.db"
+        cls.runtime_xhs_notes_path = Path(cls.temp_dir.name) / "runtime_xhs_notes.json"
+        cls.runtime_xhs_meta_path = Path(cls.temp_dir.name) / "runtime_xhs_notes.meta.json"
         cls.engine = create_engine(
             f"sqlite:///{cls.db_path}",
             connect_args={"check_same_thread": False},
@@ -32,18 +34,24 @@ class TravelApiFlowTestCase(unittest.TestCase):
         Base.metadata.create_all(bind=cls.engine)
 
         cls.original_session_local = routes.SessionLocal
+        cls.original_xhs_sample_notes_path = routes.xhs_content_service.settings.xhs_sample_notes_path
         routes.SessionLocal = cls.SessionLocal
+        routes.xhs_content_service.settings.xhs_sample_notes_path = ""
 
         cls._seed_data()
 
         routes.poi_service.trie = routes.POIService().trie
         routes.poi_service.graph = routes.POIService().graph
         routes.route_service.graph = routes.poi_service.graph
+        routes.xhs_content_service.runtime_notes_path = cls.runtime_xhs_notes_path
+        routes.xhs_content_service.runtime_meta_path = cls.runtime_xhs_meta_path
+        routes.xhs_content_service.clear_imported_notes()
 
     @classmethod
     def tearDownClass(cls):
         close_all_sessions()
         routes.SessionLocal = cls.original_session_local
+        routes.xhs_content_service.settings.xhs_sample_notes_path = cls.original_xhs_sample_notes_path
         Base.metadata.drop_all(bind=cls.engine)
         cls.engine.dispose()
         cls.temp_dir.cleanup()
@@ -91,6 +99,9 @@ class TravelApiFlowTestCase(unittest.TestCase):
         routes.poi_service.trie = routes.POIService().trie
         routes.poi_service.graph = routes.POIService().graph
         routes.route_service.graph = routes.poi_service.graph
+        routes.xhs_content_service.runtime_notes_path = self.runtime_xhs_notes_path
+        routes.xhs_content_service.runtime_meta_path = self.runtime_xhs_meta_path
+        routes.xhs_content_service.clear_imported_notes()
 
     def test_generate_trip_returns_structured_plan(self):
         db = self.SessionLocal()
@@ -186,6 +197,8 @@ class TravelApiFlowTestCase(unittest.TestCase):
 
     def test_xhs_content_service_falls_back_to_builtin_samples(self):
         service = XHSContentService()
+        service.runtime_notes_path = self.runtime_xhs_notes_path
+        service.runtime_meta_path = self.runtime_xhs_meta_path
         with patch.object(service, "_load_external_candidates", return_value=[]):
             bundle = service.enrich_trip_plan(
                 city="北京",
@@ -196,6 +209,59 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertTrue(bundle["uses_fallback"])
         self.assertTrue(bundle["notes"])
         self.assertEqual(bundle["sources"][0]["origin"], "local_sample")
+
+    def test_imported_xhs_notes_take_priority_over_builtin(self):
+        imported_notes = [
+            {
+                "id": "external-beijing-gugong",
+                "title": "真实导入的故宫样例",
+                "city": "北京",
+                "poi_name": "故宫博物院",
+                "tags": ["历史文化"],
+                "highlights": ["导入内容优先命中故宫。"],
+                "excerpt": "这是外部导入内容。",
+            }
+        ]
+
+        import_payload = routes.import_xhs_content_source(
+            routes.XHSImportPayload(source_name="beijing.json", notes=imported_notes)
+        )
+        self.assertTrue(import_payload["success"])
+        self.assertEqual(import_payload["data"]["active_source"], "runtime_import")
+        self.assertEqual(import_payload["data"]["note_count"], 1)
+
+        db = self.SessionLocal()
+        try:
+            payload = routes.generate_trip(
+                city="北京",
+                start_date="2026-05-10",
+                end_date="2026-05-12",
+                travel_days=2,
+                transportation="公共交通",
+                accommodation="舒适型酒店",
+                preferences=["历史文化"],
+                free_text_input="",
+                db=db,
+            )
+        finally:
+            db.close()
+
+        first_note = payload["data"]["days"][0]["attractions"][0]["travel_notes"][0]
+        self.assertEqual(first_note["title"], "真实导入的故宫样例")
+        self.assertEqual(first_note["origin"], "external")
+
+    def test_xhs_content_source_status_reports_builtin_after_clear(self):
+        routes.import_xhs_content_source(
+            routes.XHSImportPayload(
+                source_name="temp.json",
+                notes=[{"title": "外部样例", "city": "北京", "poi_name": "故宫博物院"}],
+            )
+        )
+        cleared = routes.clear_xhs_content_source_import()
+
+        self.assertTrue(cleared["success"])
+        self.assertEqual(cleared["data"]["active_source"], "builtin_fallback")
+        self.assertTrue(cleared["data"]["uses_builtin_fallback"])
 
 
 if __name__ == "__main__":

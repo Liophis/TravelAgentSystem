@@ -117,6 +117,11 @@ TravelAgentSystem/
 - `recommendation_reasons`
 - 每个景点下的 `travel_notes` / `content_sources` / `recommendation_reasons`
 
+当前还提供更真实外部输入接口：
+- `GET /api/xhs/content-source`
+- `POST /api/xhs/content-source/import`
+- `DELETE /api/xhs/content-source/import`
+
 ## 开发规范
 
 见 [三人协作流程.md](../三人协作流程.md) 和 [项目总览与执行说明.md](../项目总览与执行说明.md) 第 6-7 章
@@ -127,3 +132,4 @@ TravelAgentSystem/
 - 路线联调脚本：`bash tests/test_e2e_route.sh`
 - 前端联调前，请先确认后端服务已启动在 `http://127.0.0.1:8000`，或通过 `BASE_URL` 覆盖脚本默认地址
 - 如需覆盖内置小红书样例，可设置 `XHS_SAMPLE_NOTES_PATH=/abs/path/to/xhs_notes.json`；读取失败会自动回退到内置样例
+- 也可以在前端“运行时设置”中直接导入 JSON 文件，后端会保存为运行时外部样例并优先使用

@@ -43,10 +43,18 @@ class RuntimeSettingsPayload(BaseModel):
     google_maps_api_key: Optional[str] = Field(default=None, description="Google Maps API Key")
     google_maps_proxy: Optional[str] = Field(default=None, description="Google Maps Proxy")
     xhs_cookie: Optional[str] = Field(default=None, description="XHS Cookie")
+    xhs_sample_notes_path: Optional[str] = Field(default=None, description="XHS sample notes JSON path")
     openai_api_key: Optional[str] = Field(default=None, description="OpenAI API Key")
     openai_base_url: Optional[str] = Field(default=None, description="OpenAI Base URL")
     openai_model: Optional[str] = Field(default=None, description="OpenAI Model")
     log_level: Optional[str] = Field(default=None, description="Log level")
+
+
+class XHSImportPayload(BaseModel):
+    """Payload for importing external XHS-like notes."""
+
+    source_name: Optional[str] = Field(default=None, description="Imported file name")
+    notes: list[dict] = Field(..., min_length=1, description="Normalized XHS-like note objects")
 
 
 INTEREST_KEYWORDS: dict[str, tuple[str, ...]] = {
@@ -318,6 +326,38 @@ def save_runtime_settings(payload: RuntimeSettingsPayload):
         "success": True,
         "message": "配置已保存并立即生效",
         "data": updated,
+    }
+
+
+@router.get("/xhs/content-source", tags=["XHS Content"])
+def get_xhs_content_source_status():
+    return {
+        "success": True,
+        "message": "ok",
+        "data": xhs_content_service.get_content_source_status(),
+    }
+
+
+@router.post("/xhs/content-source/import", tags=["XHS Content"])
+def import_xhs_content_source(payload: XHSImportPayload):
+    try:
+        status = xhs_content_service.import_notes(payload.notes, source_name=payload.source_name or "")
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {
+        "success": True,
+        "message": "外部内容样例已导入",
+        "data": status,
+    }
+
+
+@router.delete("/xhs/content-source/import", tags=["XHS Content"])
+def clear_xhs_content_source_import():
+    return {
+        "success": True,
+        "message": "已清除导入的外部样例",
+        "data": xhs_content_service.clear_imported_notes(),
     }
 
 

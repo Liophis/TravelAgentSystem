@@ -138,6 +138,29 @@ select {
   gap: 16px;
 }
 
+.xhs-import-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.xhs-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.xhs-import-status {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(125, 167, 182, 0.18);
+  background: rgba(47, 168, 154, 0.08);
+  color: var(--text-soft);
+}
+
+.xhs-import-status p {
+  margin: 6px 0 0;
+}
+
 .locale-select {
   width: 120px;
 }

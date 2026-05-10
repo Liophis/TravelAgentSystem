@@ -166,6 +166,7 @@ export interface RuntimeSettings {
   google_maps_api_key: string
   google_maps_proxy: string
   xhs_cookie: string
+  xhs_sample_notes_path: string
   openai_api_key: string
   openai_base_url: string
   openai_model: string
@@ -176,6 +177,21 @@ export interface RuntimeSettingsResponse {
   success: boolean
   message: string
   data?: RuntimeSettings
+}
+
+export interface XHSContentSourceStatus {
+  active_source: 'runtime_import' | 'configured_path' | 'builtin_fallback' | string
+  source_name: string
+  path: string
+  note_count: number
+  updated_at: string
+  uses_builtin_fallback: boolean
+}
+
+export interface XHSContentSourceResponse {
+  success: boolean
+  message: string
+  data?: XHSContentSourceStatus
 }
 
 export interface PoiSummary {
