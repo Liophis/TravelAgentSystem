@@ -152,51 +152,6 @@ export const createUser = async (payload: { username: string; email: string; int
   return response.data
 }
 
-export const generateDemoPlan = async (): Promise<TripPlanResponse> => {
-  try {
-    // Try backend-generated plan using default demo params
-    const params = {
-      city: 'Tokyo',
-      start_date: '2026-05-01',
-      end_date: '2026-05-03',
-      travel_days: 3,
-    }
-    const res = await http.post('/api/trips', null, { params })
-    return res.data as TripPlanResponse
-  } catch (err) {
-    // fallback local demo
-    return {
-      success: true,
-      message: 'demo',
-      data: {
-        city: 'Tokyo',
-        start_date: '2026-05-01',
-        end_date: '2026-05-03',
-        overall_suggestions: 'This is a demo itinerary scaffold. Connect your backend generator here.',
-        weather_info: [],
-        budget: {
-          total_attractions: 1200,
-          total_hotels: 1800,
-          total_meals: 900,
-          total_transportation: 300,
-          total: 4200,
-        },
-        days: [
-          {
-            date: '2026-05-01',
-            day_index: 0,
-            description: 'Arrival and city orientation',
-            transportation: 'Mixed',
-            accommodation: 'Comfort hotel',
-            attractions: [],
-            meals: [],
-          },
-        ],
-      },
-    }
-  }
-}
-
 export const generateTrip = async (payload: {
   city: string
   start_date: string

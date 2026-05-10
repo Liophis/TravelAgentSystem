@@ -222,11 +222,11 @@ def _build_request_summary(
         "accommodation": accommodation,
         "preferences": preferences or [],
         "free_text_input": free_text_input or "",
-        "data_mode": "city_match" if requested_city_matched else "sample_fallback",
+        "data_mode": "city_match" if requested_city_matched else "local_sample",
         "data_note": (
             f"已按 {city} 本地样例景点生成计划。"
             if requested_city_matched
-            else f"{city} 当前没有完整本地景点库，已回退到现有样例数据生成计划。"
+            else f"{city} 当前没有完整本地景点库，已使用现有样例数据生成计划。"
         ),
     }
 

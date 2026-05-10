@@ -56,7 +56,7 @@ export interface RequestSummary {
   accommodation: string
   preferences: string[]
   free_text_input: string
-  data_mode: 'city_match' | 'sample_fallback'
+  data_mode: 'city_match' | 'local_sample'
   data_note: string
 }
 

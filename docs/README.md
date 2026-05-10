@@ -96,6 +96,9 @@ TravelAgentSystem/
 5. **行程问答**：围绕当前计划进行最小 AI Chat 问答
 6. **国际化**：支持中文、英文、日文
 
+当前 P0 主闭环已经收敛为：
+`首页表单 -> /api/trips -> Result.vue -> /api/routes -> /api/chat/ask`
+
 ## 当前第一阶段公开接口
 
 1. `GET /api/settings`
@@ -111,3 +114,9 @@ TravelAgentSystem/
 ## 开发规范
 
 见 [三人协作流程.md](../三人协作流程.md) 和 [项目总览与执行说明.md](../项目总览与执行说明.md) 第 6-7 章
+
+## 联调与验证
+
+- 后端主闭环测试：`python -m unittest tests/test_api_flow.py`
+- 路线联调脚本：`bash tests/test_e2e_route.sh`
+- 前端联调前，请先确认后端服务已启动在 `http://127.0.0.1:8000`，或通过 `BASE_URL` 覆盖脚本默认地址

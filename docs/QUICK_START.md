@@ -1,4 +1,4 @@
-# 项目最小框架快速启动指南
+# 项目快速启动指南
 
 ## 项目结构概览
 
@@ -9,7 +9,7 @@ TravelAgentSystem/
 │   ├── __init__.py
 │   ├── api/
 │   │   ├── __init__.py
-│   │   └── routes.py        # API 路由（已完善的多个端点）
+│   │   └── routes.py        # API 路由
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── poi_service.py   # 景点查询服务
@@ -31,7 +31,10 @@ TravelAgentSystem/
 │       ├── poi.py           # POI Pydantic 模型
 │       └── chat.py          # Chat Pydantic 模型
 ├── requirements.txt         # Python 依赖
-└── README.md               # 本文件
+├── tests/
+│   ├── test_api_flow.py    # 后端主闭环单元测试
+│   └── test_e2e_route.sh   # 联调脚本
+└── docs/README.md          # 文档入口
 ```
 
 ## 快速启动
@@ -72,7 +75,17 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 4. 访问 API
+### 4. 启动前端（可选）
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+默认前端地址：`http://127.0.0.1:5173`
+
+### 5. 访问 API
 
 浏览器访问：`http://127.0.0.1:8000/docs`
 
@@ -93,6 +106,10 @@ uvicorn app.main:app --reload --port 8000
 - `POST /api/trips` - 生成旅行计划
 - `POST /api/chat/ask` - 基于当前旅行计划进行问答
 
+### 设置相关
+- `GET /api/settings` - 读取运行时配置
+- `PUT /api/settings` - 保存运行时配置
+
 ## 核心模块说明
 
 ### 1. 数据结构 (app/core/)
@@ -104,7 +121,8 @@ uvicorn app.main:app --reload --port 8000
 ### 2. 服务层 (app/services/)
 
 - **POIService**: 管理景点的 CRUD、搜索、索引
-- **RouteService**: 处理路线规划逻辑
+- **RouteService**: 处理路线规划逻辑，优先尝试高德路线，失败后降级到本地 Dijkstra
+- **Trip Generation**: 在 `/api/trips` 中完成候选筛选、Top-K 和日程组装
 - **Chat Service**: 围绕当前行程生成追问回复
 
 ### 3. 数据库 (app/db/)
@@ -147,16 +165,15 @@ def get_example(id: int, db: Session = Depends(get_db)):
 - RouteService 可以继续收敛为更真实的图模型
 - Chat Service 后续可升级为 LLM 驱动问答
 
-## 下一步任务
+## 当前建议操作
 
-1. **重构 `/api/trips`**: 从 demo 行程生成器升级为真实闭环入口
-2. **收敛 Result 页**: 移除演示 fallback，全面使用真实数据
-3. **增强路线图模型**: 让 Dijkstra 降级方案更贴近真实路径网络
-4. **扩展 AI 问答**: 从规则化回复升级为 LLM 上下文问答
-5. **第二阶段扩展**: 再接入倒排索引、Huffman、知识图谱等能力
+1. 先运行 `python -m unittest tests/test_api_flow.py` 验证后端主闭环。
+2. 启动后端后，再运行 `bash tests/test_e2e_route.sh` 做接口联调。
+3. 若继续开发，请以 `项目总览与执行说明.md` 中的 P0/P1 节奏为准。
 
 ## 注意事项
 
 - 数据库文件存储在项目根目录，为 `travel_agent.db`（SQLite）
 - 开发时使用 `--reload` 标志，代码修改会自动重新加载
 - API 文档地址：`/docs`（Swagger UI）和 `/redoc`（ReDoc）
+- `test_e2e_route.sh` 依赖本地后端已启动，默认访问 `http://127.0.0.1:8000`

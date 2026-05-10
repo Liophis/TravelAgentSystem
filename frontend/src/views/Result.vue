@@ -328,8 +328,8 @@ const recommendationReasons = computed(() => {
     reasons.push(`已结合你的偏好：${requestSummary.value.preferences.join('、')}。`)
   }
 
-  if (requestSummary.value?.data_mode === 'sample_fallback') {
-    reasons.push('当前目标城市样例还不完整，因此系统使用现有样例景点做演示型推荐。')
+  if (requestSummary.value?.data_mode === 'local_sample') {
+    reasons.push('当前目标城市样例还不完整，因此系统使用现有本地景点数据生成了可用行程。')
   } else {
     reasons.push('当前推荐优先命中了目标城市样例数据，结果更接近真实城市内游览。')
   }
@@ -388,7 +388,7 @@ const budgetBreakdown = computed(() => {
       label: '餐饮',
       amount: budget.value.total_meals,
       percent: buildPercent(budget.value.total_meals),
-      description: `按 ${days.value.length} 天基础餐饮估算，适合做演示型预算参考。`,
+      description: `按 ${days.value.length} 天基础餐饮估算，可作为当前行程的基础预算参考。`,
     },
     {
       key: 'transport',
@@ -405,7 +405,7 @@ const stayTransportNote = computed(() => {
 })
 const budgetPresentationNote = computed(() => {
   if (!budget.value) return '当前没有可展示的预算信息。'
-  return `这份预算适合在课程演示中说明“系统不仅生成了路线，还给出了基础成本拆分与判断”。`
+  return '这份预算已经覆盖门票、住宿、餐饮和交通拆分，适合用来快速判断行程成本结构。'
 })
 
 const goHome = () => void router.push('/')
