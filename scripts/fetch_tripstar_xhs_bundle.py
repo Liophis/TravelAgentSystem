@@ -15,24 +15,54 @@ def _pick_query_city(city: str) -> str:
     if not raw:
         return ""
 
-    candidates = [raw]
+    split_candidates: list[str] = []
+    pending = [raw]
     for separator in CITY_SEGMENT_SEPARATORS:
-        next_candidates: list[str] = []
-        for item in candidates:
+        next_pending: list[str] = []
+        for item in pending:
             parts = [part.strip() for part in item.split(separator) if part.strip()]
             if len(parts) > 1:
-                next_candidates.extend(parts)
-        candidates.extend(next_candidates)
+                split_candidates.extend(parts)
+                next_pending.extend(parts)
+        pending.extend(next_pending)
 
-    chinese_candidates = [item for item in candidates if any("\u4e00" <= ch <= "\u9fff" for ch in item)]
+    if not split_candidates:
+        split_candidates = [raw]
+
+    chinese_candidates = [item for item in split_candidates if any("\u4e00" <= ch <= "\u9fff" for ch in item)]
     if chinese_candidates:
-        return max(chinese_candidates, key=lambda x: (len(x), x.count("市")))
+        preferred = [item for item in chinese_candidates if item not in {"中国", "中华人民共和国"}]
+        target = preferred or chinese_candidates
+        return min(target, key=lambda x: (len(x), split_candidates.index(x)))
 
-    return candidates[-1]
+    return split_candidates[-1]
 
 
 def _emit(payload: dict) -> None:
     sys.stdout.write(json.dumps(payload, ensure_ascii=False))
+
+
+def _build_query_candidates(city: str, keywords: str, poi_names: list[str]) -> list[str]:
+    query_city = _pick_query_city(city) or city
+    keyword_parts = [part.strip() for part in str(keywords or "").replace("，", " ").replace(",", " ").split() if part.strip()]
+    poi_parts = [str(item).strip() for item in poi_names if str(item).strip()]
+
+    candidates = [
+        f"{query_city} {' '.join(keyword_parts[:2])} 旅游 景点攻略".strip(),
+        f"{query_city} {' '.join(keyword_parts[:2])} 攻略".strip(),
+        f"{query_city} {' '.join(poi_parts[:2])} 攻略".strip() if poi_parts else "",
+        f"{query_city} 景点 推荐".strip(),
+        f"{query_city} 一日游 攻略".strip(),
+    ]
+
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        normalized = " ".join(item.split()).strip()
+        if normalized and normalized not in seen:
+            seen.add(normalized)
+            deduped.append(normalized)
+    return deduped
 
 
 def main() -> int:
@@ -63,6 +93,7 @@ def main() -> int:
 
     city = str(payload.get("city") or "").strip()
     keywords = str(payload.get("keywords") or "").strip()
+    poi_names = payload.get("poi_names") if isinstance(payload.get("poi_names"), list) else []
     cookie = str(payload.get("cookie") or "").strip()
     max_items = max(1, min(int(payload.get("max_items") or 4), 8))
 
@@ -73,15 +104,25 @@ def main() -> int:
         _emit({"success": False, "message": "cookie 不能为空"})
         return 1
 
-    query_city = _pick_query_city(city)
-    query = f"{query_city or city} {keywords} 旅游 景点攻略".strip()
     client = XhsNativeClient(cookie)
-
-    try:
-        search_response = client.search_notes(keyword=query, page_size=max_items)
-    except Exception as exc:
-        _emit({"success": False, "message": f"TripStar 搜索失败: {exc}"})
-        return 1
+    query_candidates = _build_query_candidates(city, keywords, poi_names)
+    query = query_candidates[0] if query_candidates else city
+    search_response = {}
+    last_error = ""
+    for candidate in query_candidates:
+        query = candidate
+        try:
+            search_response = client.search_notes(keyword=query, page_size=max_items)
+            items = search_response.get("data", {}).get("items", [])
+            if any(isinstance(item, dict) and item.get("model_type") == "note" for item in items):
+                break
+        except Exception as exc:
+            last_error = str(exc)
+            continue
+    else:
+        if last_error:
+            _emit({"success": False, "message": f"TripStar 搜索失败: {last_error}"})
+            return 1
 
     items = search_response.get("data", {}).get("items", [])
     detail_items: list[dict] = []
@@ -109,8 +150,9 @@ def main() -> int:
             "raw_note_count": matched_count,
             "data": {
                 "city": city,
-                "query_city": query_city or city,
+                "query_city": _pick_query_city(city) or city,
                 "keywords": keywords,
+                "query_candidates": query_candidates,
                 "search_response": search_response,
                 "detail_response": {"data": {"items": detail_items}},
             },

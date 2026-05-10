@@ -46,7 +46,14 @@ class XHSLiveFetchService:
         except json.JSONDecodeError as exc:
             raise XHSLiveFetchError(f"TripStar helper 返回了不可解析内容：{content[:200]}") from exc
 
-    def refresh_from_tripstar(self, *, city: str, keywords: str = "", max_items: int = 4) -> dict[str, Any]:
+    def refresh_from_tripstar(
+        self,
+        *,
+        city: str,
+        keywords: str = "",
+        poi_names: list[str] | None = None,
+        max_items: int = 4,
+    ) -> dict[str, Any]:
         normalized_cookie = self.content_service.normalize_xhs_cookie(self.settings.xhs_cookie)
         if not normalized_cookie:
             raise XHSLiveFetchError("当前未配置小红书 Cookie，无法进行实时内容刷新。")
@@ -54,6 +61,7 @@ class XHSLiveFetchService:
         payload = {
             "city": city.strip(),
             "keywords": keywords.strip(),
+            "poi_names": [str(item).strip() for item in (poi_names or []) if str(item).strip()][:4],
             "max_items": max(1, min(int(max_items or 4), 8)),
             "cookie": normalized_cookie,
             "project_root": str(self.project_root),
@@ -85,13 +93,27 @@ class XHSLiveFetchService:
         if not bundle:
             raise XHSLiveFetchError("TripStar 实时抓取没有返回可用数据。")
 
-        status = self.content_service.import_notes(
-            bundle,
-            source_name=f"tripstar-live-{city.strip() or 'xhs'}.json",
-            format_hint="xhs_search_response",
-        )
+        raw_note_count = int(response.get("raw_note_count") or 0)
+        if raw_note_count <= 0:
+            tried_queries = response.get("data", {}).get("query_candidates") or []
+            query_hint = "；".join(str(item) for item in tried_queries[:3] if str(item).strip())
+            raise XHSLiveFetchError(
+                f"已发起小红书实时搜索，但当前查询 `{response.get('query') or city}` 没有返回可用笔记。"
+                + (f" 本次已尝试：{query_hint}。" if query_hint else "")
+                + " 你可以改用更短的城市词、补充更贴近景点的关键词，或稍后重试。"
+            )
+
+        try:
+            status = self.content_service.import_notes(
+                bundle,
+                source_name=f"tripstar-live-{city.strip() or 'xhs'}.json",
+                format_hint="xhs_search_response",
+            )
+        except ValueError as exc:
+            raise XHSLiveFetchError(f"小红书实时抓取已返回响应，但内容适配失败：{exc}") from exc
+
         return {
             "status": status,
             "query": response.get("query") or "",
-            "raw_note_count": int(response.get("raw_note_count") or 0),
+            "raw_note_count": raw_note_count,
         }

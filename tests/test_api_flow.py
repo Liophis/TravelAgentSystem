@@ -19,6 +19,7 @@ from app.api import routes
 from app.models import TripChatRequest
 from app.db.models import Base, POI
 from app.services.xhs_content_service import XHSContentService
+from scripts.fetch_tripstar_xhs_bundle import _pick_query_city
 
 
 class TravelApiFlowTestCase(unittest.TestCase):
@@ -325,6 +326,13 @@ class TravelApiFlowTestCase(unittest.TestCase):
         )
         self.assertEqual(bundle["notes"][0]["title"], "故宫实时刷新内容")
 
+    def test_build_query_candidates_prefers_city_and_pois(self):
+        from scripts.fetch_tripstar_xhs_bundle import _build_query_candidates
+
+        candidates = _build_query_candidates("中国-北京", "历史文化 休闲", ["故宫博物院", "颐和园"])
+        self.assertEqual(candidates[0], "北京 历史文化 休闲 旅游 景点攻略")
+        self.assertIn("北京 故宫博物院 颐和园 攻略", candidates)
+
     def test_live_fetch_service_parses_noisy_helper_stdout(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
         helper_payload = {
@@ -374,6 +382,31 @@ class TravelApiFlowTestCase(unittest.TestCase):
 
         self.assertEqual(refreshed["query"], "北京 旅游 景点攻略")
         self.assertEqual(refreshed["status"]["active_source"], "runtime_import")
+
+    def test_live_fetch_service_reports_empty_search_results_cleanly(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
+        helper_payload = {
+            "success": True,
+            "query": "北京 旅游 景点攻略",
+            "raw_note_count": 0,
+            "data": {
+                "city": "北京",
+                "search_response": {"data": {"items": []}},
+                "detail_response": {"data": {"items": []}},
+            },
+        }
+
+        with patch("app.services.xhs_live_fetch_service.subprocess.run") as mocked_run:
+            mocked_run.return_value = subprocess.CompletedProcess(
+                args=["python"],
+                returncode=0,
+                stdout=json.dumps(helper_payload, ensure_ascii=False),
+                stderr="",
+            )
+            with self.assertRaises(Exception) as ctx:
+                routes.xhs_live_fetch_service.refresh_from_tripstar(city="北京", keywords="", max_items=1)
+
+        self.assertIn("没有返回可用笔记", str(ctx.exception))
 
     def test_refresh_xhs_content_source_requires_cookie(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = ""
@@ -544,6 +577,10 @@ class TravelApiFlowTestCase(unittest.TestCase):
 
         updated = routes._refresh_trip_plan_xhs_enrichment(trip_plan)
         self.assertEqual(updated["request_summary"]["data_mode"], "city_match")
+
+    def test_pick_query_city_prefers_core_city_segment(self):
+        self.assertEqual(_pick_query_city("中国-北京"), "北京")
+        self.assertEqual(_pick_query_city("北京/中国"), "北京")
 
     def test_import_tripstar_style_search_bundle(self):
         payload = {

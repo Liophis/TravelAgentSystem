@@ -356,6 +356,10 @@ def _extract_trip_plan_poi_stubs(trip_plan: dict) -> list[object]:
     return poi_stubs
 
 
+def _extract_trip_plan_poi_names(trip_plan: dict) -> list[str]:
+    return [str(getattr(poi, "name", "")).strip() for poi in _extract_trip_plan_poi_stubs(trip_plan) if str(getattr(poi, "name", "")).strip()]
+
+
 def _refresh_trip_plan_xhs_enrichment(trip_plan: dict) -> dict:
     city = str(trip_plan.get("city") or "").strip()
     preferences = _extract_trip_plan_preferences(trip_plan)
@@ -531,6 +535,7 @@ def refresh_xhs_content_source(payload: XHSRefreshPayload):
         refreshed = xhs_live_fetch_service.refresh_from_tripstar(
             city=payload.city,
             keywords=payload.keywords or "",
+            poi_names=[],
             max_items=payload.max_items,
         )
     except XHSLiveFetchError as exc:
@@ -561,6 +566,7 @@ def refresh_xhs_trip_content(payload: XHSRefreshTripPayload):
         refreshed = xhs_live_fetch_service.refresh_from_tripstar(
             city=city,
             keywords=payload.keywords or "",
+            poi_names=_extract_trip_plan_poi_names(trip_plan),
             max_items=payload.max_items,
         )
     except XHSLiveFetchError as exc:

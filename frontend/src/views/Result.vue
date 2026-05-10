@@ -262,7 +262,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AMapLoader from '@amap/amap-jsapi-loader'
@@ -544,6 +544,8 @@ const refreshXhsReasons = async () => {
 const initAMap = async () => {
   await nextTick()
   if (!plan.value || attractions.value.length === 0) return
+  const mapContainer = document.getElementById('amap-container')
+  if (!mapContainer) return
 
   if (map.value?.destroy) {
     map.value.destroy()
@@ -637,7 +639,13 @@ const initAMap = async () => {
 }
 
 onMounted(() => {
-  if (plan.value) {
+  if (plan.value && activePanel.value === 'map') {
+    void initAMap()
+  }
+})
+
+watch(activePanel, (panel) => {
+  if (panel === 'map' && plan.value) {
     void initAMap()
   }
 })
