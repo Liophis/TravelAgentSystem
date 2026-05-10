@@ -1,7 +1,9 @@
 import os
+import json
 import sys
 import tempfile
 import unittest
+import subprocess
 from pathlib import Path
 from unittest.mock import patch
 
@@ -102,6 +104,9 @@ class TravelApiFlowTestCase(unittest.TestCase):
         routes.xhs_content_service.runtime_notes_path = self.runtime_xhs_notes_path
         routes.xhs_content_service.runtime_meta_path = self.runtime_xhs_meta_path
         routes.xhs_content_service.clear_imported_notes()
+        routes.xhs_live_fetch_service.content_service.runtime_notes_path = self.runtime_xhs_notes_path
+        routes.xhs_live_fetch_service.content_service.runtime_meta_path = self.runtime_xhs_meta_path
+        routes.xhs_live_fetch_service.settings.xhs_cookie = ""
 
     def test_generate_trip_returns_structured_plan(self):
         db = self.SessionLocal()
@@ -262,6 +267,233 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertTrue(cleared["success"])
         self.assertEqual(cleared["data"]["active_source"], "builtin_fallback")
         self.assertTrue(cleared["data"]["uses_builtin_fallback"])
+
+    def test_refresh_xhs_content_source_uses_tripstar_bridge(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
+        helper_payload = {
+            "success": True,
+            "query": "北京 历史文化 旅游 景点攻略",
+            "raw_note_count": 1,
+            "data": {
+                "city": "北京",
+                "search_response": {
+                    "data": {
+                        "items": [
+                            {
+                                "id": "live-note-1",
+                                "model_type": "note",
+                                "note_card": {"display_title": "故宫实时刷新内容"},
+                            }
+                        ]
+                    }
+                },
+                "detail_response": {
+                    "data": {
+                        "items": [
+                            {
+                                "note_card": {
+                                    "note_id": "live-note-1",
+                                    "title": "故宫实时刷新内容",
+                                    "desc": "这是通过 TripStar bridge 刷新的内容。",
+                                    "city": "北京",
+                                    "poi_name": "故宫博物院",
+                                }
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+
+        with patch("app.services.xhs_live_fetch_service.subprocess.run") as mocked_run:
+            mocked_run.return_value = subprocess.CompletedProcess(
+                args=["python"],
+                returncode=0,
+                stdout=json.dumps(helper_payload, ensure_ascii=False),
+                stderr="",
+            )
+            payload = routes.refresh_xhs_content_source(
+                routes.XHSRefreshPayload(city="北京", keywords="历史文化", max_items=1)
+            )
+
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["meta"]["raw_note_count"], 1)
+        bundle = routes.xhs_content_service.enrich_trip_plan(
+            city="北京",
+            preferences=["历史文化"],
+            pois=[type("PoiStub", (), {"name": "故宫博物院"})()],
+        )
+        self.assertEqual(bundle["notes"][0]["title"], "故宫实时刷新内容")
+
+    def test_refresh_xhs_content_source_requires_cookie(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = ""
+        with self.assertRaises(Exception) as ctx:
+            routes.refresh_xhs_content_source(
+                routes.XHSRefreshPayload(city="北京", keywords="", max_items=1)
+            )
+        self.assertIn("小红书 Cookie", str(ctx.exception))
+
+    def test_refresh_xhs_trip_content_returns_updated_plan(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
+        helper_payload = {
+            "success": True,
+            "query": "北京 历史文化 旅游 景点攻略",
+            "raw_note_count": 1,
+            "data": {
+                "city": "北京",
+                "search_response": {
+                    "data": {
+                        "items": [
+                            {
+                                "id": "trip-note-1",
+                                "model_type": "note",
+                                "note_card": {"display_title": "故宫实时更新后的理由"},
+                            }
+                        ]
+                    }
+                },
+                "detail_response": {
+                    "data": {
+                        "items": [
+                            {
+                                "note_card": {
+                                    "note_id": "trip-note-1",
+                                    "title": "故宫实时更新后的理由",
+                                    "desc": "新的实时内容已经回填到当前行程。",
+                                    "city": "北京",
+                                    "poi_name": "故宫博物院",
+                                }
+                            }
+                        ]
+                    }
+                },
+            },
+        }
+
+        trip_plan = {
+            "city": "北京",
+            "start_date": "2026-05-10",
+            "end_date": "2026-05-12",
+            "overall_suggestions": "初始建议。",
+            "request_summary": {
+                "city": "北京",
+                "travel_days": 2,
+                "transportation": "公共交通",
+                "accommodation": "舒适型酒店",
+                "preferences": ["历史文化"],
+                "free_text_input": "",
+                "data_mode": "city_match",
+                "data_note": "初始数据说明",
+            },
+            "days": [
+                {
+                    "date": "2026-05-10",
+                    "day_index": 0,
+                    "description": "第 1 天重点安排：故宫博物院",
+                    "transportation": "公共交通",
+                    "accommodation": "舒适型酒店",
+                    "attractions": [
+                        {
+                            "id": 1,
+                            "name": "故宫博物院",
+                            "type": "景区",
+                            "category": "景区",
+                            "address": "北京 · 故宫博物院",
+                            "location": {"latitude": 39.9163, "longitude": 116.3972},
+                            "latitude": 39.9163,
+                            "longitude": 116.3972,
+                            "visit_duration": 90,
+                            "description": "北京市中心的帝制建筑群，适合历史文化体验。",
+                        }
+                    ],
+                    "meals": [],
+                }
+            ],
+            "weather_info": [],
+        }
+
+        with patch("app.services.xhs_live_fetch_service.subprocess.run") as mocked_run:
+            mocked_run.return_value = subprocess.CompletedProcess(
+                args=["python"],
+                returncode=0,
+                stdout=json.dumps(helper_payload, ensure_ascii=False),
+                stderr="",
+            )
+            payload = routes.refresh_xhs_trip_content(
+                routes.XHSRefreshTripPayload(trip_plan=trip_plan, city="北京", keywords="历史文化", max_items=1)
+            )
+
+        self.assertTrue(payload["success"])
+        self.assertEqual(payload["data"]["content_sources"][0]["origin"], "external")
+        self.assertEqual(payload["data"]["days"][0]["attractions"][0]["travel_notes"][0]["title"], "故宫实时更新后的理由")
+        self.assertTrue(payload["data"]["recommendation_reasons"])
+
+    def test_generate_trip_matches_prefixed_city_name(self):
+        db = self.SessionLocal()
+        try:
+            payload = routes.generate_trip(
+                city="中国-北京",
+                start_date="2026-05-10",
+                end_date="2026-05-12",
+                travel_days=3,
+                transportation="公共交通",
+                accommodation="舒适型酒店",
+                preferences=["历史文化"],
+                free_text_input="",
+                db=db,
+            )
+        finally:
+            db.close()
+
+        self.assertEqual(payload["data"]["request_summary"]["data_mode"], "city_match")
+        self.assertTrue(payload["data"]["content_sources"])
+        self.assertEqual(payload["data"]["content_sources"][0]["origin"], "local_sample")
+
+    def test_refresh_trip_recomputes_city_match_for_prefixed_city(self):
+        trip_plan = {
+            "city": "中国-北京",
+            "start_date": "2026-05-10",
+            "end_date": "2026-05-12",
+            "overall_suggestions": "初始建议。",
+            "request_summary": {
+                "city": "中国-北京",
+                "travel_days": 1,
+                "transportation": "公共交通",
+                "accommodation": "舒适型酒店",
+                "preferences": ["历史文化"],
+                "free_text_input": "",
+                "data_mode": "local_sample",
+                "data_note": "旧说明",
+            },
+            "days": [
+                {
+                    "date": "2026-05-10",
+                    "day_index": 0,
+                    "description": "第 1 天重点安排：故宫博物院",
+                    "transportation": "公共交通",
+                    "accommodation": "舒适型酒店",
+                    "attractions": [
+                        {
+                            "id": 1,
+                            "name": "故宫博物院",
+                            "type": "景区",
+                            "category": "景区",
+                            "address": "中国-北京 · 故宫博物院",
+                            "location": {"latitude": 39.9163, "longitude": 116.3972},
+                            "latitude": 39.9163,
+                            "longitude": 116.3972,
+                            "visit_duration": 90,
+                            "description": "北京市中心的帝制建筑群，适合历史文化体验。",
+                        }
+                    ],
+                    "meals": [],
+                }
+            ],
+            "weather_info": [],
+        }
+
+        updated = routes._refresh_trip_plan_xhs_enrichment(trip_plan)
+        self.assertEqual(updated["request_summary"]["data_mode"], "city_match")
 
     def test_import_tripstar_style_search_bundle(self):
         payload = {

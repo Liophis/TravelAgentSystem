@@ -8,3 +8,7 @@ export const setCurrentPlan = (plan: TripPlan | null) => {
 }
 
 export const getCurrentPlan = () => currentPlan
+
+export const updateCurrentPlan = (updater: (plan: TripPlan | null) => TripPlan | null) => {
+  currentPlan.value = updater(currentPlan.value)
+}

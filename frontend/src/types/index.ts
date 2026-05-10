@@ -193,6 +193,21 @@ export interface XHSContentSourceResponse {
   success: boolean
   message: string
   data?: XHSContentSourceStatus
+  meta?: {
+    query?: string
+    raw_note_count?: number
+  }
+}
+
+export interface XHSRefreshTripResponse {
+  success: boolean
+  message: string
+  data?: TripPlan
+  meta?: {
+    query?: string
+    raw_note_count?: number
+    content_source_status?: XHSContentSourceStatus
+  }
 }
 
 export interface PoiSummary {

@@ -71,6 +71,8 @@ BUILTIN_XHS_NOTES: list[dict[str, Any]] = [
     },
 ]
 
+CITY_SEGMENT_SEPARATORS = ("-", "·", "/", "|", ",", "，", " ")
+
 
 class XHSContentService:
     """Provide stable content structures and graceful fallback for P1."""
@@ -154,6 +156,28 @@ class XHSContentService:
             if value:
                 return value
         return ""
+
+    def _expand_city_tokens(self, city: str) -> set[str]:
+        raw_city = str(city or "").strip()
+        if not raw_city:
+            return set()
+
+        tokens = {raw_city, raw_city.lower()}
+        pending = {raw_city}
+        for separator in CITY_SEGMENT_SEPARATORS:
+            next_pending: set[str] = set()
+            for item in pending:
+                parts = [part.strip() for part in item.split(separator) if part.strip()]
+                if len(parts) > 1:
+                    next_pending.update(parts)
+            pending.update(next_pending)
+
+        for item in pending:
+            if item:
+                tokens.add(item)
+                tokens.add(item.lower())
+
+        return {token for token in tokens if token}
 
     def _extract_poi_name_from_text(self, item: dict[str, Any], fallback_title: str) -> str:
         for key in ("poi_name", "poi", "name", "spot_name", "attraction_name", "location_name"):
@@ -534,7 +558,7 @@ class XHSContentService:
         pois: list[object],
         keywords: list[str],
     ) -> list[dict[str, Any]]:
-        city_lower = city.strip().lower()
+        city_tokens = self._expand_city_tokens(city)
         poi_names = {str(getattr(poi, "name", "")).strip().lower() for poi in pois if getattr(poi, "name", None)}
         keyword_tokens = {token.strip().lower() for token in keywords if token and token.strip()}
 
@@ -553,7 +577,7 @@ class XHSContentService:
             ).lower()
 
             score = 0
-            if (note.get("city") or "").lower() == city_lower:
+            if (note.get("city") or "").lower() in city_tokens:
                 score += 5
             if (note.get("poi_name") or "").lower() in poi_names:
                 score += 6

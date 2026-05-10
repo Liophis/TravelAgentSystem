@@ -22,6 +22,8 @@ from app.services import (
     POIService,
     RouteService,
     XHSContentService,
+    XHSLiveFetchError,
+    XHSLiveFetchService,
 )
 
 router = APIRouter(prefix="/api", tags=["Travel System API"])
@@ -32,6 +34,7 @@ poi_service = POIService()
 # Initialize route service with global graph
 route_service = RouteService(poi_service.graph)
 xhs_content_service = XHSContentService()
+xhs_live_fetch_service = XHSLiveFetchService()
 
 
 class RuntimeSettingsPayload(BaseModel):
@@ -58,6 +61,23 @@ class XHSImportPayload(BaseModel):
     payload: dict | list = Field(..., description="Normalized notes, XHS raw results, TripStar bundle, or third-party payload")
 
 
+class XHSRefreshPayload(BaseModel):
+    """Payload for refreshing XHS content via TripStar live fetch."""
+
+    city: str = Field(min_length=1, description="Target city")
+    keywords: Optional[str] = Field(default="", description="Optional extra keywords")
+    max_items: int = Field(default=4, ge=1, le=8, description="Max raw notes to fetch")
+
+
+class XHSRefreshTripPayload(BaseModel):
+    """Payload for refreshing XHS content and re-enriching the current trip plan."""
+
+    trip_plan: dict = Field(..., description="Current trip plan")
+    city: Optional[str] = Field(default=None, description="Target city override")
+    keywords: Optional[str] = Field(default="", description="Optional extra keywords")
+    max_items: int = Field(default=4, ge=1, le=8, description="Max raw notes to fetch")
+
+
 INTEREST_KEYWORDS: dict[str, tuple[str, ...]] = {
     "历史文化": ("历史", "文化", "博物", "皇家", "建筑", "故宫", "长城", "广场"),
     "自然风光": ("自然", "风景", "公园", "园林", "长城"),
@@ -73,6 +93,8 @@ CITY_ALIASES: dict[str, tuple[str, ...]] = {
     "xi'an": ("xian", "xi'an", "西安"),
 }
 
+CITY_SEGMENT_SEPARATORS = ("-", "·", "/", "|", ",", "，", " ")
+
 
 def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     dlat = radians(lat2 - lat1)
@@ -83,10 +105,30 @@ def _haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 def _expand_city_tokens(city: str) -> set[str]:
-    normalized = city.strip().lower()
-    tokens = {normalized, city.strip()}
+    raw_city = city.strip()
+    normalized = raw_city.lower()
+    tokens = {normalized, raw_city}
+
+    pending = {raw_city}
+    for separator in CITY_SEGMENT_SEPARATORS:
+        next_pending: set[str] = set()
+        for item in pending:
+            parts = [part.strip() for part in item.split(separator) if part.strip()]
+            if len(parts) > 1:
+                next_pending.update(parts)
+        pending.update(next_pending)
+
+    for item in list(pending):
+        if item:
+            tokens.add(item)
+            tokens.add(item.lower())
+
     aliases = CITY_ALIASES.get(normalized, ())
     tokens.update(aliases)
+    for item in list(pending):
+        aliases = CITY_ALIASES.get(item.lower(), ())
+        tokens.update(aliases)
+
     return {token for token in tokens if token}
 
 
@@ -273,6 +315,123 @@ def _build_trip_recommendation_reasons(
     return reasons[:5]
 
 
+def _extract_trip_plan_preferences(trip_plan: dict) -> list[str]:
+    request_summary = trip_plan.get("request_summary")
+    if isinstance(request_summary, dict):
+        preferences = request_summary.get("preferences")
+        if isinstance(preferences, list):
+            return [str(item).strip() for item in preferences if str(item).strip()]
+    return []
+
+
+def _extract_trip_plan_poi_stubs(trip_plan: dict) -> list[object]:
+    poi_stubs: list[object] = []
+    seen_keys: set[str] = set()
+    for day in trip_plan.get("days", []) if isinstance(trip_plan.get("days"), list) else []:
+        attractions = day.get("attractions")
+        if not isinstance(attractions, list):
+            continue
+        for attraction in attractions:
+            if not isinstance(attraction, dict):
+                continue
+            name = str(attraction.get("name") or "").strip()
+            if not name:
+                continue
+            key = f"{name}|{attraction.get('latitude')}|{attraction.get('longitude')}"
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+            poi_stubs.append(
+                type(
+                    "TripAttractionStub",
+                    (),
+                    {
+                        "name": name,
+                        "city": str(trip_plan.get("city") or "").strip(),
+                        "type": str(attraction.get("type") or attraction.get("category") or "景点").strip(),
+                        "description": str(attraction.get("description") or "").strip(),
+                    },
+                )()
+            )
+    return poi_stubs
+
+
+def _refresh_trip_plan_xhs_enrichment(trip_plan: dict) -> dict:
+    city = str(trip_plan.get("city") or "").strip()
+    preferences = _extract_trip_plan_preferences(trip_plan)
+    poi_stubs = _extract_trip_plan_poi_stubs(trip_plan)
+    preference_tokens = _normalize_preference_tokens(preferences, None)
+    content_bundle = xhs_content_service.enrich_trip_plan(city=city, preferences=preferences, pois=poi_stubs)
+    city_tokens = {token.lower() for token in _expand_city_tokens(city)}
+    requested_city_matched = any(
+        str(getattr(poi, "city", "")).strip().lower() in city_tokens
+        for poi in poi_stubs
+        if str(getattr(poi, "city", "")).strip()
+    )
+
+    days = trip_plan.get("days")
+    if isinstance(days, list):
+        for day in days:
+            attractions = day.get("attractions")
+            if not isinstance(attractions, list):
+                continue
+            for attraction in attractions:
+                if not isinstance(attraction, dict):
+                    continue
+                poi_name = str(attraction.get("name") or "").strip()
+                related_notes = content_bundle["notes_by_poi"].get(poi_name, [])[:2]
+                poi_stub = type(
+                    "TripAttractionReasonStub",
+                    (),
+                    {
+                        "name": poi_name,
+                        "city": city,
+                        "type": str(attraction.get("type") or attraction.get("category") or "景点").strip(),
+                        "description": str(attraction.get("description") or "").strip(),
+                    },
+                )()
+                attraction["travel_notes"] = related_notes
+                attraction["content_sources"] = [
+                    {
+                        "source_type": note.get("source_type", "content"),
+                        "source_label": note.get("source_label", "内容来源"),
+                        "origin": note.get("origin", "local_sample"),
+                    }
+                    for note in related_notes
+                ]
+                attraction["recommendation_reasons"] = _build_attraction_reasons(
+                    poi_stub,
+                    city,
+                    preference_tokens,
+                    related_notes,
+                )
+                first_image = next(
+                    (image.get("url") for note in related_notes for image in note.get("images", []) if image.get("url")),
+                    "",
+                )
+                if first_image:
+                    attraction["image_url"] = first_image
+
+    trip_plan["content_sources"] = content_bundle["sources"]
+    trip_plan["recommendation_reasons"] = _build_trip_recommendation_reasons(
+        city=city,
+        actual_days=len(days) if isinstance(days, list) else 0,
+        attraction_count=len(_extract_trip_plan_poi_stubs(trip_plan)),
+        preferences=preferences,
+        requested_city_matched=requested_city_matched,
+        content_bundle=content_bundle,
+    )
+    request_summary = trip_plan.get("request_summary")
+    if isinstance(request_summary, dict):
+        request_summary["data_mode"] = "city_match" if requested_city_matched else "local_sample"
+        request_summary["data_note"] = (
+            f"已按 {city} 本地样例景点生成计划。"
+            if requested_city_matched
+            else f"{city} 当前没有完整本地景点库，已使用现有样例数据生成计划。"
+        )
+    return trip_plan
+
+
 def _build_request_summary(
     *,
     city: str,
@@ -363,6 +522,60 @@ def clear_xhs_content_source_import():
         "success": True,
         "message": "已清除导入的外部样例",
         "data": xhs_content_service.clear_imported_notes(),
+    }
+
+
+@router.post("/xhs/content-source/refresh", tags=["XHS Content"])
+def refresh_xhs_content_source(payload: XHSRefreshPayload):
+    try:
+        refreshed = xhs_live_fetch_service.refresh_from_tripstar(
+            city=payload.city,
+            keywords=payload.keywords or "",
+            max_items=payload.max_items,
+        )
+    except XHSLiveFetchError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return {
+        "success": True,
+        "message": "已通过 TripStar 实时刷新小红书内容源",
+        "data": refreshed["status"],
+        "meta": {
+            "query": refreshed["query"],
+            "raw_note_count": refreshed["raw_note_count"],
+        },
+    }
+
+
+@router.post("/xhs/content-source/refresh-trip", tags=["XHS Content"])
+def refresh_xhs_trip_content(payload: XHSRefreshTripPayload):
+    trip_plan = payload.trip_plan or {}
+    if not trip_plan:
+        raise HTTPException(status_code=400, detail="trip_plan 不能为空")
+
+    city = (payload.city or trip_plan.get("city") or "").strip()
+    if not city:
+        raise HTTPException(status_code=400, detail="无法从当前行程中识别城市")
+
+    try:
+        refreshed = xhs_live_fetch_service.refresh_from_tripstar(
+            city=city,
+            keywords=payload.keywords or "",
+            max_items=payload.max_items,
+        )
+    except XHSLiveFetchError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    updated_trip_plan = _refresh_trip_plan_xhs_enrichment(dict(trip_plan))
+    return {
+        "success": True,
+        "message": "已刷新 XHS 内容并重生成推荐理由",
+        "data": updated_trip_plan,
+        "meta": {
+            "query": refreshed["query"],
+            "raw_note_count": refreshed["raw_note_count"],
+            "content_source_status": refreshed["status"],
+        },
     }
 
 

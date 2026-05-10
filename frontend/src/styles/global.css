@@ -149,6 +149,12 @@ select {
   gap: 10px;
 }
 
+.xhs-live-refresh {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .xhs-import-status {
   padding: 12px 14px;
   border-radius: 14px;

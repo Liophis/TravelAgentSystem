@@ -82,6 +82,14 @@
                   清空导入并回退
                 </a-button>
               </div>
+              <div class="xhs-live-refresh">
+                <a-input v-model:value="xhsRefreshForm.city" placeholder="实时刷新城市，例如：北京" />
+                <a-input v-model:value="xhsRefreshForm.keywords" placeholder="可选关键词，例如：历史文化 休闲" />
+                <a-input-number v-model:value="xhsRefreshForm.max_items" :min="1" :max="8" style="width: 100%" />
+                <a-button type="primary" :loading="xhsRefreshing" @click="refreshXhsFromTripStar">
+                  通过 TripStar 实时刷新
+                </a-button>
+              </div>
               <div v-if="xhsSourceStatus" class="xhs-import-status">
                 <strong>当前内容源：</strong>
                 <span>{{ renderXhsSourceLabel(xhsSourceStatus.active_source) }}</span>
@@ -118,6 +126,7 @@ import {
   getRuntimeSettings,
   getXhsContentSourceStatus,
   importXhsContentSource,
+  refreshXhsContentSource,
   saveRuntimeSettings,
 } from '@/services/api'
 import { message } from 'ant-design-vue'
@@ -128,9 +137,15 @@ const settingsVisible = ref(false)
 const settingsLoading = ref(false)
 const settingsSaving = ref(false)
 const xhsImporting = ref(false)
+const xhsRefreshing = ref(false)
 const selectedXhsFile = ref<File | null>(null)
 const xhsSourceStatus = ref<XHSContentSourceStatus | null>(null)
 const xhsImportFormatHint = ref('auto')
+const xhsRefreshForm = reactive({
+  city: '',
+  keywords: '',
+  max_items: 4,
+})
 const settingsForm = reactive<RuntimeSettings>({
   api_base_url: '',
   amap_web_api_key: '',
@@ -247,6 +262,29 @@ const clearImportedXhsNotes = async () => {
     message.error(error?.response?.data?.detail || error?.message || '清空导入失败')
   } finally {
     xhsImporting.value = false
+  }
+}
+
+const refreshXhsFromTripStar = async () => {
+  if (!xhsRefreshForm.city.trim()) {
+    message.warning('请先填写要刷新的城市')
+    return
+  }
+
+  xhsRefreshing.value = true
+  try {
+    const response = await refreshXhsContentSource({
+      city: xhsRefreshForm.city,
+      keywords: xhsRefreshForm.keywords,
+      max_items: xhsRefreshForm.max_items,
+    })
+    xhsSourceStatus.value = response.data || null
+    const rawCount = response.meta?.raw_note_count ?? 0
+    message.success(`已刷新小红书内容源，命中 ${rawCount} 条原始笔记`)
+  } catch (error: any) {
+    message.error(error?.response?.data?.detail || error?.message || '实时刷新失败')
+  } finally {
+    xhsRefreshing.value = false
   }
 }
 

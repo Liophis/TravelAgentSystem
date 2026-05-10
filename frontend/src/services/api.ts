@@ -8,6 +8,7 @@ import type {
   TripChatResponse,
   TripPlanResponse,
   XHSContentSourceResponse,
+  XHSRefreshTripResponse,
 } from '@/types'
 
 const apiBase = import.meta.env.VITE_API_BASE_URL ?? ''
@@ -186,5 +187,15 @@ export const importXhsContentSource = async (payload: { source_name?: string; fo
 
 export const clearXhsContentSourceImport = async () => {
   const response = await http.delete<XHSContentSourceResponse>('/api/xhs/content-source/import')
+  return response.data
+}
+
+export const refreshXhsContentSource = async (payload: { city: string; keywords?: string; max_items?: number }) => {
+  const response = await http.post<XHSContentSourceResponse>('/api/xhs/content-source/refresh', payload)
+  return response.data
+}
+
+export const refreshXhsTripContent = async (payload: { trip_plan: object; city?: string; keywords?: string; max_items?: number }) => {
+  const response = await http.post<XHSRefreshTripResponse>('/api/xhs/content-source/refresh-trip', payload)
   return response.data
 }

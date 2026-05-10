@@ -9,6 +9,9 @@
         </div>
         <div class="result-actions">
           <a-button type="primary" @click="goHome">{{ t('nav.cta') }}</a-button>
+          <a-button :disabled="!planAvailable || xhsRefreshing" :loading="xhsRefreshing" @click="refreshXhsReasons">
+            刷新 XHS 推荐理由
+          </a-button>
           <a-button :disabled="!planAvailable" @click="showChat = !showChat">AI Chat</a-button>
         </div>
       </section>
@@ -263,11 +266,12 @@ import { computed, nextTick, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import AMapLoader from '@amap/amap-jsapi-loader'
+import { message } from 'ant-design-vue'
 
 import AIChat from '@/components/AIChat.vue'
 import OverviewAttractionCard from '@/components/OverviewAttractionCard.vue'
-import { askTripChat, findRoute } from '@/services/api'
-import { getCurrentPlan } from '@/services/store'
+import { askTripChat, findRoute, refreshXhsTripContent } from '@/services/api'
+import { getCurrentPlan, setCurrentPlan } from '@/services/store'
 import type { ChatMessage } from '@/types'
 
 const router = useRouter()
@@ -275,6 +279,7 @@ const { t } = useI18n()
 const showChat = ref(false)
 const chatMessages = ref<ChatMessage[]>([])
 const chatPending = ref(false)
+const xhsRefreshing = ref(false)
 const map = ref<any>(null)
 type ResultPanelKey = 'overview' | 'days' | 'route' | 'map' | 'budget'
 
@@ -507,9 +512,44 @@ const handleQuickQuestion = (message: string) => {
   void sendChat(message)
 }
 
+const refreshXhsReasons = async () => {
+  if (!plan.value || xhsRefreshing.value) return
+
+  xhsRefreshing.value = true
+  try {
+    const response = await refreshXhsTripContent({
+      trip_plan: plan.value,
+      city: requestSummary.value?.city || plan.value.city,
+      keywords: (requestSummary.value?.preferences || []).join(' '),
+      max_items: 4,
+    })
+
+    if (response.success && response.data) {
+      setCurrentPlan(response.data)
+      const rawCount = response.meta?.raw_note_count ?? 0
+      message.success(`已刷新 XHS 内容并更新推荐理由，命中 ${rawCount} 条原始笔记`)
+      await initAMap()
+      return
+    }
+
+    message.error(response.message || '刷新 XHS 内容失败')
+  } catch (error: any) {
+    console.error('[XHS Refresh] 请求失败:', error)
+    message.error(error?.response?.data?.detail || error?.message || '刷新 XHS 内容失败')
+  } finally {
+    xhsRefreshing.value = false
+  }
+}
+
 const initAMap = async () => {
   await nextTick()
   if (!plan.value || attractions.value.length === 0) return
+
+  if (map.value?.destroy) {
+    map.value.destroy()
+    map.value = null
+  }
+  routeSummary.value = null
 
   const mapJsKey = import.meta.env.VITE_AMAP_WEB_JS_KEY || ''
   if (!mapJsKey) {
