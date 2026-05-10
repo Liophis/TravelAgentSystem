@@ -179,7 +179,7 @@ export const getXhsContentSourceStatus = async () => {
   return response.data
 }
 
-export const importXhsContentSource = async (payload: { source_name?: string; notes: object[] }) => {
+export const importXhsContentSource = async (payload: { source_name?: string; format_hint?: string; payload: object[] | object }) => {
   const response = await http.post<XHSContentSourceResponse>('/api/xhs/content-source/import', payload)
   return response.data
 }

@@ -54,7 +54,8 @@ class XHSImportPayload(BaseModel):
     """Payload for importing external XHS-like notes."""
 
     source_name: Optional[str] = Field(default=None, description="Imported file name")
-    notes: list[dict] = Field(..., min_length=1, description="Normalized XHS-like note objects")
+    format_hint: Optional[str] = Field(default="auto", description="Optional import format hint")
+    payload: dict | list = Field(..., description="Normalized notes, XHS raw results, TripStar bundle, or third-party payload")
 
 
 INTEREST_KEYWORDS: dict[str, tuple[str, ...]] = {
@@ -341,7 +342,11 @@ def get_xhs_content_source_status():
 @router.post("/xhs/content-source/import", tags=["XHS Content"])
 def import_xhs_content_source(payload: XHSImportPayload):
     try:
-        status = xhs_content_service.import_notes(payload.notes, source_name=payload.source_name or "")
+        status = xhs_content_service.import_notes(
+            payload.payload,
+            source_name=payload.source_name or "",
+            format_hint=payload.format_hint or "auto",
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

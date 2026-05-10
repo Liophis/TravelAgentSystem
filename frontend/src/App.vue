@@ -66,6 +66,13 @@
           </a-form-item>
           <a-form-item label="外部内容导入">
             <div class="xhs-import-panel">
+              <a-select v-model:value="xhsImportFormatHint" size="small">
+                <a-select-option value="auto">自动识别</a-select-option>
+                <a-select-option value="normalized_notes">规范化 notes 数组</a-select-option>
+                <a-select-option value="xhs_search_response">小红书搜索原始响应 / TripStar bundle</a-select-option>
+                <a-select-option value="xhs_detail_response">小红书详情原始响应</a-select-option>
+                <a-select-option value="third_party_items">第三方中间数据</a-select-option>
+              </a-select>
               <input type="file" accept="application/json,.json" @change="handleXhsFileChange" />
               <div class="xhs-import-actions">
                 <a-button type="default" :loading="xhsImporting" @click="importSelectedXhsFile" :disabled="!selectedXhsFile">
@@ -79,6 +86,7 @@
                 <strong>当前内容源：</strong>
                 <span>{{ renderXhsSourceLabel(xhsSourceStatus.active_source) }}</span>
                 <p>来源名：{{ xhsSourceStatus.source_name }}</p>
+                <p>识别格式：{{ renderXhsFormatLabel(xhsSourceStatus.format_kind) }}</p>
                 <p>笔记数：{{ xhsSourceStatus.note_count }}</p>
                 <p v-if="xhsSourceStatus.path">路径：{{ xhsSourceStatus.path }}</p>
                 <p v-if="xhsSourceStatus.updated_at">更新时间：{{ xhsSourceStatus.updated_at }}</p>
@@ -122,6 +130,7 @@ const settingsSaving = ref(false)
 const xhsImporting = ref(false)
 const selectedXhsFile = ref<File | null>(null)
 const xhsSourceStatus = ref<XHSContentSourceStatus | null>(null)
+const xhsImportFormatHint = ref('auto')
 const settingsForm = reactive<RuntimeSettings>({
   api_base_url: '',
   amap_web_api_key: '',
@@ -154,6 +163,16 @@ const renderXhsSourceLabel = (source: string) => {
   if (source === 'runtime_import') return '前端导入外部样例'
   if (source === 'configured_path') return '服务端配置路径'
   return '内置本地样例降级'
+}
+
+const renderXhsFormatLabel = (formatKind: string) => {
+  if (formatKind === 'normalized_notes') return '规范化 notes'
+  if (formatKind === 'xhs_search_items' || formatKind === 'xhs_search_response') return '小红书搜索结果 / TripStar bundle'
+  if (formatKind === 'xhs_detail_response') return '小红书详情结果'
+  if (formatKind === 'third_party_items' || formatKind === 'single_third_party_item') return '第三方中间数据'
+  if (formatKind === 'configured_path') return '配置路径文件'
+  if (formatKind === 'builtin_fallback') return '内置降级样例'
+  return formatKind || '未知格式'
 }
 
 const refreshXhsSourceStatus = async () => {
@@ -206,7 +225,8 @@ const importSelectedXhsFile = async () => {
     const parsed = JSON.parse(rawText)
     const response = await importXhsContentSource({
       source_name: selectedXhsFile.value.name,
-      notes: Array.isArray(parsed) ? parsed : [],
+      format_hint: xhsImportFormatHint.value,
+      payload: parsed,
     })
     xhsSourceStatus.value = response.data || null
     message.success('外部小红书样例已导入')

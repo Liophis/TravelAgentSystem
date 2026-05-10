@@ -172,6 +172,7 @@ def get_example(id: int, db: Session = Depends(get_db)):
 3. 若继续开发，请以 `项目总览与执行说明.md` 中的 P0/P1 节奏为准。
 4. P1 小红书内容增强默认可直接运行；若要注入外部样例，可设置 `XHS_SAMPLE_NOTES_PATH`，失败时会自动降级到内置内容。
 5. 若要直接验证更真实外部输入，可在“运行时设置”里导入 `docs/examples/xhs_sample_notes.example.json`，或把它复制到任意绝对路径后填入 `XHS_SAMPLE_NOTES_PATH`。
+6. 若你手里已经有 `TripStar` 抓下来的原始搜索/详情 JSON，可直接导入 `docs/examples/tripstar_xhs_bundle.example.json` 这种结构；若是别的采集器中间结果，可参考 `docs/examples/third_party_xhs_items.example.json`。
 
 ## 注意事项
 

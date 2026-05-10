@@ -224,7 +224,7 @@ class TravelApiFlowTestCase(unittest.TestCase):
         ]
 
         import_payload = routes.import_xhs_content_source(
-            routes.XHSImportPayload(source_name="beijing.json", notes=imported_notes)
+            routes.XHSImportPayload(source_name="beijing.json", payload=imported_notes)
         )
         self.assertTrue(import_payload["success"])
         self.assertEqual(import_payload["data"]["active_source"], "runtime_import")
@@ -254,7 +254,7 @@ class TravelApiFlowTestCase(unittest.TestCase):
         routes.import_xhs_content_source(
             routes.XHSImportPayload(
                 source_name="temp.json",
-                notes=[{"title": "外部样例", "city": "北京", "poi_name": "故宫博物院"}],
+                payload=[{"title": "外部样例", "city": "北京", "poi_name": "故宫博物院"}],
             )
         )
         cleared = routes.clear_xhs_content_source_import()
@@ -262,6 +262,85 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertTrue(cleared["success"])
         self.assertEqual(cleared["data"]["active_source"], "builtin_fallback")
         self.assertTrue(cleared["data"]["uses_builtin_fallback"])
+
+    def test_import_tripstar_style_search_bundle(self):
+        payload = {
+            "city": "北京",
+            "search_response": {
+                "data": {
+                    "items": [
+                        {
+                            "id": "note-123",
+                            "model_type": "note",
+                            "note_card": {
+                                "display_title": "故宫打卡半日路线",
+                                "cover": {"url_default": "https://example.com/gugong.jpg"},
+                                "user": {"nickname": "Alice"},
+                            },
+                        }
+                    ]
+                }
+            },
+            "detail_response": {
+                "data": {
+                    "items": [
+                        {
+                            "note_card": {
+                                "note_id": "note-123",
+                                "title": "故宫打卡半日路线",
+                                "desc": "建议上午入园，适合历史文化体验。",
+                                "city": "北京",
+                                "poi_name": "故宫博物院",
+                            }
+                        }
+                    ]
+                }
+            },
+        }
+
+        imported = routes.import_xhs_content_source(
+            routes.XHSImportPayload(source_name="tripstar_bundle.json", payload=payload)
+        )
+
+        self.assertTrue(imported["success"])
+        self.assertEqual(imported["data"]["format_kind"], "xhs_search_items")
+
+        bundle = routes.xhs_content_service.enrich_trip_plan(
+            city="北京",
+            preferences=["历史文化"],
+            pois=[type("PoiStub", (), {"name": "故宫博物院"})()],
+        )
+        self.assertEqual(bundle["notes"][0]["title"], "故宫打卡半日路线")
+        self.assertEqual(bundle["notes"][0]["excerpt"], "建议上午入园，适合历史文化体验。")
+
+    def test_import_third_party_intermediate_payload(self):
+        payload = {
+            "source_label": "第三方采集结果",
+            "items": [
+                {
+                    "title": "颐和园慢游建议",
+                    "city": "北京",
+                    "poi_name": "颐和园",
+                    "content": "更适合安排在节奏放松的一天。",
+                    "tags": ["休闲", "园林"],
+                }
+            ],
+        }
+
+        imported = routes.import_xhs_content_source(
+            routes.XHSImportPayload(source_name="third_party.json", payload=payload)
+        )
+
+        self.assertTrue(imported["success"])
+        self.assertEqual(imported["data"]["format_kind"], "third_party_items")
+
+        bundle = routes.xhs_content_service.enrich_trip_plan(
+            city="北京",
+            preferences=["休闲"],
+            pois=[type("PoiStub", (), {"name": "颐和园"})()],
+        )
+        self.assertEqual(bundle["notes"][0]["source_label"], "第三方采集结果")
+        self.assertEqual(bundle["notes"][0]["poi_name"], "颐和园")
 
 
 if __name__ == "__main__":

@@ -184,6 +184,7 @@ export interface XHSContentSourceStatus {
   source_name: string
   path: string
   note_count: number
+  format_kind: string
   updated_at: string
   uses_builtin_fallback: boolean
 }
