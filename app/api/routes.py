@@ -539,7 +539,13 @@ def refresh_xhs_content_source(payload: XHSRefreshPayload):
             max_items=payload.max_items,
         )
     except XHSLiveFetchError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": str(exc),
+                **(exc.detail or {}),
+            },
+        ) from exc
 
     return {
         "success": True,
@@ -570,7 +576,13 @@ def refresh_xhs_trip_content(payload: XHSRefreshTripPayload):
             max_items=payload.max_items,
         )
     except XHSLiveFetchError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": str(exc),
+                **(exc.detail or {}),
+            },
+        ) from exc
 
     updated_trip_plan = _refresh_trip_plan_xhs_enrichment(dict(trip_plan))
     return {

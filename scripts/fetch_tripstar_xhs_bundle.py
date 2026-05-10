@@ -65,6 +65,19 @@ def _build_query_candidates(city: str, keywords: str, poi_names: list[str]) -> l
     return deduped
 
 
+def _is_note_like_item(item: dict) -> bool:
+    if not isinstance(item, dict):
+        return False
+    model_type = str(item.get("model_type") or "").strip().lower()
+    if model_type in {"note", "note_v2", "normal_note", "search_note"}:
+        return True
+    note_card = item.get("note_card")
+    if isinstance(note_card, dict):
+        title = str(note_card.get("display_title") or note_card.get("title") or "").strip()
+        return bool(title or note_card.get("desc") or item.get("id"))
+    return bool(item.get("id") and item.get("xsec_token"))
+
+
 def main() -> int:
     raw = sys.stdin.read().strip()
     try:
@@ -114,7 +127,7 @@ def main() -> int:
         try:
             search_response = client.search_notes(keyword=query, page_size=max_items)
             items = search_response.get("data", {}).get("items", [])
-            if any(isinstance(item, dict) and item.get("model_type") == "note" for item in items):
+            if any(_is_note_like_item(item) for item in items if isinstance(item, dict)):
                 break
         except Exception as exc:
             last_error = str(exc)
@@ -127,8 +140,22 @@ def main() -> int:
     items = search_response.get("data", {}).get("items", [])
     detail_items: list[dict] = []
     matched_count = 0
+    model_types: list[str] = []
+    preview_items: list[dict] = []
     for item in items:
-        if not isinstance(item, dict) or item.get("model_type") != "note":
+        if not isinstance(item, dict):
+            continue
+        model_types.append(str(item.get("model_type") or ""))
+        note_card = item.get("note_card") if isinstance(item.get("note_card"), dict) else {}
+        preview_items.append(
+            {
+                "id": str(item.get("id") or "")[:24],
+                "model_type": str(item.get("model_type") or ""),
+                "title": str(note_card.get("display_title") or note_card.get("title") or item.get("title") or "")[:80],
+                "keys": list(item.keys())[:8],
+            }
+        )
+        if not _is_note_like_item(item):
             continue
         note_id = str(item.get("id") or "").strip()
         xsec_token = str(item.get("xsec_token") or "").strip()
@@ -153,6 +180,9 @@ def main() -> int:
                 "query_city": _pick_query_city(city) or city,
                 "keywords": keywords,
                 "query_candidates": query_candidates,
+                "search_item_count": len(items),
+                "search_model_types": model_types[:10],
+                "search_item_preview": preview_items[:5],
                 "search_response": search_response,
                 "detail_response": {"data": {"items": detail_items}},
             },

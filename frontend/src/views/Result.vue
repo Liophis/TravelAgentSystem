@@ -535,7 +535,21 @@ const refreshXhsReasons = async () => {
     message.error(response.message || '刷新 XHS 内容失败')
   } catch (error: any) {
     console.error('[XHS Refresh] 请求失败:', error)
-    message.error(error?.response?.data?.detail || error?.message || '刷新 XHS 内容失败')
+    console.error('[XHS Refresh] 响应详情:', error?.response?.data)
+    const detailPayload = error?.response?.data?.detail
+    if (detailPayload) {
+      try {
+        console.error('[XHS Refresh] 响应详情 JSON:', JSON.stringify(detailPayload, null, 2))
+      } catch {
+        console.error('[XHS Refresh] 响应详情 JSON: <unserializable>')
+      }
+    }
+    message.error(
+      detailPayload?.message
+      || detailPayload
+      || error?.message
+      || '刷新 XHS 内容失败',
+    )
   } finally {
     xhsRefreshing.value = false
   }

@@ -333,6 +333,13 @@ class TravelApiFlowTestCase(unittest.TestCase):
         self.assertEqual(candidates[0], "北京 历史文化 休闲 旅游 景点攻略")
         self.assertIn("北京 故宫博物院 颐和园 攻略", candidates)
 
+    def test_is_note_like_item_accepts_note_variants(self):
+        from scripts.fetch_tripstar_xhs_bundle import _is_note_like_item
+
+        self.assertTrue(_is_note_like_item({"model_type": "note_v2", "id": "1"}))
+        self.assertTrue(_is_note_like_item({"id": "2", "note_card": {"display_title": "故宫攻略"}}))
+        self.assertFalse(_is_note_like_item({"model_type": "user", "id": "3"}))
+
     def test_live_fetch_service_parses_noisy_helper_stdout(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
         helper_payload = {
@@ -407,6 +414,41 @@ class TravelApiFlowTestCase(unittest.TestCase):
                 routes.xhs_live_fetch_service.refresh_from_tripstar(city="北京", keywords="", max_items=1)
 
         self.assertIn("没有返回可用笔记", str(ctx.exception))
+
+    def test_refresh_trip_http_error_contains_structured_detail(self):
+        routes.xhs_live_fetch_service.settings.xhs_cookie = "a1=test-cookie"
+        helper_payload = {
+            "success": True,
+            "query": "北京 攻略",
+            "raw_note_count": 0,
+            "data": {
+                "city": "北京",
+                "query_candidates": ["北京 攻略"],
+                "search_item_count": 2,
+                "search_model_types": ["user", "ad"],
+                "search_item_preview": [{"id": "1", "model_type": "user", "title": "", "keys": ["id", "model_type"]}],
+                "search_response": {"data": {"items": []}},
+                "detail_response": {"data": {"items": []}},
+            },
+        }
+
+        trip_plan = {"city": "北京", "days": [], "request_summary": {"preferences": []}}
+        with patch("app.services.xhs_live_fetch_service.subprocess.run") as mocked_run:
+            mocked_run.return_value = subprocess.CompletedProcess(
+                args=["python"],
+                returncode=0,
+                stdout=json.dumps(helper_payload, ensure_ascii=False),
+                stderr="",
+            )
+            with self.assertRaises(Exception) as ctx:
+                routes.refresh_xhs_trip_content(
+                    routes.XHSRefreshTripPayload(trip_plan=trip_plan, city="北京", keywords="", max_items=1)
+                )
+
+        detail = ctx.exception.detail
+        self.assertIsInstance(detail, dict)
+        self.assertEqual(detail["search_item_count"], 2)
+        self.assertEqual(detail["search_model_types"], ["user", "ad"])
 
     def test_refresh_xhs_content_source_requires_cookie(self):
         routes.xhs_live_fetch_service.settings.xhs_cookie = ""

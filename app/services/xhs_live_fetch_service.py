@@ -15,6 +15,10 @@ from app.services.xhs_content_service import XHSContentService
 class XHSLiveFetchError(RuntimeError):
     """Raised when the live XHS fetch bridge cannot refresh content."""
 
+    def __init__(self, message: str, *, detail: dict[str, Any] | None = None) -> None:
+        super().__init__(message)
+        self.detail = detail or {}
+
 
 class XHSLiveFetchService:
     """Bridge live fetch requests to TripStar without importing its app package inline."""
@@ -82,25 +86,44 @@ class XHSLiveFetchService:
         raw_output = (result.stdout or "").strip()
         if result.returncode != 0 and not raw_output:
             message = (result.stderr or "").strip() or "TripStar helper 运行失败。"
-            raise XHSLiveFetchError(message)
+            raise XHSLiveFetchError(message, detail={"stderr": message})
 
         response = self._extract_json_from_output(raw_output)
 
         if not response.get("success"):
-            raise XHSLiveFetchError(str(response.get("message") or "TripStar 实时抓取失败。"))
+            raise XHSLiveFetchError(
+                str(response.get("message") or "TripStar 实时抓取失败。"),
+                detail=response if isinstance(response, dict) else {},
+            )
 
         bundle = response.get("data")
         if not bundle:
-            raise XHSLiveFetchError("TripStar 实时抓取没有返回可用数据。")
+            raise XHSLiveFetchError("TripStar 实时抓取没有返回可用数据。", detail=response)
 
         raw_note_count = int(response.get("raw_note_count") or 0)
         if raw_note_count <= 0:
             tried_queries = response.get("data", {}).get("query_candidates") or []
             query_hint = "；".join(str(item) for item in tried_queries[:3] if str(item).strip())
-            raise XHSLiveFetchError(
+            item_count = int(response.get("data", {}).get("search_item_count") or 0)
+            model_types = response.get("data", {}).get("search_model_types") or []
+            model_hint = "、".join(str(item) for item in model_types[:5] if str(item).strip())
+            message = (
                 f"已发起小红书实时搜索，但当前查询 `{response.get('query') or city}` 没有返回可用笔记。"
                 + (f" 本次已尝试：{query_hint}。" if query_hint else "")
+                + (f" 搜索响应共返回 {item_count} 条 items。" if item_count else "")
+                + (f" 顶部 model_type: {model_hint}。" if model_hint else "")
                 + " 你可以改用更短的城市词、补充更贴近景点的关键词，或稍后重试。"
+            )
+            raise XHSLiveFetchError(
+                message,
+                detail={
+                    "query": response.get("query") or city,
+                    "query_candidates": tried_queries,
+                    "raw_note_count": raw_note_count,
+                    "search_item_count": item_count,
+                    "search_model_types": model_types,
+                    "search_item_preview": response.get("data", {}).get("search_item_preview") or [],
+                },
             )
 
         try:
@@ -110,7 +133,13 @@ class XHSLiveFetchService:
                 format_hint="xhs_search_response",
             )
         except ValueError as exc:
-            raise XHSLiveFetchError(f"小红书实时抓取已返回响应，但内容适配失败：{exc}") from exc
+            raise XHSLiveFetchError(
+                f"小红书实时抓取已返回响应，但内容适配失败：{exc}",
+                detail={
+                    "query": response.get("query") or city,
+                    "raw_note_count": raw_note_count,
+                },
+            ) from exc
 
         return {
             "status": status,
