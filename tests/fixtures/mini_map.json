@@ -1,0 +1,27 @@
+{
+  "nodes": [
+    {"id": "n1", "name": "North Gate", "lat": 40.0001, "lng": 116.3001},
+    {"id": "n2", "name": "Library", "lat": 40.0005, "lng": 116.301},
+    {"id": "n3", "name": "Lake", "lat": 40.001, "lng": 116.302},
+    {"id": "n4", "name": "Canteen", "lat": 40.0015, "lng": 116.303},
+    {"id": "n5", "name": "Teaching Building", "lat": 40.002, "lng": 116.304}
+  ],
+  "edges": [
+    {"from": "n1", "to": "n2", "distance": 120, "walk_speed": 1.2, "congestion": 0.8},
+    {"from": "n2", "to": "n3", "distance": 160, "walk_speed": 1.2, "congestion": 0.7},
+    {"from": "n3", "to": "n4", "distance": 140, "walk_speed": 1.2, "congestion": 0.9},
+    {"from": "n4", "to": "n5", "distance": 180, "walk_speed": 1.2, "congestion": 0.8},
+    {"from": "n1", "to": "n3", "distance": 350, "walk_speed": 1.2, "congestion": 0.9},
+    {"from": "n2", "to": "n5", "distance": 500, "walk_speed": 1.2, "congestion": 0.6}
+  ],
+  "buildings": [
+    {"id": "b1", "name": "Library", "node_id": "n2"},
+    {"id": "b2", "name": "Teaching Building", "node_id": "n5"}
+  ],
+  "facilities": [
+    {"id": "f1", "name": "Restroom A", "category": "toilet", "node_id": "n2"},
+    {"id": "f2", "name": "Water Station", "category": "water", "node_id": "n3"},
+    {"id": "f3", "name": "Canteen Shop", "category": "shop", "node_id": "n4"}
+  ]
+}
+
