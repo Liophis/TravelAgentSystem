@@ -1,0 +1,85 @@
+BUPT_SHAHE_OSM_SAMPLE = {
+    "source": "fixture-osm-bupt-shahe",
+    "place_name": "北京邮电大学沙河校区 OSM fixture",
+    "nodes": [
+        {"external_id": "osm-bupt-1", "name": "南门路口", "lng": 116.28333, "lat": 40.15608},
+        {"external_id": "osm-bupt-2", "name": "教学区路口", "lng": 116.28410, "lat": 40.15668},
+        {"external_id": "osm-bupt-3", "name": "图书馆路口", "lng": 116.28490, "lat": 40.15720},
+        {"external_id": "osm-bupt-4", "name": "生活区路口", "lng": 116.28570, "lat": 40.15778},
+        {"external_id": "osm-bupt-5", "name": "北区路口", "lng": 116.28625, "lat": 40.15835},
+    ],
+    "edges": [
+        {
+            "from_external_id": "osm-bupt-1",
+            "to_external_id": "osm-bupt-2",
+            "distance": 98,
+            "walk_time": 82,
+            "geometry": [[116.28333, 40.15608], [116.28410, 40.15668]],
+        },
+        {
+            "from_external_id": "osm-bupt-2",
+            "to_external_id": "osm-bupt-3",
+            "distance": 92,
+            "walk_time": 77,
+            "geometry": [[116.28410, 40.15668], [116.28490, 40.15720]],
+        },
+        {
+            "from_external_id": "osm-bupt-3",
+            "to_external_id": "osm-bupt-4",
+            "distance": 105,
+            "walk_time": 88,
+            "geometry": [[116.28490, 40.15720], [116.28570, 40.15778]],
+        },
+        {
+            "from_external_id": "osm-bupt-4",
+            "to_external_id": "osm-bupt-5",
+            "distance": 82,
+            "walk_time": 68,
+            "geometry": [[116.28570, 40.15778], [116.28625, 40.15835]],
+        },
+    ],
+    "buildings": [
+        {
+            "name": "教学楼 OSM 样例",
+            "category": "teaching",
+            "description": "Fixture building imported through the OSM import pipeline.",
+            "polygon": [
+                [116.28400, 40.15658],
+                [116.28432, 40.15658],
+                [116.28432, 40.15688],
+                [116.28400, 40.15688],
+            ],
+        },
+        {
+            "name": "图书馆 OSM 样例",
+            "category": "library",
+            "description": "Fixture library polygon imported through the OSM import pipeline.",
+            "polygon": [
+                [116.28474, 40.15705],
+                [116.28510, 40.15705],
+                [116.28510, 40.15734],
+                [116.28474, 40.15734],
+            ],
+        },
+    ],
+    "facilities": [
+        {
+            "name": "厕所 OSM 样例",
+            "category": "toilet",
+            "category_name": "厕所",
+            "description": "Fixture amenity imported from OSM-shaped data.",
+            "lng": 116.28418,
+            "lat": 40.15676,
+            "nearest_node_external_id": "osm-bupt-2",
+        },
+        {
+            "name": "饮水点 OSM 样例",
+            "category": "water",
+            "category_name": "饮水点",
+            "description": "Fixture water facility imported from OSM-shaped data.",
+            "lng": 116.28495,
+            "lat": 40.15726,
+            "nearest_node_external_id": "osm-bupt-3",
+        },
+    ],
+}

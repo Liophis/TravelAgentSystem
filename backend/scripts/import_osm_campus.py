@@ -1,0 +1,55 @@
+import argparse
+import sys
+from pathlib import Path
+
+from sqlalchemy.orm import Session
+
+if __name__ == "__main__":
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from app.core.config import settings
+from app.db.init_db import create_all
+from app.db.session import create_app_engine
+from app.services.osm_import_service import (
+    build_osmnx_payload,
+    import_fixture_osm_payload,
+    import_osm_payload_to_db,
+)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Import campus map data from OSMnx or fixture payload.")
+    parser.add_argument("--source", choices=["fixture", "osmnx"], default="fixture")
+    parser.add_argument("--database-url", default=settings.dev_database_url)
+    parser.add_argument("--place-name", default=settings.osm_default_place)
+    parser.add_argument("--center-lng", type=float, default=settings.osm_fallback_lng)
+    parser.add_argument("--center-lat", type=float, default=settings.osm_fallback_lat)
+    parser.add_argument("--dist", type=int, default=settings.osm_fallback_dist)
+    parser.add_argument("--keep-existing", action="store_true")
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    engine = create_app_engine(args.database_url)
+    create_all(engine)
+    with Session(engine) as session:
+        if args.source == "fixture":
+            summary = import_fixture_osm_payload(session, reset_existing=not args.keep_existing)
+        else:
+            payload = build_osmnx_payload(
+                place_name=args.place_name,
+                center_lng=args.center_lng,
+                center_lat=args.center_lat,
+                dist=args.dist,
+            )
+            summary = import_osm_payload_to_db(session, payload, reset_existing=not args.keep_existing)
+
+    print("[osm-import] database:", args.database_url)
+    for key, value in summary.items():
+        if key != "algorithm_trace":
+            print(f"[osm-import] {key}: {value}")
+
+
+if __name__ == "__main__":
+    main()
