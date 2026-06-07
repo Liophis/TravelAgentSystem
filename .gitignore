@@ -35,6 +35,7 @@ frontend/.env.local
 
 # Build and dependencies
 frontend/dist/
+frontend/.vite/
 frontend/node_modules/
 node_modules/
 
@@ -45,6 +46,8 @@ Thumbs.db
 # Logs
 *.log
 logs/
+media/uploads/*
+!media/uploads/.gitkeep
 
 # Test artifacts
 .coverage
