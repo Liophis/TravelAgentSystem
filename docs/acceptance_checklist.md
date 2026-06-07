@@ -65,12 +65,12 @@
 
 ## Diary Community
 
-- [ ] User can publish diary with title, body, destination, media.
-- [ ] Diary detail increments views.
-- [ ] User can rate/comment/like/favorite diary.
-- [ ] Title exact search works.
-- [ ] Full-text diary search works.
-- [ ] Compression ratio can be displayed for a diary.
+- [x] User can publish diary with title, body, and destination.
+- [x] Diary detail increments views.
+- [x] User can rate/comment on diary.
+- [x] Title exact search works.
+- [x] Body keyword diary search works.
+- [x] Compression ratio can be displayed for a diary.
 
 ## Food
 

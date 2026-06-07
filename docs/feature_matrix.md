@@ -16,9 +16,9 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Routing | Multi-point optimized route on OSM graph | `POST /api/v1/routes/multi-point` | RoutePlannerPage | `map_nodes`, `map_edges` | planned |
 | Facilities | Nearby by category and graph distance | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facilities`, `facility_categories`, `map_nodes`, `map_edges` | tested: DB-backed Dijkstra distance + Top-K heap |
 | Indoor | Building, floor, cross-floor route | `POST /api/indoor/routes` | Indoor Navigation | `indoor_nodes`, `indoor_edges` | planned |
-| Diaries | Publish, browse, rating, comments | `POST /api/diaries`, `GET /api/diaries` | Diary Community | `diaries`, `diary_media`, `diary_comments`, `diary_ratings` | scaffolded: model + seed |
-| Diaries | Title search, full-text search | `GET /api/diaries/search` | Diary Search | `diaries`, search index | planned |
-| Diaries | Compression stats | `GET /api/diaries/{id}/compression` | Diary Detail | `diaries` | planned |
+| Diaries | Publish, browse, rating, comments | `POST /api/v1/diaries`, `GET /api/v1/diaries`, `POST /api/v1/diaries/{id}/rating`, `POST /api/v1/diaries/{id}/comments` | Diary Community | `diaries`, `diary_comments`, `diary_ratings` | tested: DB-backed API + page |
+| Diaries | Title/body search and recommendation | `GET /api/v1/diaries/search`, `GET /api/v1/diaries/recommend` | Diary Community | `diaries` | tested: contains search + Top-K recommendation |
+| Diaries | Compression stats | `GET /api/v1/diaries/{id}/compression` | Diary Community | `diaries` | tested: zlib compression/decompression |
 | Food | Search, cuisine filter, fuzzy search | `GET /api/foods` | Food | `foods`, `restaurants` | scaffolded: models + seed |
 | Food | Hot/rating/distance recommendation | `GET /api/foods/recommendations` | Food | `foods`, `user_interests`, `map_edges` | planned |
 | AIGC | Diary draft and storyboard prompt | `POST /api/aigc/diary-draft`, `POST /api/aigc/storyboard` | Diary Editor | `diaries`, `diary_media` | planned |

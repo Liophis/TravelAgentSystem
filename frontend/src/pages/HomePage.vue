@@ -73,6 +73,11 @@ const modules = [
     description: "按类别查询设施，并使用道路图距离进行 Top-K 排序。",
     path: "/facilities",
   },
+  {
+    title: "游记社区",
+    description: "发布、搜索、评分和评论游记，并展示文本压缩统计。",
+    path: "/diaries",
+  },
 ];
 
 async function loadRecommendations() {

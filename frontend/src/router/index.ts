@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import DestinationListPage from "../pages/DestinationListPage.vue";
+import DiaryCommunityPage from "../pages/DiaryCommunityPage.vue";
 import HomePage from "../pages/HomePage.vue";
 import MapGuidePage from "../pages/MapGuidePage.vue";
 import NearbyFacilitiesPage from "../pages/NearbyFacilitiesPage.vue";
@@ -14,6 +15,7 @@ const router = createRouter({
     { path: "/map", name: "map-guide", component: MapGuidePage },
     { path: "/routes", name: "route-planner", component: RoutePlannerPage },
     { path: "/facilities", name: "nearby-facilities", component: NearbyFacilitiesPage },
+    { path: "/diaries", name: "diaries", component: DiaryCommunityPage },
   ],
 });
 

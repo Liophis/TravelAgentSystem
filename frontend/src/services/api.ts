@@ -109,6 +109,47 @@ export interface SearchPlacesPayload {
   algorithm_trace: Record<string, string>;
 }
 
+export interface DiaryCommentItem {
+  id: number;
+  diary_id: number;
+  user_id: number;
+  content: string;
+  created_at: string;
+}
+
+export interface DiaryItem {
+  id: number;
+  user_id: number;
+  destination_id: number | null;
+  title: string;
+  summary: string;
+  body?: string;
+  views: number;
+  rating_avg: number;
+  rating_count: number;
+  created_at: string;
+  comments?: DiaryCommentItem[];
+  score?: number;
+  reason?: string;
+}
+
+export interface DiaryListPayload {
+  items: DiaryItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  algorithm_trace?: Record<string, string>;
+}
+
+export interface DiaryCompressionPayload {
+  diary_id: number;
+  algorithm: string;
+  original_size: number;
+  compressed_size: number;
+  compression_ratio: number;
+  decompress_ok: boolean;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export async function apiGet<T>(path: string): Promise<T> {

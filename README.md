@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 7 OSM import pipeline** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、单点路线规划、附近设施查询、目的地搜索、推荐 API 和 OSM 导入管线接入数据库数据。
+当前仓库处于 **Stage 8 diary community** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、附近设施、目的地搜索、推荐、OSM 导入和游记社区接入数据库数据。
 
 ## Target Stack
 
@@ -121,6 +121,7 @@ curl 'http://127.0.0.1:8000/api/v1/recommendations?user_id=1&strategy=composite&
 curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
   -H 'Content-Type: application/json' \
   -d '{"source":"fixture","reset_existing":true}'
+curl 'http://127.0.0.1:8000/api/v1/diaries?limit=5'
 ```
 
 OSMnx import CLI:
@@ -144,6 +145,7 @@ If the configured `OSM_DEFAULT_PLACE` is not found by Nominatim, the importer fa
 - `docs/stage_5_nearby_facilities.md`: graph-distance nearby facility query notes.
 - `docs/stage_6_destinations_search_recommend.md`: destination list, search, and recommendation notes.
 - `docs/stage_7_osm_import.md`: OSMnx import pipeline and admin import notes.
+- `docs/stage_8_diaries.md`: diary community, search, rating, comments, and compression notes.
 - `tests/fixtures/README.md`: shared test fixture notes.
 
 ## Development Flow
