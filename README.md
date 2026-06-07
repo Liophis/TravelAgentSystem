@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 6 destinations/search/recommendation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、单点路线规划、附近设施查询、目的地搜索和推荐 API 接入数据库数据。
+当前仓库处于 **Stage 7 OSM import pipeline** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、单点路线规划、附近设施查询、目的地搜索、推荐 API 和 OSM 导入管线接入数据库数据。
 
 ## Target Stack
 
@@ -118,6 +118,15 @@ curl 'http://127.0.0.1:8000/api/v1/facilities/nearby?current_lng=116.28333&curre
 curl 'http://127.0.0.1:8000/api/v1/destinations?category=campus&q=导览点&limit=5'
 curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=厕所&limit=5'
 curl 'http://127.0.0.1:8000/api/v1/recommendations?user_id=1&strategy=composite&limit=10'
+curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
+  -H 'Content-Type: application/json' \
+  -d '{"source":"fixture","reset_existing":true}'
+```
+
+OSMnx import CLI:
+
+```bash
+PYTHONPATH=backend python backend/scripts/import_osm_campus.py --source osmnx
 ```
 
 ## Docs
@@ -132,6 +141,7 @@ curl 'http://127.0.0.1:8000/api/v1/recommendations?user_id=1&strategy=composite&
 - `docs/stage_4_route_planning.md`: database-backed Dijkstra route planning notes.
 - `docs/stage_5_nearby_facilities.md`: graph-distance nearby facility query notes.
 - `docs/stage_6_destinations_search_recommend.md`: destination list, search, and recommendation notes.
+- `docs/stage_7_osm_import.md`: OSMnx import pipeline and admin import notes.
 - `tests/fixtures/README.md`: shared test fixture notes.
 
 ## Development Flow

@@ -10,7 +10,7 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Destinations | Search by name/category/keyword | `GET /api/v1/search/places` | Destinations/Search | `destinations`, `buildings`, `facilities` | tested: contains search across places |
 | Recommendation | Hot/high-rating/interest/composite | `GET /api/v1/recommendations` | Home | `destinations`, `user_interests` | tested: rule scoring + Top-K heap |
 | Map Data | Seeded map data stats and layer API | `GET /api/v1/map/stats`, `GET /api/v1/map/nodes`, `GET /api/v1/map/edges`, `GET /api/v1/map/buildings`, `GET /api/v1/map/facilities` | MapGuidePage, Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities`, `facility_categories` | tested: DB-backed seed API |
-| Map Data | OSM import and admin import status | `POST /api/admin/map/import`, `GET /api/admin/stats` | Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities` | planned: real OSMnx import |
+| Map Data | OSM import and admin import status | `POST /api/v1/admin/map/import`, `GET /api/v1/admin/map/import/status`, `GET /api/v1/admin/stats` | Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities` | tested: fixture import + OSMnx source path |
 | Map UI | AMap display for roads/buildings/facilities | `GET /api/v1/map/geojson` | MapGuidePage | `map_nodes`, `map_edges`, `buildings`, `facilities` | scaffolded: page + AMapView, API is DB-backed seed |
 | Routing | Single-route distance/time response on OSM-shaped graph | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_nodes`, `map_edges` | tested: DB-backed Dijkstra API + page |
 | Routing | Multi-point optimized route on OSM graph | `POST /api/v1/routes/multi-point` | RoutePlannerPage | `map_nodes`, `map_edges` | planned |

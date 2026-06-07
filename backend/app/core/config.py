@@ -19,6 +19,13 @@ class Settings(BaseSettings):
     api_database_url: str = Field(default="sqlite:///./smart_tour_dev.db", alias="API_DATABASE_URL")
     dev_database_url: str = Field(default="sqlite:///./smart_tour_dev.db", alias="DEV_DATABASE_URL")
     redis_url: str = Field(default="redis://redis:6379/0", alias="REDIS_URL")
+    osm_default_place: str = Field(
+        default="Beijing University of Posts and Telecommunications Shahe Campus, Beijing, China",
+        alias="OSM_DEFAULT_PLACE",
+    )
+    osm_fallback_lat: float = Field(default=40.15608, alias="OSM_FALLBACK_LAT")
+    osm_fallback_lng: float = Field(default=116.28333, alias="OSM_FALLBACK_LNG")
+    osm_fallback_dist: int = Field(default=1500, alias="OSM_FALLBACK_DIST")
 
     model_config = SettingsConfigDict(
         env_file=(".env", ".env.local"),
