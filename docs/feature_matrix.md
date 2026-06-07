@@ -9,8 +9,9 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Destinations | List, detail, category filter | `GET /api/destinations`, `GET /api/destinations/{id}` | Destinations | `destinations`, `destination_tags`, `destination_statistics` | scaffolded: models + 200 seed rows |
 | Destinations | Search by name/category/keyword | `GET /api/search/places` | Map/Search | `destinations`, `buildings`, `facilities` | planned |
 | Recommendation | Hot/high-rating/interest/composite | `GET /api/recommendations` | Home | `destinations`, `user_interests`, `user_behavior_logs` | planned |
-| Map Data | OSM import and data stats | `POST /api/admin/map/import`, `GET /api/admin/stats` | Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities` | scaffolded: models + deterministic seed, OSM import planned |
-| Map UI | AMap display for roads/buildings/facilities | `GET /api/v1/map/geojson` | MapGuidePage | `map_nodes`, `map_edges`, `buildings`, `facilities` | scaffolded: mock API + page + AMapView |
+| Map Data | Seeded map data stats and layer API | `GET /api/v1/map/stats`, `GET /api/v1/map/nodes`, `GET /api/v1/map/edges`, `GET /api/v1/map/buildings`, `GET /api/v1/map/facilities` | MapGuidePage, Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities`, `facility_categories` | tested: DB-backed seed API |
+| Map Data | OSM import and admin import status | `POST /api/admin/map/import`, `GET /api/admin/stats` | Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities` | planned: real OSMnx import |
+| Map UI | AMap display for roads/buildings/facilities | `GET /api/v1/map/geojson` | MapGuidePage | `map_nodes`, `map_edges`, `buildings`, `facilities` | scaffolded: page + AMapView, API is DB-backed seed |
 | Routing | Single-route distance/time/modes on OSM graph | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_nodes`, `map_edges` | scaffolded: mock API + page |
 | Routing | Multi-point optimized route on OSM graph | `POST /api/v1/routes/multi-point` | RoutePlannerPage | `map_nodes`, `map_edges` | planned |
 | Facilities | Nearby by category and road distance | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facilities`, `facility_categories`, `map_edges` | scaffolded: mock API + page |

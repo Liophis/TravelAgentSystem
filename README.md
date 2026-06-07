@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 2 data foundation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，并加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据和基础规模验收。
+当前仓库处于 **Stage 3 map data API** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览 API 接入数据库种子数据。
 
 ## Target Stack
 
@@ -69,7 +69,6 @@ bash scripts/check_all.sh
 
 ## Startup
 
-At the harness stage there is no runnable business app yet. After backend/frontend scaffolds are added, use:
 Backend:
 
 ```bash
@@ -98,7 +97,21 @@ bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
 ```
 
-These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 220 map edges, 20 buildings, 50 facilities, and 10 facility categories.
+These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 80 map nodes, 220 map edges, 20 buildings, 50 facilities, and 10 facility categories.
+
+The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run:
+
+```bash
+bash scripts/reset_dev_db.sh
+cd backend
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Then check:
+
+```bash
+curl http://127.0.0.1:8000/api/v1/map/stats
+```
 
 ## Docs
 
@@ -106,8 +119,9 @@ These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and cu
 - `docs/feature_matrix.md`: feature/API/page/table/test status.
 - `docs/acceptance_checklist.md`: acceptance requirements.
 - `docs/amap_map_plan.md`: AMap frontend rendering plan and OSM backend boundary.
-- `docs/stage_1_foundation.md`: current stage delivery notes and known gaps.
+- `docs/stage_1_foundation.md`: project skeleton delivery notes and known gaps.
 - `docs/stage_2_data_foundation.md`: data model and seed delivery notes.
+- `docs/stage_3_map_data_api.md`: database-backed map API delivery notes.
 - `tests/fixtures/README.md`: shared test fixture notes.
 
 ## Development Flow

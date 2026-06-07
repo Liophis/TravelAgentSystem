@@ -1,15 +1,45 @@
 from fastapi import APIRouter
+from fastapi import Depends
+from sqlalchemy.orm import Session
 
-from app.services.mock_map_service import get_map_payload
+from app.db.session import get_db
+from app.services.map_data_service import (
+    get_buildings_from_db,
+    get_facilities_from_db,
+    get_map_edges_from_db,
+    get_map_nodes_from_db,
+    get_map_payload_from_db,
+    get_map_stats_from_db,
+)
 
 router = APIRouter()
 
 
 @router.get("/stats")
-def get_map_stats() -> dict[str, int]:
-    return get_map_payload()["statistics"]
+def get_map_stats(db: Session = Depends(get_db)) -> dict[str, int]:
+    return get_map_stats_from_db(db)
 
 
 @router.get("/geojson")
-def get_map_geojson() -> dict:
-    return get_map_payload()
+def get_map_geojson(db: Session = Depends(get_db)) -> dict:
+    return get_map_payload_from_db(db)
+
+
+@router.get("/nodes")
+def get_map_nodes(db: Session = Depends(get_db)) -> list[dict]:
+    return get_map_nodes_from_db(db)
+
+
+@router.get("/edges")
+def get_map_edges(db: Session = Depends(get_db)) -> list[dict]:
+    return get_map_edges_from_db(db)
+
+
+@router.get("/buildings")
+def get_map_buildings(db: Session = Depends(get_db)) -> list[dict]:
+    return get_buildings_from_db(db)
+
+
+@router.get("/facilities")
+def get_map_facilities(db: Session = Depends(get_db)) -> list[dict]:
+    return get_facilities_from_db(db)

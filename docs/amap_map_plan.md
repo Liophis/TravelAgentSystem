@@ -50,7 +50,8 @@ Rendering rules:
 - Reads roads, buildings, and facilities.
 - Converts backend GeoJSON to AMap coordinate arrays.
 - Supports facility category filtering.
-- Current stage uses mock OSM-shaped payloads until OSM import is implemented.
+- Current stage reads deterministic seeded DB rows shaped like campus map data.
+- Real OSMnx import is still planned and must keep the same frontend contract.
 
 `RoutePlannerPage.vue`:
 

@@ -17,6 +17,7 @@
 - [x] `buildings` count >= 20.
 - [x] `facilities` count >= 50.
 - [x] Facility categories count >= 10.
+- [x] `GET /api/v1/map/stats` reads the seeded database and returns map scale counts.
 
 ## Users
 
@@ -41,6 +42,7 @@
 - [x] Backend map data and route topology boundary is documented as OSMnx/OpenStreetMap, not AMap routing.
 - [x] AMap default center is `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
 - [x] Backend GeoJSON coordinate contract is documented as `[lng, lat]` arrays for AMap overlays.
+- [x] `GET /api/v1/map/geojson` returns roads, buildings, facilities, categories, statistics, and GeoJSON from seeded DB rows.
 - [ ] Place search highlights a map item.
 - [x] Facility markers open an info window on click in `AMapView`.
 - [x] Building polygons clear old overlays before filters redraw.
@@ -80,7 +82,7 @@
 
 ## Docs And Tests
 
-- [ ] `docs/feature_matrix.md` is updated for implemented features.
+- [x] `docs/feature_matrix.md` is updated for implemented features.
 - [x] Backend tests pass.
 - [x] Frontend typecheck/build passes.
 - [x] `bash scripts/check_all.sh` passes.

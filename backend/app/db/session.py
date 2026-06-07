@@ -22,7 +22,7 @@ def create_session_factory(database_url: str | None = None) -> sessionmaker[Sess
 
 
 def get_db() -> Generator[Session, None, None]:
-    session_local = create_session_factory()
+    session_local = create_session_factory(settings.api_database_url)
     db = session_local()
     try:
         yield db
