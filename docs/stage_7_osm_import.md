@@ -40,6 +40,14 @@ curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
   -d '{"source":"osmnx","place_name":"Beijing University of Posts and Telecommunications Shahe Campus, Beijing, China","reset_existing":true}'
 ```
 
+If Nominatim returns no result for `place_name`, the importer automatically falls back to:
+
+```text
+OSM_FALLBACK_LAT
+OSM_FALLBACK_LNG
+OSM_FALLBACK_DIST
+```
+
 CLI:
 
 ```bash
@@ -80,6 +88,7 @@ Expected backend result:
 
 - Harness tests do not call Overpass/OSMnx network services.
 - The checklist item "At least one real OSM campus/scenic map can be imported" remains unchecked until the OSMnx command is run successfully in a network-enabled environment.
+- Some campus names are not discoverable by Nominatim; fallback point import is enabled for that case.
 - Imported OSM feature categorization is intentionally simple and should be refined after seeing real Overpass payloads.
 - There is no frontend admin dashboard yet; only admin APIs are implemented.
 

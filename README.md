@@ -129,6 +129,8 @@ OSMnx import CLI:
 PYTHONPATH=backend python backend/scripts/import_osm_campus.py --source osmnx
 ```
 
+If the configured `OSM_DEFAULT_PLACE` is not found by Nominatim, the importer falls back to `OSM_FALLBACK_LAT` / `OSM_FALLBACK_LNG` / `OSM_FALLBACK_DIST`.
+
 ## Docs
 
 - `AGENTS.md`: rules for Codex and future agents.

@@ -113,19 +113,21 @@ def build_osmnx_payload(
     dist: int,
 ) -> dict[str, Any]:
     ox = _load_osmnx()
+    lookup_mode = "point"
+    resolved_place_name = f"point:{center_lng},{center_lat},dist:{dist}"
     if place_name:
-        graph = ox.graph_from_place(place_name, network_type="walk", simplify=True)
-        features = ox.features_from_place(
-            place_name,
-            tags={"building": True, "amenity": True, "shop": True, "tourism": True},
-        )
+        try:
+            graph, features = _fetch_osmnx_place(ox, place_name)
+            lookup_mode = "place"
+            resolved_place_name = place_name
+        except Exception as exc:
+            if not _is_place_lookup_failure(exc):
+                raise
+            graph, features = _fetch_osmnx_point(ox, center_lng, center_lat, dist)
+            lookup_mode = "point-fallback"
+            resolved_place_name = f"fallback-point:{center_lng},{center_lat},dist:{dist}; failed-place:{place_name}"
     else:
-        graph = ox.graph_from_point((center_lat, center_lng), dist=dist, network_type="walk", simplify=True)
-        features = ox.features_from_point(
-            (center_lat, center_lng),
-            tags={"building": True, "amenity": True, "shop": True, "tourism": True},
-            dist=dist,
-        )
+        graph, features = _fetch_osmnx_point(ox, center_lng, center_lat, dist)
 
     nodes_gdf, edges_gdf = ox.graph_to_gdfs(graph)
     nodes = [
@@ -198,7 +200,8 @@ def build_osmnx_payload(
 
     return {
         "source": "osmnx-overpass",
-        "place_name": place_name or f"point:{center_lng},{center_lat},dist:{dist}",
+        "place_name": resolved_place_name,
+        "lookup_mode": lookup_mode,
         "nodes": nodes,
         "edges": edges,
         "buildings": buildings,
@@ -270,6 +273,34 @@ def _load_osmnx() -> Any:
         return import_module("osmnx")
     except ImportError as exc:
         raise OsmImportError("OSMnx is not installed. Install backend requirements with osmnx support.") from exc
+
+
+def _fetch_osmnx_place(ox: Any, place_name: str) -> tuple[Any, Any]:
+    graph = ox.graph_from_place(place_name, network_type="walk", simplify=True)
+    features = ox.features_from_place(
+        place_name,
+        tags={"building": True, "amenity": True, "shop": True, "tourism": True},
+    )
+    return graph, features
+
+
+def _fetch_osmnx_point(ox: Any, center_lng: float, center_lat: float, dist: int) -> tuple[Any, Any]:
+    graph = ox.graph_from_point((center_lat, center_lng), dist=dist, network_type="walk", simplify=True)
+    features = ox.features_from_point(
+        (center_lat, center_lng),
+        tags={"building": True, "amenity": True, "shop": True, "tourism": True},
+        dist=dist,
+    )
+    return graph, features
+
+
+def _is_place_lookup_failure(exc: Exception) -> bool:
+    message = str(exc)
+    return (
+        exc.__class__.__name__ == "InsufficientResponseError"
+        or "Nominatim geocoder returned 0 results" in message
+        or "returned 0 results" in message
+    )
 
 
 def _line_geometry(geometry: Any) -> list[list[float]] | None:
