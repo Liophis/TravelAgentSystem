@@ -29,11 +29,11 @@
 
 ## Destinations And Recommendations
 
-- [ ] Destination list supports category filter and sorting.
+- [x] Destination list supports category filter and sorting.
 - [ ] Destination detail shows rating, popularity, tags, description, related diaries.
-- [ ] Search supports name/category/keyword.
-- [ ] Home shows personalized Top 10 recommendations.
-- [ ] Recommendation response includes score and reason.
+- [x] Search supports name/category/keyword.
+- [x] Home shows personalized Top 10 recommendations.
+- [x] Recommendation response includes score and reason.
 
 ## Map And Routing
 

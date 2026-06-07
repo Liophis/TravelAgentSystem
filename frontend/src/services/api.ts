@@ -59,6 +59,56 @@ export interface NearbyFacilitiesPayload {
   algorithm_trace?: Record<string, string>;
 }
 
+export interface DestinationItem {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  lng: number;
+  lat: number;
+  rating: number;
+  popularity: number;
+  tags: string[];
+  score?: number;
+  reason?: string;
+}
+
+export interface DestinationListPayload {
+  items: DestinationItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  categories: string[];
+  algorithm_trace?: Record<string, string>;
+}
+
+export interface RecommendationPayload {
+  items: DestinationItem[];
+  total: number;
+  strategy: string;
+  user_id: number | null;
+  algorithm_trace: Record<string, string>;
+}
+
+export interface SearchPlaceItem {
+  id: string;
+  source: string;
+  source_id: number;
+  name: string;
+  category: string;
+  lng: number;
+  lat: number;
+  description?: string;
+}
+
+export interface SearchPlacesPayload {
+  items: SearchPlaceItem[];
+  total: number;
+  keyword: string;
+  category: string | null;
+  algorithm_trace: Record<string, string>;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export async function apiGet<T>(path: string): Promise<T> {

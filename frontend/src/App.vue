@@ -10,6 +10,7 @@
       </div>
       <el-menu router :default-active="$route.path" class="nav-menu">
         <el-menu-item index="/">总览</el-menu-item>
+        <el-menu-item index="/destinations">目的地</el-menu-item>
         <el-menu-item index="/map">地图导览</el-menu-item>
         <el-menu-item index="/routes">路线规划</el-menu-item>
         <el-menu-item index="/facilities">附近设施</el-menu-item>

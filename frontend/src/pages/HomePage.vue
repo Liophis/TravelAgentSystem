@@ -2,8 +2,8 @@
   <section class="page-stack">
     <div class="page-heading">
       <div>
-        <h1>项目第一阶段基座</h1>
-        <p>后端 OSM 拓扑接口与前端高德展示层已按边界拆分，当前使用 mock 数据验证页面闭环。</p>
+        <h1>Smart Tour Guide</h1>
+        <p>北京邮电大学沙河校区导览、路线、设施、搜索与推荐演示。</p>
       </div>
     </div>
 
@@ -16,11 +16,48 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <el-card shadow="never">
+      <template #header>
+        <div class="card-header">
+          <span>推荐目的地</span>
+          <el-segmented v-model="strategy" :options="strategyOptions" @change="() => loadRecommendations()" />
+        </div>
+      </template>
+      <el-row :gutter="12">
+        <el-col v-for="item in recommendations" :key="item.id" :span="8">
+          <div class="recommendation-item">
+            <div>
+              <strong>{{ item.name }}</strong>
+              <p>{{ item.reason }}</p>
+            </div>
+            <div class="recommendation-score">{{ item.score?.toFixed(2) }}</div>
+          </div>
+        </el-col>
+      </el-row>
+    </el-card>
   </section>
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
+
+import { apiGet, type DestinationItem, type RecommendationPayload } from "../services/api";
+
+const strategy = ref("composite");
+const recommendations = ref<DestinationItem[]>([]);
+const strategyOptions = [
+  { label: "综合", value: "composite" },
+  { label: "热门", value: "hot" },
+  { label: "高分", value: "rating" },
+  { label: "兴趣", value: "interest" },
+];
 const modules = [
+  {
+    title: "目的地",
+    description: "浏览 200 个演示目的地，支持分类筛选、关键词搜索和详情查看。",
+    path: "/destinations",
+  },
   {
     title: "地图导览",
     description: "展示道路、建筑区域和设施点，并支持设施类别过滤。",
@@ -33,8 +70,47 @@ const modules = [
   },
   {
     title: "附近设施",
-    description: "查询当前位置附近设施，保留真实道路距离排序接口。",
+    description: "按类别查询设施，并使用道路图距离进行 Top-K 排序。",
     path: "/facilities",
   },
 ];
+
+async function loadRecommendations() {
+  const payload = await apiGet<RecommendationPayload>(`/api/v1/recommendations?user_id=1&strategy=${strategy.value}&limit=10`);
+  recommendations.value = payload.items;
+}
+
+onMounted(() => {
+  void loadRecommendations();
+});
 </script>
+
+<style scoped>
+.card-header,
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.recommendation-item {
+  min-height: 118px;
+  margin-bottom: 12px;
+  padding: 14px;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+}
+
+.recommendation-item p {
+  margin: 6px 0 0;
+  color: #667085;
+  line-height: 1.5;
+}
+
+.recommendation-score {
+  font-size: 20px;
+  font-weight: 700;
+  color: #176b87;
+}
+</style>

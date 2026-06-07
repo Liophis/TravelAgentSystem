@@ -6,9 +6,9 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | --- | --- | --- | --- | --- | --- |
 | Users | Register, login, profile, interests | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/users/me` | Login, Profile | `users`, `user_profiles`, `user_interests` | scaffolded: models + seed |
 | Users | Favorites, behavior logs, ratings | `POST /api/favorites`, `POST /api/behavior`, `POST /api/ratings` | Profile | `user_favorites`, `user_behavior_logs`, `user_ratings` | planned |
-| Destinations | List, detail, category filter | `GET /api/destinations`, `GET /api/destinations/{id}` | Destinations | `destinations`, `destination_tags`, `destination_statistics` | scaffolded: models + 200 seed rows |
-| Destinations | Search by name/category/keyword | `GET /api/search/places` | Map/Search | `destinations`, `buildings`, `facilities` | planned |
-| Recommendation | Hot/high-rating/interest/composite | `GET /api/recommendations` | Home | `destinations`, `user_interests`, `user_behavior_logs` | planned |
+| Destinations | List, detail, category filter | `GET /api/v1/destinations`, `GET /api/v1/destinations/{id}` | Destinations | `destinations`, `destination_tags` | tested: DB-backed API + page |
+| Destinations | Search by name/category/keyword | `GET /api/v1/search/places` | Destinations/Search | `destinations`, `buildings`, `facilities` | tested: contains search across places |
+| Recommendation | Hot/high-rating/interest/composite | `GET /api/v1/recommendations` | Home | `destinations`, `user_interests` | tested: rule scoring + Top-K heap |
 | Map Data | Seeded map data stats and layer API | `GET /api/v1/map/stats`, `GET /api/v1/map/nodes`, `GET /api/v1/map/edges`, `GET /api/v1/map/buildings`, `GET /api/v1/map/facilities` | MapGuidePage, Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities`, `facility_categories` | tested: DB-backed seed API |
 | Map Data | OSM import and admin import status | `POST /api/admin/map/import`, `GET /api/admin/stats` | Admin Dashboard | `map_nodes`, `map_edges`, `buildings`, `facilities` | planned: real OSMnx import |
 | Map UI | AMap display for roads/buildings/facilities | `GET /api/v1/map/geojson` | MapGuidePage | `map_nodes`, `map_edges`, `buildings`, `facilities` | scaffolded: page + AMapView, API is DB-backed seed |

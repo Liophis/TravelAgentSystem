@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 5 nearby facilities** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、单点路线规划和附近设施查询 API 接入数据库图数据。
+当前仓库处于 **Stage 6 destinations/search/recommendation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、单点路线规划、附近设施查询、目的地搜索和推荐 API 接入数据库数据。
 
 ## Target Stack
 
@@ -115,6 +115,9 @@ curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"end_lng":116.2862,"end_lat":40.1582}'
 curl 'http://127.0.0.1:8000/api/v1/facilities/nearby?current_lng=116.28333&current_lat=40.15608&category=water&radius=5000&limit=3'
+curl 'http://127.0.0.1:8000/api/v1/destinations?category=campus&q=导览点&limit=5'
+curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=厕所&limit=5'
+curl 'http://127.0.0.1:8000/api/v1/recommendations?user_id=1&strategy=composite&limit=10'
 ```
 
 ## Docs
@@ -128,6 +131,7 @@ curl 'http://127.0.0.1:8000/api/v1/facilities/nearby?current_lng=116.28333&curre
 - `docs/stage_3_map_data_api.md`: database-backed map API delivery notes.
 - `docs/stage_4_route_planning.md`: database-backed Dijkstra route planning notes.
 - `docs/stage_5_nearby_facilities.md`: graph-distance nearby facility query notes.
+- `docs/stage_6_destinations_search_recommend.md`: destination list, search, and recommendation notes.
 - `tests/fixtures/README.md`: shared test fixture notes.
 
 ## Development Flow
