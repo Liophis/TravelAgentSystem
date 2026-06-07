@@ -15,6 +15,9 @@
         <el-menu-item index="/routes">路线规划</el-menu-item>
         <el-menu-item index="/facilities">附近设施</el-menu-item>
         <el-menu-item index="/diaries">游记社区</el-menu-item>
+        <el-menu-item index="/foods">美食推荐</el-menu-item>
+        <el-menu-item index="/aigc">AIGC 辅助</el-menu-item>
+        <el-menu-item index="/admin">管理后台</el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

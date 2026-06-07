@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 8 diary community** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、附近设施、目的地搜索、推荐、OSM 导入和游记社区接入数据库数据。
+当前仓库处于 **Stage 9 food, AIGC, and admin dashboard** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。
 
 ## Target Stack
 
@@ -97,7 +97,7 @@ bash scripts/reset_dev_db.sh
 bash scripts/smoke_features.sh
 ```
 
-These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 80 map nodes, 220 map edges, 20 buildings, 50 facilities, and 10 facility categories.
+These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 80 map nodes, 220 map edges, 20 buildings, 50 facilities, 10 facility categories, 5 restaurants, 30 foods, and 20 diaries.
 
 The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run the backend from the repository root so the SQLite relative path matches `scripts/reset_dev_db.sh`:
 
@@ -122,6 +122,11 @@ curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
   -H 'Content-Type: application/json' \
   -d '{"source":"fixture","reset_existing":true}'
 curl 'http://127.0.0.1:8000/api/v1/diaries?limit=5'
+curl 'http://127.0.0.1:8000/api/v1/foods/recommend?limit=5'
+curl -X POST http://127.0.0.1:8000/api/v1/aigc/diary-draft \
+  -H 'Content-Type: application/json' \
+  -d '{"topic":"沙河校区路线","keywords":["食堂","图书馆"],"tone":"自然"}'
+curl 'http://127.0.0.1:8000/api/v1/admin/stats'
 ```
 
 OSMnx import CLI:
@@ -146,6 +151,7 @@ If the configured `OSM_DEFAULT_PLACE` is not found by Nominatim, the importer fa
 - `docs/stage_6_destinations_search_recommend.md`: destination list, search, and recommendation notes.
 - `docs/stage_7_osm_import.md`: OSMnx import pipeline and admin import notes.
 - `docs/stage_8_diaries.md`: diary community, search, rating, comments, and compression notes.
+- `docs/stage_9_food_aigc_admin.md`: food recommendation, AIGC placeholders, and admin dashboard notes.
 - `tests/fixtures/README.md`: shared test fixture notes.
 
 ## Development Flow
