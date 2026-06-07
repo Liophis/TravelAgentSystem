@@ -14,7 +14,7 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Map UI | AMap display for roads/buildings/facilities | `GET /api/v1/map/geojson` | MapGuidePage | `map_nodes`, `map_edges`, `buildings`, `facilities` | scaffolded: page + AMapView, API is DB-backed seed |
 | Routing | Single-route distance/time response on OSM-shaped graph | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_nodes`, `map_edges` | tested: DB-backed Dijkstra API + page |
 | Routing | Multi-point optimized route on OSM graph | `POST /api/v1/routes/multi-point` | RoutePlannerPage | `map_nodes`, `map_edges` | planned |
-| Facilities | Nearby by category and road distance | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facilities`, `facility_categories`, `map_edges` | scaffolded: mock API + page |
+| Facilities | Nearby by category and graph distance | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facilities`, `facility_categories`, `map_nodes`, `map_edges` | tested: DB-backed Dijkstra distance + Top-K heap |
 | Indoor | Building, floor, cross-floor route | `POST /api/indoor/routes` | Indoor Navigation | `indoor_nodes`, `indoor_edges` | planned |
 | Diaries | Publish, browse, rating, comments | `POST /api/diaries`, `GET /api/diaries` | Diary Community | `diaries`, `diary_media`, `diary_comments`, `diary_ratings` | scaffolded: model + seed |
 | Diaries | Title search, full-text search | `GET /api/diaries/search` | Diary Search | `diaries`, search index | planned |

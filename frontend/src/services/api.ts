@@ -4,12 +4,14 @@ export interface FacilityItem {
   id: string;
   name: string;
   category: string;
+  category_name?: string;
   lng: number;
   lat: number;
   description?: string;
   distance?: number;
   duration?: number;
   routePath?: Coordinate[];
+  node_ids?: number[];
 }
 
 export interface BuildingItem {
@@ -54,6 +56,7 @@ export interface NearbyFacilitiesPayload {
   total: number;
   category: string | null;
   radius: number;
+  algorithm_trace?: Record<string, string>;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";

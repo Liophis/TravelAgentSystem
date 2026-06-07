@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy.orm import Session
 
-from app.services.mock_map_service import get_nearby_facilities
+from app.algorithms.route_planning import RouteNotFoundError
+from app.db.session import get_db
+from app.services.facility_service import get_nearby_facilities_from_db
 
 router = APIRouter()
 
@@ -12,11 +15,16 @@ def nearby_facilities(
     category: str | None = Query(default=None),
     radius: int = Query(default=800, ge=1),
     limit: int = Query(default=10, ge=1, le=50),
+    db: Session = Depends(get_db),
 ) -> dict:
-    return get_nearby_facilities(
-        current_lng=current_lng,
-        current_lat=current_lat,
-        category=category,
-        radius=radius,
-        limit=limit,
-    )
+    try:
+        return get_nearby_facilities_from_db(
+            session=db,
+            current_lng=current_lng,
+            current_lat=current_lat,
+            category=category,
+            radius=radius,
+            limit=limit,
+        )
+    except RouteNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc

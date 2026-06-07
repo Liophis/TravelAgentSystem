@@ -3,7 +3,7 @@
     <div class="page-heading">
       <div>
         <h1>附近设施</h1>
-        <p>按类别查询附近设施，后续替换为 OSM 道路最短路径距离排序。</p>
+        <p>按类别和道路图距离查询附近设施。</p>
       </div>
       <el-button type="primary" :loading="loading" @click="loadFacilities">查询</el-button>
     </div>
@@ -14,9 +14,16 @@
           <el-form label-position="top">
             <el-form-item label="设施类别">
               <el-select v-model="category" clearable placeholder="全部类别">
-                <el-option label="toilet" value="toilet" />
-                <el-option label="water" value="water" />
-                <el-option label="shop" value="shop" />
+                <el-option label="厕所" value="toilet" />
+                <el-option label="饮水点" value="water" />
+                <el-option label="便利店" value="shop" />
+                <el-option label="食堂" value="canteen" />
+                <el-option label="校门" value="gate" />
+                <el-option label="图书馆服务" value="library" />
+                <el-option label="运动设施" value="sport" />
+                <el-option label="医务室" value="clinic" />
+                <el-option label="交通站点" value="transport" />
+                <el-option label="ATM" value="atm" />
               </el-select>
             </el-form-item>
             <el-form-item label="搜索半径">
@@ -28,7 +35,7 @@
         <el-card shadow="never" class="result-card">
           <el-table :data="facilities" size="small">
             <el-table-column prop="name" label="设施" />
-            <el-table-column prop="category" label="类别" width="88" />
+            <el-table-column prop="category_name" label="类别" width="96" />
             <el-table-column prop="distance" label="距离" width="88">
               <template #default="{ row }">{{ row.distance }}m</template>
             </el-table-column>

@@ -61,7 +61,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
         "mode": payload.get("mode", "walk"),
         "distance": round(distance),
         "duration": round(duration),
-        "path": _build_path_coordinates(start, end, start_snap.node, end_snap.node, route.edges),
+        "path": build_path_coordinates(start, end, start_snap.node, end_snap.node, route.edges),
         "node_ids": route.node_ids,
         "steps": _build_steps(start_snap, end_snap, route.edges),
         "algorithm_trace": {
@@ -84,7 +84,7 @@ def _resolve_weight(strategy: str | None) -> WeightMode:
     return "distance"
 
 
-def _build_path_coordinates(
+def build_path_coordinates(
     start: tuple[float, float],
     end: tuple[float, float],
     start_node: GraphNode,
