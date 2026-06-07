@@ -66,6 +66,7 @@ Run from repository root:
 
 ```bash
 bash scripts/reset_dev_db.sh
+bash scripts/smoke_features.sh
 bash scripts/check_backend.sh
 bash scripts/check_frontend.sh
 bash scripts/check_all.sh
