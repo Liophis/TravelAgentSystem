@@ -117,7 +117,7 @@ onMounted(async () => {
   try {
     AMap = await loadAMap();
     map = new AMap.Map(mapElement.value, {
-      center: [116.3260, 40.0030],
+      center: [116.28333, 40.15608],
       zoom: 16,
       viewMode: "2D",
     });

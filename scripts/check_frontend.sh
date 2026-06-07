@@ -13,10 +13,15 @@ if [ -f frontend/package.json ]; then
     echo "[frontend] skipping typecheck/build until dependencies are installed"
     exit 0
   fi
-  if npm run | grep -q "typecheck"; then
+  if [ ! -x node_modules/.bin/vue-tsc ] || [ ! -x node_modules/.bin/vite ]; then
+    echo "[frontend] dependencies incomplete; run npm install"
+    echo "[frontend] skipping typecheck/build until required binaries are installed"
+    exit 0
+  fi
+  if node -e "const scripts=require('./package.json').scripts||{}; process.exit(scripts.typecheck ? 0 : 1)"; then
     npm run typecheck
   fi
-  if npm run | grep -q "build"; then
+  if node -e "const scripts=require('./package.json').scripts||{}; process.exit(scripts.build ? 0 : 1)"; then
     npm run build
   fi
 else

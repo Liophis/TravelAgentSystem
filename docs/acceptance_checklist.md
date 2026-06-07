@@ -10,13 +10,13 @@
 
 ## Data
 
-- [ ] Seed users count >= 10.
-- [ ] Destinations count >= 200.
+- [x] Seed users count >= 10.
+- [x] Destinations count >= 200.
 - [ ] At least one real OSM campus/scenic map can be imported.
-- [ ] `map_edges` count >= 200.
-- [ ] `buildings` count >= 20.
-- [ ] `facilities` count >= 50.
-- [ ] Facility categories count >= 10.
+- [x] `map_edges` count >= 200.
+- [x] `buildings` count >= 20.
+- [x] `facilities` count >= 50.
+- [x] Facility categories count >= 10.
 
 ## Users
 
@@ -39,7 +39,7 @@
 - [ ] Map page displays roads, buildings, and facilities.
 - [x] Map page scaffold uses AMap JS API for rendering.
 - [x] Backend map data and route topology boundary is documented as OSMnx/OpenStreetMap, not AMap routing.
-- [x] AMap default center is `[116.3260, 40.0030]`.
+- [x] AMap default center is `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
 - [x] Backend GeoJSON coordinate contract is documented as `[lng, lat]` arrays for AMap overlays.
 - [ ] Place search highlights a map item.
 - [x] Facility markers open an info window on click in `AMapView`.
@@ -81,6 +81,6 @@
 ## Docs And Tests
 
 - [ ] `docs/feature_matrix.md` is updated for implemented features.
-- [ ] Backend tests pass.
-- [ ] Frontend typecheck/build passes.
-- [ ] `bash scripts/check_all.sh` passes.
+- [x] Backend tests pass.
+- [x] Frontend typecheck/build passes.
+- [x] `bash scripts/check_all.sh` passes.

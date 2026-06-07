@@ -1,12 +1,12 @@
 from math import hypot
 from typing import Any
 
-DEFAULT_CENTER = [116.3260, 40.0030]
+DEFAULT_CENTER = [116.28333, 40.15608]
 
 ROADS = [
-    {"id": "r1", "path": [[116.3260, 40.0030], [116.3276, 40.0038], [116.3290, 40.0046]]},
-    {"id": "r2", "path": [[116.3290, 40.0046], [116.3302, 40.0055], [116.3312, 40.0065]]},
-    {"id": "r3", "path": [[116.3276, 40.0038], [116.3271, 40.0052], [116.3268, 40.0062]]},
+    {"id": "r1", "path": [[116.28333, 40.15608], [116.28430, 40.15680], [116.28515, 40.15745]]},
+    {"id": "r2", "path": [[116.28515, 40.15745], [116.28580, 40.15790], [116.28620, 40.15820]]},
+    {"id": "r3", "path": [[116.28430, 40.15680], [116.28370, 40.15770], [116.28320, 40.15835]]},
 ]
 
 BUILDINGS = [
@@ -14,20 +14,20 @@ BUILDINGS = [
         "id": "b1",
         "name": "Library",
         "polygon": [
-            [116.3270, 40.0040],
-            [116.3281, 40.0042],
-            [116.3279, 40.0049],
-            [116.3269, 40.0048],
+            [116.28410, 40.15695],
+            [116.28495, 40.15710],
+            [116.28478, 40.15758],
+            [116.28398, 40.15744],
         ],
     },
     {
         "id": "b2",
         "name": "Teaching Building",
         "polygon": [
-            [116.3302, 40.0059],
-            [116.3313, 40.0060],
-            [116.3310, 40.0067],
-            [116.3300, 40.0066],
+            [116.28570, 40.15778],
+            [116.28645, 40.15790],
+            [116.28628, 40.15842],
+            [116.28555, 40.15830],
         ],
     },
 ]
@@ -35,28 +35,28 @@ BUILDINGS = [
 FACILITIES = [
     {
         "id": "f1",
-        "name": "North Gate Restroom",
+        "name": "Shahe Campus Restroom",
         "category": "toilet",
-        "lng": 116.3268,
-        "lat": 40.0037,
-        "description": "Public restroom near the north gate.",
+        "lng": 116.28395,
+        "lat": 40.15682,
+        "description": "Public restroom in BUPT Shahe Campus.",
         "node_id": "n2",
     },
     {
         "id": "f2",
         "name": "Library Water Station",
         "category": "water",
-        "lng": 116.3277,
-        "lat": 40.0045,
-        "description": "Drinking water station beside the library.",
+        "lng": 116.28472,
+        "lat": 40.15732,
+        "description": "Drinking water station beside the library area.",
         "node_id": "n3",
     },
     {
         "id": "f3",
         "name": "Campus Store",
         "category": "shop",
-        "lng": 116.3304,
-        "lat": 40.0058,
+        "lng": 116.28600,
+        "lat": 40.15804,
         "description": "Convenience store for snacks and daily supplies.",
         "node_id": "n5",
     },
@@ -85,9 +85,9 @@ def get_map_payload() -> dict[str, Any]:
 def get_route_plan(payload: dict[str, Any]) -> dict[str, Any]:
     path = [
         [payload["start_lng"], payload["start_lat"]],
-        [116.3276, 40.0038],
-        [116.3290, 40.0046],
-        [116.3302, 40.0055],
+        [116.28430, 40.15680],
+        [116.28515, 40.15745],
+        [116.28580, 40.15790],
         [payload["end_lng"], payload["end_lat"]],
     ]
     return {

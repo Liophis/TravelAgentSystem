@@ -9,7 +9,7 @@ def test_health_check() -> None:
 def test_map_geojson_payload_contains_stage1_layers() -> None:
     payload = get_map_payload()
 
-    assert payload["center"] == [116.3260, 40.0030]
+    assert payload["center"] == [116.28333, 40.15608]
     assert payload["statistics"]["buildings"] >= 1
     assert payload["statistics"]["facilities"] >= 1
     assert payload["geojson"]["type"] == "FeatureCollection"
@@ -18,10 +18,10 @@ def test_map_geojson_payload_contains_stage1_layers() -> None:
 def test_route_plan_returns_polyline_path() -> None:
     payload = get_route_plan(
         {
-            "start_lng": 116.3260,
-            "start_lat": 40.0030,
-            "end_lng": 116.3312,
-            "end_lat": 40.0065,
+            "start_lng": 116.28333,
+            "start_lat": 40.15608,
+            "end_lng": 116.28620,
+            "end_lat": 40.15820,
             "strategy": "shortest_distance",
             "mode": "walk",
         }
@@ -34,8 +34,8 @@ def test_route_plan_returns_polyline_path() -> None:
 
 def test_nearby_facilities_can_filter_by_category() -> None:
     payload = get_nearby_facilities(
-        current_lng=116.3260,
-        current_lat=40.0030,
+        current_lng=116.28333,
+        current_lat=40.15608,
         category="water",
         radius=1000,
         limit=10,

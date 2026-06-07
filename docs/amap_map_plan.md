@@ -33,7 +33,7 @@ routePath: route coordinate path
 
 Rendering rules:
 
-- Default center is `[116.3260, 40.0030]`.
+- Default center is `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
 - Facilities render as AMap `Marker`.
 - Building areas render as AMap `Polygon`.
 - Roads render as neutral AMap `Polyline`.

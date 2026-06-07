@@ -9,13 +9,15 @@ export function loadAMap(): Promise<any> {
     throw new Error("VITE_AMAP_KEY is not configured");
   }
 
-  if (!amapLoading) {
-    amapLoading = AMapLoader.load({
-      key,
-      version: "2.0",
-      plugins: ["AMap.Scale", "AMap.ToolBar"],
-    });
+  if (amapLoading) {
+    return amapLoading;
   }
 
-  return amapLoading;
+  const loading = AMapLoader.load({
+    key,
+    version: "2.0",
+    plugins: ["AMap.Scale", "AMap.ToolBar"],
+  });
+  amapLoading = loading;
+  return loading;
 }

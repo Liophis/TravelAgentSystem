@@ -21,7 +21,7 @@
 - Real PostgreSQL/PostGIS models and migrations.
 - Real graph shortest-path routing.
 - Real road-distance sorting for nearby facilities.
-- Frontend typecheck/build verification, because npm dependency installation was not allowed in this session.
+- Real frontend typecheck/build verification was deferred during Stage 1 and completed in Stage 2.
 
 ## Verification
 
@@ -42,4 +42,3 @@ npm install
 npm run typecheck
 npm run build
 ```
-

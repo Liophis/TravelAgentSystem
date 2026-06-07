@@ -7,8 +7,8 @@ router = APIRouter()
 
 @router.get("/nearby")
 def nearby_facilities(
-    current_lng: float = Query(default=116.3260),
-    current_lat: float = Query(default=40.0030),
+    current_lng: float = Query(default=116.28333),
+    current_lat: float = Query(default=40.15608),
     category: str | None = Query(default=None),
     radius: int = Query(default=800, ge=1),
     limit: int = Query(default=10, ge=1, le=50),

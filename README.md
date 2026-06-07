@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 1 foundation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，并用 mock API 验证地图、路线、附近设施三个页面的接口闭环。
+当前仓库处于 **Stage 2 data foundation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，并加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据和基础规模验收。
 
 ## Target Stack
 
@@ -41,6 +41,13 @@ VITE_AMAP_KEY=your_amap_web_js_api_key
 ```
 
 The frontend uses AMap only for rendering. Backend map import, graph topology, route planning, and nearby-facility distance calculation still use OSMnx/OpenStreetMap data.
+
+Default campus:
+
+```text
+北京邮电大学沙河校区
+Center: [116.28333, 40.15608]
+```
 
 Optional backend conda workflow:
 
@@ -91,7 +98,7 @@ bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
 ```
 
-At this harness stage these scripts are intentionally safe if seed/reset implementation is not created yet.
+These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 220 map edges, 20 buildings, 50 facilities, and 10 facility categories.
 
 ## Docs
 
@@ -100,6 +107,7 @@ At this harness stage these scripts are intentionally safe if seed/reset impleme
 - `docs/acceptance_checklist.md`: acceptance requirements.
 - `docs/amap_map_plan.md`: AMap frontend rendering plan and OSM backend boundary.
 - `docs/stage_1_foundation.md`: current stage delivery notes and known gaps.
+- `docs/stage_2_data_foundation.md`: data model and seed delivery notes.
 - `tests/fixtures/README.md`: shared test fixture notes.
 
 ## Development Flow

@@ -54,10 +54,10 @@ import { apiPost, type RoutePlanPayload } from "../services/api";
 const loading = ref(false);
 const route = ref<RoutePlanPayload | null>(null);
 const form = reactive({
-  start_lng: 116.3260,
-  start_lat: 40.0030,
-  end_lng: 116.3312,
-  end_lat: 40.0065,
+  start_lng: 116.28333,
+  start_lat: 40.15608,
+  end_lng: 116.28620,
+  end_lat: 40.15820,
   strategy: "shortest_distance",
   mode: "walk",
 });

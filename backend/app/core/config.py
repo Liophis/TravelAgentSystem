@@ -16,6 +16,7 @@ class Settings(BaseSettings):
         default="postgresql+psycopg://smart_tour:smart_tour_dev@postgres:5432/smart_tour_guide",
         alias="DATABASE_URL",
     )
+    dev_database_url: str = Field(default="sqlite:///./smart_tour_dev.db", alias="DEV_DATABASE_URL")
     redis_url: str = Field(default="redis://redis:6379/0", alias="REDIS_URL")
 
     model_config = SettingsConfigDict(

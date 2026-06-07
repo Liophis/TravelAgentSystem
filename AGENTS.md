@@ -45,7 +45,7 @@ tests/fixtures/     small shared fixtures for backend/frontend tests
 - Frontend renders maps with AMap JS API.
 - API coordinates are WGS84 longitude/latitude.
 - AMap overlays must receive `[lng, lat]`.
-- Default map center: `[116.3260, 40.0030]`.
+- Default map center: `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
 
 ## Required Harness Commands
 

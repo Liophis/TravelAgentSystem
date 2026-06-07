@@ -7,10 +7,10 @@ router = APIRouter()
 
 
 class RoutePlanRequest(BaseModel):
-    start_lng: float = Field(default=116.3260)
-    start_lat: float = Field(default=40.0030)
-    end_lng: float = Field(default=116.3312)
-    end_lat: float = Field(default=40.0065)
+    start_lng: float = Field(default=116.28333)
+    start_lat: float = Field(default=40.15608)
+    end_lng: float = Field(default=116.28620)
+    end_lat: float = Field(default=40.15820)
     strategy: str = Field(default="shortest_distance")
     mode: str = Field(default="walk")
 
