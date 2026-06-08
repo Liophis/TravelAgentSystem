@@ -9,10 +9,20 @@ PYTHONPATH=backend ${PYTHON_CMD} - <<'PY'
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+<<<<<<< HEAD
+from app.api.v1.admin import admin_stats
+from app.db.session import create_app_engine
+from app.services.aigc_service import generate_diary_draft, generate_storyboard
+from app.services.destination_service import list_destinations_from_db
+from app.services.diary_service import list_diaries_from_db
+from app.services.facility_service import get_nearby_facilities_from_db
+from app.services.food_service import nearby_foods_from_db, recommend_foods_from_db
+=======
 from app.db.session import create_app_engine
 from app.services.destination_service import list_destinations_from_db
 from app.services.diary_service import list_diaries_from_db
 from app.services.facility_service import get_nearby_facilities_from_db
+>>>>>>> main
 from app.services.map_data_service import get_map_stats_from_db
 from app.services.recommendation_service import recommend_destinations_from_db
 from app.services.route_service import plan_route_from_db
@@ -86,5 +96,39 @@ with Session(engine) as session:
     require("diaries", diaries["total"])
     print(f"[smoke] diaries: total={diaries['total']} returned={len(diaries['items'])}")
 
+<<<<<<< HEAD
+    foods = recommend_foods_from_db(
+        session=session,
+        cuisine=None,
+        user_id=1,
+        current_lng=116.28333,
+        current_lat=40.15608,
+        limit=3,
+    )
+    require("food recommendations", len(foods["items"]))
+    print(f"[smoke] foods: total={foods['total']} returned={len(foods['items'])}")
+
+    nearby_foods = nearby_foods_from_db(
+        session=session,
+        current_lng=116.28333,
+        current_lat=40.15608,
+        cuisine=None,
+        radius=5000,
+        limit=3,
+    )
+    require("nearby foods", len(nearby_foods["items"]))
+    print(f"[smoke] nearby foods: total={nearby_foods['total']} returned={len(nearby_foods['items'])}")
+
+    stats_payload = admin_stats(session)
+    require("admin food count", stats_payload["tables"]["foods"])
+    print(f"[smoke] admin: tables={stats_payload['tables']}")
+
+draft = generate_diary_draft({"topic": "沙河校区路线", "keywords": ["食堂", "图书馆"], "tone": "自然"})
+storyboard = generate_storyboard({"text": draft["draft"], "scene_count": 3})
+require("aigc scenes", len(storyboard["scenes"]), 3)
+print(f"[smoke] aigc: title={draft['title']} scenes={len(storyboard['scenes'])}")
+
+=======
+>>>>>>> main
 print(f"[smoke] OK using API_DATABASE_URL={settings.api_database_url}")
 PY

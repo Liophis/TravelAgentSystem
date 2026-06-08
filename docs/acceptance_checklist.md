@@ -74,15 +74,21 @@
 
 ## Food
 
-- [ ] Food list shows restaurant/window, cuisine, price, rating, heat.
-- [ ] Cuisine filter works.
-- [ ] Fuzzy search handles close spelling.
-- [ ] Food recommendations change with current location.
+- [x] Food list shows restaurant/window, cuisine, price, rating, heat.
+- [x] Cuisine filter works.
+- [x] Fuzzy search handles close spelling.
+- [x] Food recommendations change with current location.
+
+## AIGC
+
+- [x] Diary draft endpoint returns title, draft, and reusable prompt.
+- [x] Storyboard endpoint returns scene list, prompt, and simulated video link.
+- [x] Frontend page can call both placeholder endpoints.
 
 ## Admin
 
-- [ ] Admin dashboard shows user/destination/map/diary/food counts.
-- [ ] Admin can inspect OSM import status and data scale.
+- [x] Admin dashboard shows user/destination/map/diary/food counts.
+- [x] Admin can inspect OSM import status and data scale.
 - [ ] Admin can moderate diaries and edit destinations/facilities/foods.
 
 ## Docs And Tests

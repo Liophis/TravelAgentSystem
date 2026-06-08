@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.session import get_db
+from app.models import Destination, Diary, Facility, Food, Restaurant, User
 from app.services.osm_import_service import (
     OsmImportError,
     build_osmnx_payload,
@@ -26,7 +28,17 @@ class MapImportRequest(BaseModel):
 
 @router.get("/stats")
 def admin_stats(db: Session = Depends(get_db)) -> dict:
-    return {"map": get_map_import_status(db)}
+    return {
+        "map": get_map_import_status(db),
+        "tables": {
+            "users": _count(db, User),
+            "destinations": _count(db, Destination),
+            "facilities": _count(db, Facility),
+            "restaurants": _count(db, Restaurant),
+            "foods": _count(db, Food),
+            "diaries": _count(db, Diary),
+        },
+    }
 
 
 @router.get("/map/import/status")
@@ -53,3 +65,7 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
         raise HTTPException(status_code=502, detail=f"OSM import failed: {exc}") from exc
 
     raise HTTPException(status_code=400, detail="Unsupported import source.")
+
+
+def _count(db: Session, model) -> int:
+    return int(db.scalar(select(func.count()).select_from(model)) or 0)

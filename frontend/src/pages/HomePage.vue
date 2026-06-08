@@ -78,6 +78,21 @@ const modules = [
     description: "发布、搜索、评分和评论游记，并展示文本压缩统计。",
     path: "/diaries",
   },
+  {
+    title: "美食推荐",
+    description: "按菜系、热度、评分和距离推荐校区餐厅与菜品。",
+    path: "/foods",
+  },
+  {
+    title: "AIGC 辅助",
+    description: "生成游记草稿、标题和短视频分镜提示词。",
+    path: "/aigc",
+  },
+  {
+    title: "管理后台",
+    description: "查看地图、用户、目的地、游记和美食数据规模。",
+    path: "/admin",
+  },
 ];
 
 async function loadRecommendations() {

@@ -150,6 +150,75 @@ export interface DiaryCompressionPayload {
   decompress_ok: boolean;
 }
 
+export interface RestaurantItem {
+  id: number;
+  name: string;
+  lng: number;
+  lat: number;
+  heat: number;
+  food_count: number;
+  cuisines: string[];
+}
+
+export interface FoodItem {
+  id: number;
+  restaurant_id: number;
+  restaurant_name: string;
+  restaurant_lng: number;
+  restaurant_lat: number;
+  restaurant_heat: number;
+  name: string;
+  cuisine: string;
+  price: number;
+  rating: number;
+  heat: number;
+  score?: number;
+  distance?: number;
+  duration?: number;
+  reason?: string;
+  routePath?: Coordinate[];
+  node_ids?: number[];
+}
+
+export interface RestaurantListPayload {
+  items: RestaurantItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  algorithm_trace?: Record<string, string>;
+}
+
+export interface FoodListPayload {
+  items: FoodItem[];
+  total: number;
+  limit?: number;
+  offset?: number;
+  cuisines?: string[];
+  keyword?: string;
+  cuisine?: string | null;
+  radius?: number;
+  algorithm_trace?: Record<string, string>;
+}
+
+export interface AigcDraftPayload {
+  title: string;
+  draft: string;
+  prompt: string;
+  algorithm_trace: Record<string, string>;
+}
+
+export interface AigcStoryboardPayload {
+  scenes: Array<{ index: number; title: string; description: string; duration_seconds: number }>;
+  prompt: string;
+  simulated_video_url: string;
+  algorithm_trace: Record<string, string>;
+}
+
+export interface AdminStatsPayload {
+  map: Record<string, number>;
+  tables: Record<string, number>;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export async function apiGet<T>(path: string): Promise<T> {
