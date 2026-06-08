@@ -7,7 +7,10 @@ Base path: `/api/v1`.
 - `GET /map/stats`
 - `GET /map/geojson`
 - `POST /routes/plan`
+  - accepts `start_place_id` / `end_place_id` from `GET /search/places`
+  - keeps `start_lng/start_lat/end_lng/end_lat` as coordinate fallback
 - `POST /routes/multi-point`
+  - each point accepts `place_id` or coordinate fallback
 - `GET /facilities/nearby`
 
 ## Search And Recommendation

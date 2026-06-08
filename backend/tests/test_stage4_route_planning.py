@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
 from app.algorithms.route_planning import (
@@ -8,6 +8,7 @@ from app.algorithms.route_planning import (
 )
 from app.api.v1.routes import MultiPointRouteRequest, RoutePlanRequest, RoutePointRequest, plan_multi_point_route, plan_route
 from app.db.init_db import create_all
+from app.models import Facility
 from app.seed.sample_data import BUPT_SHAHE_CENTER
 from app.seed.seed_all import seed_demo_data
 from app.services.route_service import plan_multi_point_route_from_db, plan_route_from_db
@@ -65,9 +66,32 @@ def test_route_api_handler_uses_seeded_database() -> None:
 
     assert route["strategy"] == "shortest_distance"
     assert route["mode"] == "walk"
-    assert route["algorithm_trace"]["topology_source"] == "map_nodes/map_edges seeded database"
+    assert route["algorithm_trace"]["topology_source"] == "local map_nodes/map_edges graph"
     assert route["distance"] > 0
     assert route["path"][0] == [116.28333, 40.15608]
+
+
+def test_route_service_accepts_place_ids_for_user_facing_inputs() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        facilities = session.scalars(select(Facility).order_by(Facility.id).limit(2)).all()
+        route = plan_route_from_db(
+            session,
+            {
+                "start_place_id": f"facility-{facilities[0].id}",
+                "end_place_id": f"facility-{facilities[1].id}",
+                "strategy": "shortest_distance",
+                "mode": "walk",
+            },
+        )
+
+    assert route["start"]["source"] == "facility"
+    assert route["end"]["source"] == "facility"
+    assert route["algorithm_trace"]["input_model"] == "place_id first, coordinate fallback"
+    assert route["distance"] > 0
 
 
 def test_shortest_time_and_bike_mode_use_transport_duration() -> None:
@@ -162,10 +186,12 @@ def test_multi_point_route_api_handler() -> None:
 
     with Session(engine) as session:
         seed_demo_data(session)
+        facilities = session.scalars(select(Facility).order_by(Facility.id).limit(2)).all()
         route = plan_multi_point_route(
             MultiPointRouteRequest(
+                start_place_id=f"facility-{facilities[0].id}",
                 points=[
-                    RoutePointRequest(lng=116.2842, lat=40.1567, name="教学楼"),
+                    RoutePointRequest(place_id=f"facility-{facilities[1].id}"),
                     RoutePointRequest(lng=116.2862, lat=40.1582, name="图书馆"),
                 ]
             ),

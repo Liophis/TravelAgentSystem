@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 19 real data enrichment** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨，以及高德 Web Service 真实 POI 导入链路。
+当前仓库处于 **Stage 20 data cleaning and route inputs** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗，以及路线地点选择输入。
 
 ## Target Stack
 
@@ -115,13 +115,22 @@ PYTHONPATH=backend python backend/scripts/import_amap_pois.py --radius 1800 --ma
 Use `--reset-facilities` when you want AMap POIs to replace seeded facility points while keeping the existing road graph:
 
 ```bash
-PYTHONPATH=backend python backend/scripts/import_amap_pois.py --radius 1800 --max-pages 5 --request-interval 0.5 --reset-facilities
+PYTHONPATH=backend python backend/scripts/import_amap_pois.py --radius 3000 --max-pages 3 --request-interval 0.8 --reset-facilities
 ```
 
 The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run the backend from the repository root so the SQLite relative path matches `scripts/reset_dev_db.sh`:
 
 ```bash
 bash scripts/reset_dev_db.sh
+bash scripts/smoke_features.sh
+PYTHONPATH=backend uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+For a cleaned real-facility demo, replace the fallback facility seed after reset:
+
+```bash
+bash scripts/reset_dev_db.sh
+python backend/scripts/import_amap_pois.py --radius 3000 --max-pages 3 --request-interval 0.8 --reset-facilities
 bash scripts/smoke_features.sh
 PYTHONPATH=backend uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
@@ -133,6 +142,9 @@ curl http://127.0.0.1:8000/api/v1/map/stats
 curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"end_lng":116.2862,"end_lat":40.1582}'
+curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
+  -H 'Content-Type: application/json' \
+  -d '{"start_place_id":"facility-1","end_place_id":"facility-2","strategy":"shortest_distance","mode":"walk"}'
 curl -X POST http://127.0.0.1:8000/api/v1/routes/multi-point \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"points":[{"name":"教学楼","lng":116.2842,"lat":40.1567},{"name":"图书馆","lng":116.2862,"lat":40.1582}],"return_to_start":true}'
@@ -195,6 +207,7 @@ AMap POI import uses the official Place Around Web Service endpoint, converts re
 - `docs/stage_16_user_preferences.md`: editable interests and recommendation refresh notes.
 - `docs/stage_18_query_polish.md`: facility category lookup and food search sorting notes.
 - `docs/stage_19_real_data_enrichment.md`: AMap POI real-data enrichment notes.
+- `docs/stage_20_data_cleaning_route_inputs.md`: data cleaning and route place-input notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

@@ -6,12 +6,16 @@
 
 Input:
 
+- `start_place_id` optional
+- `end_place_id` optional
 - `start_lng`
 - `start_lat`
 - `end_lng`
 - `end_lat`
 - `strategy`
 - `mode`
+
+The user-facing frontend should prefer `start_place_id` and `end_place_id` selected from `GET /api/v1/search/places`. Raw coordinates remain as a fallback for debugging, imported data issues, and algorithm tests.
 
 Output:
 
@@ -25,6 +29,14 @@ Output:
 ## Algorithm
 
 The service snaps start/end coordinates to nearest graph nodes, builds a bidirectional graph from `map_edges`, and runs Dijkstra shortest path.
+
+If a place ID is provided, the service resolves it first:
+
+- `destination-{id}` uses destination coordinates
+- `building-{id}` uses the building polygon center
+- `facility-{id}` uses facility coordinates
+
+Then the resolved coordinate is snapped to the nearest graph node.
 
 Supported weights:
 
@@ -44,7 +56,7 @@ Nearby facility search filters facility category first, then computes graph dist
 
 ## Multi-Point Route
 
-`POST /api/v1/routes/multi-point` accepts a start point and 1-12 destination points. The service uses a greedy TSP approximation: for each step, it evaluates remaining destinations by actual Dijkstra leg cost using the selected strategy and visits the nearest next point. It returns:
+`POST /api/v1/routes/multi-point` accepts a start point and 1-12 destination points. Each destination can use `place_id` or coordinate fallback. The service uses a greedy TSP approximation: for each step, it evaluates remaining destinations by actual Dijkstra leg cost using the selected strategy and visits the nearest next point. It returns:
 
 - optimized `visit_order`
 - route `segments`

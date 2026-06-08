@@ -17,14 +17,13 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
-| P1 | Route target selection | Route strategy depth is covered for demo: distance/time, congestion, walk/bike/electric-cart/mixed modes | Route planner still expects coordinates instead of selecting destination/facility names | Add target search/select controls connected to destination/facility APIs |
 | P1 | User auth and behavior loop | Editable user interests now update recommendation output | Registration/login, favorites, destination ratings, and browsing behavior logs are still missing | Add minimal auth plus favorite/rating/behavior APIs |
 | P1 | Diary media | Text diary works; compression works | No image/video upload, no media preview, AIGC does not accept photos | Add media table/local upload and pass uploaded media metadata to mock AIGC |
 | P1 | Diary search | Title/body contains search works | No exact-title index/hash/trie; full-text is not an inverted index or DB full-text search | Add exact title lookup and lightweight inverted index or SQLite/Postgres FTS path |
 | P1 | Diary recommendation | Uses views + rating Top-K | Does not use personal interest | Add user-interest overlap to diary score and expose reason |
 | P1 | Food destination scope | Cuisine filter, fuzzy search, heat/rating/distance sort, and Top-K scoring work | Food is not explicitly scoped to selected destination/school | Add destination/current-place context and destination linkage |
 | P1 | Map demo verification | AMap component exists and converts WGS84 to GCJ-02 | No browser/e2e screenshot proof because AMap key is environment-dependent | Add optional Playwright smoke guarded by `VITE_AMAP_KEY` |
-| P2 | Real map data richness | Dense deterministic BUPT seed is documented as offline fallback; OSM import path exists; AMap POI importer exists; live AMap import added 516 real facility rows locally | Building polygons and walkable campus topology may still be sparse if OSM data is incomplete | Keep OSM/manual graph data for routes and use AMap import for POI density |
+| P2 | Real map data richness | Dense deterministic BUPT seed is documented as offline fallback; OSM import path exists; AMap POI importer exists; clean live AMap import replaced facility seed with 516 real facility rows locally | Building polygons and walkable campus topology may still be sparse if OSM data is incomplete | Keep OSM/manual graph data for routes and use AMap import for POI density |
 
 ## Requirement Coverage By Module
 
@@ -32,8 +31,8 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | --- | --- | --- |
 | 旅游推荐 | Partial | Top-K heap, hot/rating/interest strategies, editable interests, and recommendation refresh exist. Missing favorites/ratings/behavior feedback. |
 | 景点/学校查询 | Mostly covered | Destination list supports keyword/category and hot/rating sort. Cross-source search does not yet sort all result types by heat/rating. |
-| 单点路线规划 | Partial | Dijkstra route and map polyline exist. Distance/time/mode strategies work. Target input is still coordinate-oriented. |
-| 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start. Candidate legs use the selected distance/time strategy, but it is still an approximation. |
+| 单点路线规划 | Mostly covered | Dijkstra route, map polyline, distance/time/mode strategies, and place-name start/end selection work. |
+| 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start and place IDs. Candidate legs use the selected distance/time strategy, but it is still an approximation. |
 | 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
 | 室内导航 | Covered for demo | Indoor nodes/edges, cross-floor Dijkstra, elevator/stair steps, and frontend page are implemented. |

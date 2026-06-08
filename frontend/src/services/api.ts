@@ -29,6 +29,14 @@ export interface RoadItem {
   allowed_modes?: string[];
 }
 
+export interface RouteEndpointItem {
+  id: string;
+  source: string;
+  name: string;
+  lng: number;
+  lat: number;
+}
+
 export interface MapGeoJsonPayload {
   center: Coordinate;
   statistics: {
@@ -49,6 +57,8 @@ export interface RoutePlanPayload {
   mode: string;
   distance: number;
   duration: number;
+  start?: RouteEndpointItem;
+  end?: RouteEndpointItem;
   path: Coordinate[];
   node_ids?: number[];
   steps: Array<{ text: string; distance: number }>;

@@ -36,7 +36,7 @@ Open map guide, show roads, buildings, facilities, and category filter.
 
 ## 6. Route Planning
 
-Open route planner, plan default route, show distance/time/steps and map polyline.
+Open route planner, choose start/end by place search, show distance/time/steps and map polyline. Open advanced coordinates only if explaining graph-node snapping.
 
 ## 7. Nearby Facilities
 

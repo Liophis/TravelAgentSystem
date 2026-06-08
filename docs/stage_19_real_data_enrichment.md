@@ -66,12 +66,12 @@ Expected:
 - AMap QPS limit code `10021` backs off and retries
 - no tests require a live AMap key
 
-## Live Import Result
+## Clean Live Import Result
 
 Executed locally with a real `AMAP_WEB_API_KEY`:
 
 ```bash
-python backend/scripts/import_amap_pois.py --radius 3000 --max-pages 3 --request-interval 0.8
+python backend/scripts/import_amap_pois.py --radius 3000 --max-pages 3 --request-interval 0.8 --reset-facilities
 ```
 
 Result:
@@ -79,22 +79,23 @@ Result:
 - raw AMap POIs: 544
 - imported facility rows: 516
 - skipped duplicate/invalid/out-of-radius rows: 28
-- total local facilities after import: 636
+- total local facilities after cleanup: 516
+- offline fallback facility seed rows removed from the local dev DB
 
 Category distribution after import:
 
 | Category | Count |
 | --- | ---: |
-| shop | 194 |
-| transport | 140 |
-| clinic | 65 |
-| sport | 57 |
-| canteen | 53 |
-| gate | 34 |
-| library | 26 |
-| water | 25 |
-| toilet | 21 |
-| atm | 21 |
+| shop | 182 |
+| transport | 128 |
+| clinic | 53 |
+| sport | 45 |
+| canteen | 41 |
+| gate | 22 |
+| library | 14 |
+| water | 13 |
+| toilet | 9 |
+| atm | 9 |
 
 The generated SQLite database remains ignored and is not committed.
 

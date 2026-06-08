@@ -2,13 +2,15 @@
 
 ## Scope
 
-This stage connects `POST /api/v1/routes/plan` to the seeded map graph. It does not implement real OSMnx import yet.
+This stage connects `POST /api/v1/routes/plan` to the local map graph. Later stages add OSM import, transport strategies, and place-name route inputs.
 
 ## Delivered
 
 - Added reusable route algorithms in `backend/app/algorithms/route_planning.py`.
 - Added DB-backed route orchestration in `backend/app/services/route_service.py`.
 - `POST /api/v1/routes/plan` now:
+  - accepts `start_place_id/end_place_id` from place search
+  - keeps raw coordinates as fallback
   - snaps start/end coordinates to nearest `map_nodes`
   - builds a bidirectional graph from `map_edges`
   - runs Dijkstra shortest path
@@ -24,6 +26,8 @@ Request:
 
 ```json
 {
+  "start_place_id": "facility-1",
+  "end_place_id": "building-8",
   "start_lng": 116.28333,
   "start_lat": 40.15608,
   "end_lng": 116.2862,
@@ -54,6 +58,8 @@ shortest_time / fastest -> edge duration weight
 
 Stage 14 extends this with per-edge congestion, ideal speeds, and walk/bike/electric-cart/mixed mode filtering.
 
+Stage 20 changes the user-facing route planner to place-name selection first. Raw coordinate inputs remain in an advanced panel for debugging and algorithm tests.
+
 ## Validation
 
 Run from repository root:
@@ -77,8 +83,8 @@ Expected backend result:
 - Stage 7 added OSM import.
 - Stage 12 added multi-point route planning.
 - Stage 14 added congestion, speed, and transport-mode routing.
-- The route planner page still uses coordinate-oriented target input.
+- Stage 20 added place-name target selection and `place_id` route inputs.
 
 ## Next Stage
 
-Implement indoor navigation and name-based route target selection.
+Improve real campus road topology and map visual verification.

@@ -13,7 +13,7 @@ from app.algorithms.route_planning import (
     dijkstra_shortest_path,
     find_nearest_node,
 )
-from app.models import MapEdge, MapNode
+from app.models import Building, Destination, Facility, MapEdge, MapNode
 
 TRANSPORT_MODES = {"walk", "bike", "electric_cart"}
 MODE_LABELS = {
@@ -30,8 +30,10 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
     if not edges:
         raise RouteNotFoundError(f"No map edges are available for mode {mode}.")
 
-    start = (float(payload["start_lng"]), float(payload["start_lat"]))
-    end = (float(payload["end_lng"]), float(payload["end_lat"]))
+    start_endpoint = _resolve_route_endpoint(session, payload, "start")
+    end_endpoint = _resolve_route_endpoint(session, payload, "end")
+    start = (start_endpoint["lng"], start_endpoint["lat"])
+    end = (end_endpoint["lng"], end_endpoint["lat"])
     start_snap = find_nearest_node(start[0], start[1], nodes)
     end_snap = find_nearest_node(end[0], end[1], nodes)
     weight = _resolve_weight(payload.get("strategy"))
@@ -51,13 +53,16 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
         "mode": mode,
         "distance": round(distance),
         "duration": round(duration),
+        "start": start_endpoint,
+        "end": end_endpoint,
         "path": build_path_coordinates(start, end, start_snap.node, end_snap.node, route.edges),
         "node_ids": route.node_ids,
         "steps": _build_steps(start_snap, end_snap, route.edges),
         "algorithm_trace": {
             "stage": "stage-4-db-graph",
             "algorithm": "Dijkstra shortest path",
-            "topology_source": "map_nodes/map_edges seeded database",
+            "topology_source": "local map_nodes/map_edges graph",
+            "input_model": "place_id first, coordinate fallback",
             "weight": weight,
             "mode": mode,
             "mode_filter": _mode_trace(mode),
@@ -76,19 +81,14 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
     if not points:
         raise RouteNotFoundError("At least one destination point is required.")
 
+    start_endpoint = _resolve_route_endpoint(session, payload, "start")
     current = {
-        "name": "起点",
-        "lng": float(payload["start_lng"]),
-        "lat": float(payload["start_lat"]),
+        **start_endpoint,
+        "name": start_endpoint.get("name") or "起点",
     }
     start = dict(current)
     remaining = [
-        {
-            "index": index,
-            "name": point.get("name") or f"终点 {index + 1}",
-            "lng": float(point["lng"]),
-            "lat": float(point["lat"]),
-        }
+        _resolve_multi_point_endpoint(session, point, index)
         for index, point in enumerate(points)
     ]
     segments = []
@@ -131,6 +131,7 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
         "algorithm_trace": {
             "stage": "stage-12-multi-point-route",
             "algorithm": "Greedy TSP approximation, each candidate leg scored by Dijkstra graph distance",
+            "input_model": "place_id first, coordinate fallback",
             "points": str(len(points)),
             "segments": str(len(segments)),
             "return_to_start": str(bool(payload.get("return_to_start"))),
@@ -177,6 +178,101 @@ def _plan_between(
             "mode": payload.get("mode", "walk"),
         },
     )
+
+
+def _resolve_route_endpoint(session: Session, payload: dict[str, Any], prefix: str) -> dict[str, Any]:
+    place_id = payload.get(f"{prefix}_place_id")
+    if place_id:
+        return _lookup_place_coordinate(session, str(place_id))
+
+    lng = payload.get(f"{prefix}_lng")
+    lat = payload.get(f"{prefix}_lat")
+    if lng is None or lat is None:
+        raise RouteNotFoundError(f"{prefix} point requires either place_id or lng/lat.")
+    return {
+        "id": "",
+        "source": "coordinate",
+        "name": "起点" if prefix == "start" else "终点",
+        "lng": float(lng),
+        "lat": float(lat),
+    }
+
+
+def _resolve_multi_point_endpoint(session: Session, point: dict[str, Any], index: int) -> dict[str, Any]:
+    place_id = point.get("place_id")
+    if place_id:
+        endpoint = _lookup_place_coordinate(session, str(place_id))
+        endpoint["index"] = index
+        endpoint["name"] = point.get("name") or endpoint.get("name") or f"终点 {index + 1}"
+        return endpoint
+
+    if point.get("lng") is None or point.get("lat") is None:
+        raise RouteNotFoundError(f"Destination point {index + 1} requires either place_id or lng/lat.")
+    return {
+        "index": index,
+        "id": "",
+        "source": "coordinate",
+        "name": point.get("name") or f"终点 {index + 1}",
+        "lng": float(point["lng"]),
+        "lat": float(point["lat"]),
+    }
+
+
+def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
+    source, raw_id = _split_place_id(place_id)
+    model_id = int(raw_id)
+    if source == "destination":
+        destination = session.get(Destination, model_id)
+        if destination is None:
+            raise RouteNotFoundError(f"Destination {place_id} was not found.")
+        return {
+            "id": place_id,
+            "source": "destination",
+            "name": destination.name,
+            "lng": destination.lng,
+            "lat": destination.lat,
+        }
+    if source == "facility":
+        facility = session.get(Facility, model_id)
+        if facility is None:
+            raise RouteNotFoundError(f"Facility {place_id} was not found.")
+        return {
+            "id": place_id,
+            "source": "facility",
+            "name": facility.name,
+            "lng": facility.lng,
+            "lat": facility.lat,
+        }
+    if source == "building":
+        building = session.get(Building, model_id)
+        if building is None:
+            raise RouteNotFoundError(f"Building {place_id} was not found.")
+        lng, lat = _building_center(building.polygon)
+        return {
+            "id": place_id,
+            "source": "building",
+            "name": building.name,
+            "lng": lng,
+            "lat": lat,
+        }
+    raise RouteNotFoundError(f"Unsupported route place id: {place_id}.")
+
+
+def _split_place_id(place_id: str) -> tuple[str, str]:
+    if "-" not in place_id:
+        raise RouteNotFoundError(f"Invalid route place id: {place_id}.")
+    source, raw_id = place_id.split("-", maxsplit=1)
+    if not raw_id.isdigit():
+        raise RouteNotFoundError(f"Invalid route place id: {place_id}.")
+    return source, raw_id
+
+
+def _building_center(polygon: list[list[float]]) -> tuple[float, float]:
+    if not polygon:
+        raise RouteNotFoundError("Building polygon is empty.")
+    lng = sum(point[0] for point in polygon) / len(polygon)
+    lat = sum(point[1] for point in polygon) / len(polygon)
+    return lng, lat
 
 
 def _serialize_segment(start: dict[str, Any], end: dict[str, Any], route: dict[str, Any]) -> dict[str, Any]:

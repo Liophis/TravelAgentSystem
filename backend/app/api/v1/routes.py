@@ -10,6 +10,8 @@ router = APIRouter()
 
 
 class RoutePlanRequest(BaseModel):
+    start_place_id: str | None = Field(default=None)
+    end_place_id: str | None = Field(default=None)
     start_lng: float = Field(default=116.28333)
     start_lat: float = Field(default=40.15608)
     end_lng: float = Field(default=116.28620)
@@ -19,12 +21,14 @@ class RoutePlanRequest(BaseModel):
 
 
 class RoutePointRequest(BaseModel):
-    lng: float
-    lat: float
+    place_id: str | None = Field(default=None)
+    lng: float | None = Field(default=None)
+    lat: float | None = Field(default=None)
     name: str | None = Field(default=None)
 
 
 class MultiPointRouteRequest(BaseModel):
+    start_place_id: str | None = Field(default=None)
     start_lng: float = Field(default=116.28333)
     start_lat: float = Field(default=40.15608)
     points: list[RoutePointRequest] = Field(min_length=1, max_length=12)

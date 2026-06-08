@@ -17,12 +17,12 @@
 - [x] AMap Web Service POI import path exists for real facility enrichment.
 - [x] AMap POI import converts GCJ-02 coordinates to backend WGS84 before storage.
 - [x] AMap POI import de-duplicates repeated keyword hits.
-- [x] AMap POI live import has been run with a real key and produced 516 new BUPT Shahe surrounding facility rows.
+- [x] AMap POI live import has been run with a real key and produced 516 clean BUPT Shahe surrounding facility rows after replacing offline facility seed rows.
 - [x] `map_edges` count >= 450.
 - [x] `buildings` count >= 60.
 - [x] `facilities` count >= 120.
 - [x] Facility categories count >= 10.
-- [x] `GET /api/v1/map/stats` reads the seeded database and returns map scale counts.
+- [x] `GET /api/v1/map/stats` reads the local database and returns map scale counts.
 - [x] OSM import pipeline can import an OSM-shaped payload into map tables.
 - [x] Admin map import/status API reports current map table counts.
 
@@ -59,7 +59,7 @@
 - [x] Building polygons clear old overlays before filters redraw.
 - [x] Single-route planning returns path steps, distance, time, and mode.
 - [x] Single-route planning uses local `map_nodes` / `map_edges` and Dijkstra instead of mock route data.
-- [ ] Route target can be selected by destination/place/facility name, not only typed coordinates.
+- [x] Route target can be selected by destination/place/facility name, not only typed coordinates.
 - [x] Shortest-time routing uses per-edge congestion where real speed = congestion * ideal speed.
 - [x] Route planning filters by transport mode: walking, bicycle, electric cart, and mixed mode.
 - [x] Route scaffold is drawn as polyline on map.
