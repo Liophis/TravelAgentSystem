@@ -178,14 +178,15 @@ watch(
   min-height: 520px;
   height: 100%;
   overflow: hidden;
-  border: 1px solid #d8dee4;
+  border: 1px solid #d0d5dd;
   border-radius: 8px;
-  background: #f6f8fa;
+  background: #f8fafc;
+  box-shadow: 0 12px 32px rgba(16, 24, 40, 0.08);
 }
 
 .amap-container {
   width: 100%;
-  min-height: 520px;
+  min-height: 620px;
   height: 100%;
 }
 
@@ -200,7 +201,7 @@ watch(
   text-align: center;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
-    repeating-linear-gradient(45deg, #eef2f7 0, #eef2f7 10px, #e2e8f0 10px, #e2e8f0 20px);
+    repeating-linear-gradient(45deg, #eef4f3 0, #eef4f3 10px, #e2e8f0 10px, #e2e8f0 20px);
 }
 
 :global(.facility-dot) {
