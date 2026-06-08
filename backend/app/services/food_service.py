@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.algorithms.ranking import top_k_smallest
+from app.algorithms.ranking import top_k_smallest, top_k_smallest_tuple
 from app.algorithms.route_planning import RouteNotFoundError, approximate_distance_meters
 from app.models import Destination, Food, Restaurant, UserInterest
 from app.seed.sample_data import BUPT_SHAHE_CENTER
@@ -85,7 +85,8 @@ def search_foods_from_db(
         item["distance"] = round(approximate_distance_meters(current, (food.restaurant.lng, food.restaurant.lat)))
         scored.append(item)
 
-    results = sorted(scored, key=lambda item: _food_search_sort_key(item, sort))[:limit]
+    resolved_sort = _normalize_food_sort(sort, allow_match=True)
+    results = top_k_smallest_tuple(scored, key=lambda item: _food_search_sort_key(item, resolved_sort), k=limit)
     for item in results:
         item.pop("match_rank", None)
     return {
@@ -94,12 +95,14 @@ def search_foods_from_db(
         "keyword": q,
         "cuisine": cuisine,
         "destination_id": destination_id,
-        "sort": sort,
+        "sort": resolved_sort,
         "algorithm_trace": {
             "stage": "stage-9-food-aigc-admin",
             "algorithm": "contains plus lightweight Levenshtein fuzzy search",
+            "ranking": "hand-written Top-K heap by match/heat/rating/distance key, no full result sort",
             "scope": "destination-linked or nearby restaurants" if destination is not None else "all restaurants",
-            "sort": sort,
+            "sort": resolved_sort,
+            "candidate_count": str(len(scored)),
             "matched": str(len(scored)),
             "returned": str(len(results)),
         },
@@ -114,7 +117,9 @@ def recommend_foods_from_db(
     current_lng: float | None,
     current_lat: float | None,
     limit: int,
+    sort: str = "composite",
 ) -> dict[str, Any]:
+    resolved_sort = _normalize_food_sort(sort, allow_match=False)
     destination = _load_destination(session, destination_id)
     foods = _filter_foods(_load_foods(session), cuisine, None, destination)
     interests = _load_user_interests(session, user_id)
@@ -126,18 +131,27 @@ def recommend_foods_from_db(
         _score_food(food, interests, current, max_food_heat, max_restaurant_heat)
         for food in foods
     ]
-    items = top_k_smallest(scored, key=lambda item: -float(item["score"]), k=limit)
+    if resolved_sort == "distance":
+        _attach_routes_to_items(session, scored, current)
+    items = top_k_smallest_tuple(scored, key=lambda item: _food_recommend_sort_key(item, resolved_sort), k=limit)
+    if resolved_sort != "distance":
+        _attach_routes_to_items(session, items, current)
     return {
         "items": items,
         "total": len(foods),
         "cuisine": cuisine,
         "destination_id": destination_id,
         "user_id": user_id,
+        "sort": resolved_sort,
         "algorithm_trace": {
             "stage": "stage-24-destination-scoped-food",
-            "algorithm": "rating + food heat + restaurant heat + cuisine interest + distance + price scoring, Top-K heap",
+            "algorithm": "rating + food heat + restaurant heat + cuisine interest + distance + price scoring",
+            "ranking": "hand-written Top-K heap by selected hot/rating/distance/composite key, no full candidate sort",
+            "distance_metric": "graph route distance for distance sort; current/destination approximate distance for composite score",
             "scope": "destination-linked or nearby restaurants" if destination is not None else "all restaurants",
             "scope_radius_meters": str(DESTINATION_FOOD_SCOPE_METERS),
+            "sort": resolved_sort,
+            "candidate_count": str(len(foods)),
             "returned": str(len(items)),
             "interest_tags": ",".join(sorted(interests)) if interests else "",
         },
@@ -297,6 +311,26 @@ def _food_search_sort_key(item: dict[str, Any], sort: str) -> tuple[float, ...]:
     return (float(item["match_rank"]), -float(item["heat"]), -float(item["rating"]), float(item["distance"]))
 
 
+def _food_recommend_sort_key(item: dict[str, Any], sort: str) -> tuple[float, ...]:
+    if sort == "hot":
+        return (-float(item["heat"]), -float(item["rating"]), float(item["distance"]), -float(item["score"]))
+    if sort == "rating":
+        return (-float(item["rating"]), -float(item["heat"]), float(item["distance"]), -float(item["score"]))
+    if sort == "distance":
+        return (float(item["distance"]), -float(item["rating"]), -float(item["heat"]), -float(item["score"]))
+    return (-float(item["score"]), -float(item["rating"]), -float(item["heat"]), float(item["distance"]))
+
+
+def _normalize_food_sort(sort: str | None, allow_match: bool) -> str:
+    allowed = {"hot", "rating", "distance", "composite"}
+    if allow_match:
+        allowed.add("match")
+    normalized = str(sort).strip().casefold() if sort is not None else ""
+    if normalized in allowed:
+        return normalized
+    return "match" if allow_match else "composite"
+
+
 def _score_food(
     food: Food,
     interests: set[str],
@@ -338,10 +372,30 @@ def _food_reason(food: Food, cuisine_score: float, distance_score: float) -> str
     return f"综合热度与评分较高，评分 {food.rating:.1f}，热度 {food.heat}"
 
 
+def _attach_routes_to_items(session: Session, items: list[dict[str, Any]], current: tuple[float, float]) -> None:
+    for item in items:
+        route = _route_to_coordinates(
+            session,
+            current,
+            float(item["restaurant_lng"]),
+            float(item["restaurant_lat"]),
+        )
+        item.update(route)
+
+
 def _route_to_restaurant(
     session: Session,
     current: tuple[float, float],
     restaurant: Restaurant,
+) -> dict[str, Any]:
+    return _route_to_coordinates(session, current, restaurant.lng, restaurant.lat)
+
+
+def _route_to_coordinates(
+    session: Session,
+    current: tuple[float, float],
+    target_lng: float,
+    target_lat: float,
 ) -> dict[str, Any]:
     try:
         route = plan_route_from_db(
@@ -349,8 +403,8 @@ def _route_to_restaurant(
             {
                 "start_lng": current[0],
                 "start_lat": current[1],
-                "end_lng": restaurant.lng,
-                "end_lat": restaurant.lat,
+                "end_lng": target_lng,
+                "end_lat": target_lat,
                 "strategy": "shortest_distance",
                 "mode": "walk",
                 "route_source": "local_graph",
@@ -358,7 +412,7 @@ def _route_to_restaurant(
         )
         route_path = route["path"]
         if len(route_path) < 2:
-            route_path = [[current[0], current[1]], [restaurant.lng, restaurant.lat]]
+            route_path = [[current[0], current[1]], [target_lng, target_lat]]
         return {
             "distance": route["distance"],
             "duration": route["duration"],
@@ -366,11 +420,11 @@ def _route_to_restaurant(
             "node_ids": route["node_ids"],
         }
     except RouteNotFoundError:
-        distance = approximate_distance_meters(current, (restaurant.lng, restaurant.lat))
+        distance = approximate_distance_meters(current, (target_lng, target_lat))
         return {
             "distance": round(distance),
             "duration": round(distance / 1.2),
-            "routePath": [[current[0], current[1]], [restaurant.lng, restaurant.lat]],
+            "routePath": [[current[0], current[1]], [target_lng, target_lat]],
             "node_ids": [],
         }
 

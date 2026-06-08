@@ -2,7 +2,7 @@
 
 景点/学校推荐 + 多场景内部导航平台 MVP。
 
-当前仓库处于 **Stage 35 Multi-Scene Scenic Navigation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC Agent 和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层、北邮沙河参考校园拓扑导入、双 POI 数据集、游记管理/交流的讲义要求对齐、管理员/普通用户角色登录与后台权限保护、AIGC 可解释轻量 Agent 工作流，并开始扩展北京颐和园内部导航场景。
+当前仓库处于 **Stage 36 Food Recommendation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC Agent 和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层、北邮沙河参考校园拓扑导入、双 POI 数据集、游记管理/交流的讲义要求对齐、管理员/普通用户角色登录与后台权限保护、AIGC 可解释轻量 Agent 工作流、北京颐和园内部导航场景，以及讲义要求下的美食 Top-K 推荐/模糊查询/路线距离排序。
 
 Scope clarification:
 
@@ -334,6 +334,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_33_campus_map_restore.md`: reset-safe BUPT Shahe campus map restore notes.
 - `docs/stage_34_nearby_facility_origin.md`: nearby-facility origin selection plan and acceptance criteria.
 - `docs/stage_35_multi_scene_scenic_navigation.md`: multi-scene navigation and Summer Palace scenic navigation plan.
+- `docs/stage_36_food_recommendation.md`: food Top-K recommendation, fuzzy search, sort modes, and data boundary notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

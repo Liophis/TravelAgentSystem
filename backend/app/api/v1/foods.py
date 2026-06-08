@@ -72,6 +72,7 @@ def recommend_foods(
     user_id: int | None = Query(default=1),
     current_lng: float | None = Query(default=None),
     current_lat: float | None = Query(default=None),
+    sort: str = Query(default="composite"),
     limit: int = Query(default=10, ge=1, le=50),
     db: Session = Depends(get_db),
 ) -> dict:
@@ -82,6 +83,7 @@ def recommend_foods(
         user_id=user_id,
         current_lng=current_lng,
         current_lat=current_lat,
+        sort=sort,
         limit=limit,
     )
 

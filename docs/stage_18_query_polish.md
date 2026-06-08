@@ -46,5 +46,5 @@ Expected:
 
 ## Remaining Gaps
 
-- Food recommendation is not yet scoped to a selected destination/school.
+- Food recommendation scope was completed later in Stage 24 and strengthened in Stage 36.
 - Facility category lookup is deterministic alias/contains matching, not a learned semantic search.

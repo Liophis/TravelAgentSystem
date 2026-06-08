@@ -343,6 +343,7 @@ export interface FoodListPayload {
   keyword?: string;
   cuisine?: string | null;
   destination_id?: number | null;
+  sort?: string;
   radius?: number;
   algorithm_trace?: Record<string, string>;
 }

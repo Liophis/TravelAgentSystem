@@ -41,6 +41,7 @@ def test_food_list_search_recommend_and_nearby() -> None:
             offset=0,
         )
         search = search_foods_from_db(session, q="番茄牛腩面", cuisine=None, destination_id=None, limit=5)
+        restaurant_search = search_foods_from_db(session, q="南区食堂", cuisine=None, destination_id=1, limit=5)
         search_hot = search_foods_from_db(session, q="饭", cuisine=None, destination_id=None, sort="hot", limit=5)
         search_distance = search_foods_from_db(
             session,
@@ -61,6 +62,36 @@ def test_food_list_search_recommend_and_nearby() -> None:
             current_lat=None,
             limit=5,
         )
+        recommend_hot = recommend_foods_from_db(
+            session=session,
+            cuisine=None,
+            destination_id=1,
+            user_id=1,
+            current_lng=None,
+            current_lat=None,
+            sort="hot",
+            limit=10,
+        )
+        recommend_rating = recommend_foods_from_db(
+            session=session,
+            cuisine=None,
+            destination_id=1,
+            user_id=1,
+            current_lng=None,
+            current_lat=None,
+            sort="rating",
+            limit=10,
+        )
+        recommend_distance = recommend_foods_from_db(
+            session=session,
+            cuisine=None,
+            destination_id=1,
+            user_id=1,
+            current_lng=116.28333,
+            current_lat=40.15608,
+            sort="distance",
+            limit=10,
+        )
         nearby = nearby_foods_from_db(
             session=session,
             current_lng=116.28333,
@@ -75,11 +106,20 @@ def test_food_list_search_recommend_and_nearby() -> None:
     assert scoped_restaurants["total"] > 0
     assert items["total"] > 0
     assert search["total"] >= 1
+    assert restaurant_search["total"] >= 1
     assert search_hot["items"][0]["heat"] >= search_hot["items"][-1]["heat"]
+    assert "Top-K heap" in search_hot["algorithm_trace"]["ranking"]
     assert search_distance["items"][0]["distance"] <= search_distance["items"][-1]["distance"]
     assert len(recommend["items"]) == 5
     assert recommend["destination_id"] == 1
     assert recommend["items"][0]["score"] >= recommend["items"][-1]["score"]
+    assert len(recommend_hot["items"]) == 10
+    assert recommend_hot["items"][0]["heat"] >= recommend_hot["items"][-1]["heat"]
+    assert recommend_rating["items"][0]["rating"] >= recommend_rating["items"][-1]["rating"]
+    assert recommend_distance["items"][0]["distance"] <= recommend_distance["items"][-1]["distance"]
+    assert "routePath" in recommend_distance["items"][0]
+    assert "Top-K heap" in recommend_hot["algorithm_trace"]["ranking"]
+    assert "graph route distance" in recommend_distance["algorithm_trace"]["distance_metric"]
     assert len(nearby["items"]) == 3
     assert len(nearby["items"][0]["routePath"]) >= 2
 

@@ -36,7 +36,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | 日记精确查询/全文检索 | Covered for demo | Exact title uses `diary_title_indexes`; full-text uses lightweight `diary_search_tokens` inverted index. Chinese segmentation quality can be improved later. |
 | 日记压缩 | Covered for demo | Uses zlib+base64 lossless compression on publish and decompression on read, with compression ratio and `decompress_ok`. If hand-written compression is required, add a Huffman implementation. |
 | AIGC 动画 | Covered for demo | `POST /api/v1/aigc/agent/run` accepts scenic/school media URLs, orchestrates local Agent tools, returns storyboard scenes, prompt, compression summary, `agent_trace`, and a simulated video link. Real external AIGC generation remains future work. |
-| 美食推荐 | Mostly covered | Cuisine filter, destination scope, hot/rating/distance scoring, Top-K heap, route preview, fuzzy query, and explicit search sort controls exist. |
+| 美食推荐 | Covered for demo | Cuisine filter, destination scope, hot/rating/distance/composite Top-10 recommendation, hand-written Top-K heap, graph-distance ranking for distance sort, route preview, restaurant/window fuzzy query, and explicit search sort controls exist. Current food rows are deterministic BUPT Shahe demo data, not live AMap/OSM restaurant imports. |
 | 管理员/普通用户登录状态 | Covered for demo | One login endpoint returns `role=user|admin`; `admin01` is seeded; admin APIs require admin token and return `401/403` for missing or normal-user tokens. |
 
 ## Recommended Next Stages

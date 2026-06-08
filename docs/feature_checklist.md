@@ -29,6 +29,8 @@ Run this after `bash scripts/reset_dev_db.sh`.
 - [x] `POST /api/v1/diaries/{id}/comments`
 - [x] `POST /api/v1/diaries/{id}/media`
 - [x] `GET /api/v1/diaries/{id}/compression`
+- [x] `GET /api/v1/foods/items`
+- [x] `GET /api/v1/foods/search`
 - [x] `GET /api/v1/foods/recommend`
 - [x] `GET /api/v1/foods/nearby`
 - [x] `POST /api/v1/aigc/diary-draft`

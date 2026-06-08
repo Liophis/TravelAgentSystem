@@ -246,10 +246,47 @@ with Session(engine) as session:
         user_id=1,
         current_lng=116.28333,
         current_lat=40.15608,
+        sort="composite",
         limit=3,
     )
     require("food recommendations", len(foods["items"]))
-    print(f"[smoke] foods: total={foods['total']} returned={len(foods['items'])}")
+    require("food recommendation route preview", len(foods["items"][0].get("routePath", [])), 2)
+    print(
+        "[smoke] foods: "
+        f"sort={foods['sort']} total={foods['total']} returned={len(foods['items'])}"
+    )
+
+    hot_foods = recommend_foods_from_db(
+        session=session,
+        cuisine=None,
+        destination_id=1,
+        user_id=1,
+        current_lng=116.28333,
+        current_lat=40.15608,
+        sort="hot",
+        limit=3,
+    )
+    require("hot food recommendations", len(hot_foods["items"]))
+    if hot_foods["items"][0]["heat"] < hot_foods["items"][-1]["heat"]:
+        raise SystemExit("[smoke] food hot recommendation order failed")
+
+    distance_foods = recommend_foods_from_db(
+        session=session,
+        cuisine=None,
+        destination_id=1,
+        user_id=1,
+        current_lng=116.28333,
+        current_lat=40.15608,
+        sort="distance",
+        limit=3,
+    )
+    require("distance food recommendations", len(distance_foods["items"]))
+    if distance_foods["items"][0]["distance"] > distance_foods["items"][-1]["distance"]:
+        raise SystemExit("[smoke] food distance recommendation order failed")
+    print(
+        "[smoke] food recommendation sorts: "
+        f"hot={hot_foods['sort']} distance={distance_foods['sort']}"
+    )
 
     food_search = search_foods_from_db(
         session=session,
@@ -265,6 +302,22 @@ with Session(engine) as session:
     print(
         "[smoke] food search: "
         f"sort={food_search['sort']} returned={len(food_search['items'])}"
+    )
+
+    restaurant_search = search_foods_from_db(
+        session=session,
+        q="南区食堂",
+        cuisine=None,
+        destination_id=1,
+        sort="match",
+        current_lng=116.28333,
+        current_lat=40.15608,
+        limit=3,
+    )
+    require("food restaurant/window search", len(restaurant_search["items"]))
+    print(
+        "[smoke] food restaurant search: "
+        f"keyword={restaurant_search['keyword']} returned={len(restaurant_search['items'])}"
     )
 
     nearby_foods = nearby_foods_from_db(
