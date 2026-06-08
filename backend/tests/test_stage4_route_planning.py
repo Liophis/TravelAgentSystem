@@ -52,6 +52,7 @@ def test_route_service_returns_seeded_graph_path() -> None:
     assert len(route["path"]) >= 3
     assert len(route["node_ids"]) >= 2
     assert route["steps"][0]["text"].startswith("起点吸附到道路节点")
+    assert route["algorithm_trace"]["congestion_model"] == "duration = distance / (ideal_speed * congestion)"
 
 
 def test_route_api_handler_uses_seeded_database() -> None:
@@ -67,6 +68,64 @@ def test_route_api_handler_uses_seeded_database() -> None:
     assert route["algorithm_trace"]["topology_source"] == "map_nodes/map_edges seeded database"
     assert route["distance"] > 0
     assert route["path"][0] == [116.28333, 40.15608]
+
+
+def test_shortest_time_and_bike_mode_use_transport_duration() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        walk_route = plan_route_from_db(
+            session,
+            {
+                "start_lng": BUPT_SHAHE_CENTER[0],
+                "start_lat": BUPT_SHAHE_CENTER[1],
+                "end_lng": BUPT_SHAHE_CENTER[0] + 0.0015,
+                "end_lat": BUPT_SHAHE_CENTER[1] + 0.0012,
+                "strategy": "shortest_time",
+                "mode": "walk",
+            },
+        )
+        bike_route = plan_route_from_db(
+            session,
+            {
+                "start_lng": BUPT_SHAHE_CENTER[0],
+                "start_lat": BUPT_SHAHE_CENTER[1],
+                "end_lng": BUPT_SHAHE_CENTER[0] + 0.0015,
+                "end_lat": BUPT_SHAHE_CENTER[1] + 0.0012,
+                "strategy": "shortest_time",
+                "mode": "bike",
+            },
+        )
+
+    assert walk_route["algorithm_trace"]["weight"] == "duration"
+    assert bike_route["mode"] == "bike"
+    assert bike_route["duration"] < walk_route["duration"]
+    assert any("自行车" in step["text"] for step in bike_route["steps"])
+
+
+def test_electric_cart_mode_filters_to_fixed_route_edges() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        route = plan_route_from_db(
+            session,
+            {
+                "start_lng": BUPT_SHAHE_CENTER[0],
+                "start_lat": BUPT_SHAHE_CENTER[1],
+                "end_lng": BUPT_SHAHE_CENTER[0] + 0.0009,
+                "end_lat": BUPT_SHAHE_CENTER[1],
+                "strategy": "shortest_time",
+                "mode": "electric_cart",
+            },
+        )
+
+    assert route["mode"] == "electric_cart"
+    assert route["algorithm_trace"]["mode_filter"] == "only edges allowing electric_cart"
+    assert any("电瓶车" in step["text"] for step in route["steps"])
 
 
 def test_multi_point_route_returns_visit_order_and_segments() -> None:

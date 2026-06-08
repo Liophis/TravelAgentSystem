@@ -24,6 +24,8 @@ def get_map_payload_from_db(session: Session) -> dict[str, Any]:
             "from_node_id": edge.from_node_id,
             "to_node_id": edge.to_node_id,
             "distance": edge.distance,
+            "congestion": edge.congestion,
+            "allowed_modes": edge.allowed_modes,
             "path": edge.geometry,
         }
         for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all()
@@ -87,6 +89,11 @@ def get_map_edges_from_db(session: Session) -> list[dict[str, Any]]:
             "to_node_id": edge.to_node_id,
             "distance": edge.distance,
             "walk_time": edge.walk_time,
+            "congestion": edge.congestion,
+            "walk_speed": edge.walk_speed,
+            "bike_speed": edge.bike_speed,
+            "electric_cart_speed": edge.electric_cart_speed,
+            "allowed_modes": edge.allowed_modes,
             "geometry": edge.geometry,
         }
         for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all()
@@ -120,6 +127,8 @@ def _to_feature_collection(
                     "id": road["id"],
                     "kind": "road",
                     "distance": road["distance"],
+                    "congestion": road["congestion"],
+                    "allowed_modes": road["allowed_modes"],
                 },
             }
         )

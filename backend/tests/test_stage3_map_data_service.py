@@ -42,6 +42,8 @@ def test_map_payload_matches_amap_frontend_contract() -> None:
     first_road = payload["roads"][0]
     assert isinstance(first_road["path"][0], list)
     assert len(first_road["path"][0]) == 2
+    assert 0 < first_road["congestion"] <= 1
+    assert "walk" in first_road["allowed_modes"]
 
 
 def test_map_api_handlers_read_seeded_database() -> None:

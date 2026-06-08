@@ -22,6 +22,11 @@ class MapEdge(Base):
     to_node_id: Mapped[int] = mapped_column(ForeignKey("map_nodes.id"), index=True)
     distance: Mapped[float] = mapped_column(Float)
     walk_time: Mapped[float] = mapped_column(Float)
+    congestion: Mapped[float] = mapped_column(Float, default=1.0)
+    walk_speed: Mapped[float] = mapped_column(Float, default=1.2)
+    bike_speed: Mapped[float] = mapped_column(Float, default=3.5)
+    electric_cart_speed: Mapped[float] = mapped_column(Float, default=4.5)
+    allowed_modes: Mapped[list[str]] = mapped_column(JSON, default=lambda: ["walk"])
     geometry: Mapped[list[list[float]]] = mapped_column(JSON)
 
 

@@ -15,30 +15,20 @@ from app.algorithms.route_planning import (
 )
 from app.models import MapEdge, MapNode
 
+TRANSPORT_MODES = {"walk", "bike", "electric_cart"}
+MODE_LABELS = {
+    "walk": "步行",
+    "bike": "自行车",
+    "electric_cart": "电瓶车",
+    "mixed": "混合交通",
+}
+
 
 def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, Any]:
-    nodes = [
-        GraphNode(
-            id=node.id,
-            lng=node.lng,
-            lat=node.lat,
-            name=node.name,
-        )
-        for node in session.scalars(select(MapNode).order_by(MapNode.id)).all()
-    ]
-    edges = [
-        GraphEdge(
-            id=edge.id,
-            from_node_id=edge.from_node_id,
-            to_node_id=edge.to_node_id,
-            distance=edge.distance,
-            duration=edge.walk_time,
-            geometry=edge.geometry,
-        )
-        for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all()
-    ]
+    mode = _normalize_mode(payload.get("mode"))
+    nodes, edges = _load_route_graph_data(session, mode)
     if not edges:
-        raise RouteNotFoundError("No map edges are available.")
+        raise RouteNotFoundError(f"No map edges are available for mode {mode}.")
 
     start = (float(payload["start_lng"]), float(payload["start_lat"]))
     end = (float(payload["end_lng"]), float(payload["end_lat"]))
@@ -55,10 +45,10 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
 
     snap_distance = start_snap.distance + end_snap.distance
     distance = route.graph_distance + snap_distance
-    duration = route.graph_duration + snap_distance / 1.2
+    duration = route.graph_duration + _snap_duration(start_snap.distance, mode) + _snap_duration(end_snap.distance, mode)
     return {
         "strategy": payload.get("strategy", "shortest_distance"),
-        "mode": payload.get("mode", "walk"),
+        "mode": mode,
         "distance": round(distance),
         "duration": round(duration),
         "path": build_path_coordinates(start, end, start_snap.node, end_snap.node, route.edges),
@@ -69,6 +59,9 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
             "algorithm": "Dijkstra shortest path",
             "topology_source": "map_nodes/map_edges seeded database",
             "weight": weight,
+            "mode": mode,
+            "mode_filter": _mode_trace(mode),
+            "congestion_model": "duration = distance / (ideal_speed * congestion)",
             "nodes": str(len(nodes)),
             "edges": str(len(edges)),
             "start_node_id": str(start_snap.node.id),
@@ -146,7 +139,7 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
 
 
 def _resolve_weight(strategy: str | None) -> WeightMode:
-    if strategy in {"shortest_time", "fastest"}:
+    if strategy in {"shortest_time", "fastest", "transport_time", "mixed_time"}:
         return "duration"
     return "distance"
 
@@ -158,9 +151,10 @@ def _nearest_route(
     payload: dict[str, Any],
 ) -> tuple[int, dict[str, Any]]:
     scored = []
+    score_key = "duration" if _resolve_weight(payload.get("strategy")) == "duration" else "distance"
     for index, point in enumerate(remaining):
         route = _plan_between(session, current, point, payload)
-        scored.append((int(route["distance"]), index, route))
+        scored.append((int(route[score_key]), index, route))
     scored.sort(key=lambda item: (item[0], item[1]))
     _, index, route = scored[0]
     return index, route
@@ -261,7 +255,11 @@ def _build_steps(start_snap, end_snap, edges: list[GraphEdge]) -> list[dict[str,
     for index, edge in enumerate(edges, start=1):
         steps.append(
             {
-                "text": f"第 {index} 段：从节点 {edge.from_node_id} 到节点 {edge.to_node_id}",
+                "text": (
+                    f"第 {index} 段：从节点 {edge.from_node_id} 到节点 {edge.to_node_id}"
+                    f"，{MODE_LABELS.get(edge.transport_mode, edge.transport_mode)}"
+                    f"，拥挤度 {edge.congestion:.2f}"
+                ),
                 "distance": round(edge.distance),
             }
         )
@@ -272,3 +270,79 @@ def _build_steps(start_snap, end_snap, edges: list[GraphEdge]) -> list[dict[str,
         }
     )
     return steps
+
+
+def _load_route_graph_data(session: Session, mode: str) -> tuple[list[GraphNode], list[GraphEdge]]:
+    nodes = [
+        GraphNode(
+            id=node.id,
+            lng=node.lng,
+            lat=node.lat,
+            name=node.name,
+        )
+        for node in session.scalars(select(MapNode).order_by(MapNode.id)).all()
+    ]
+    edges = []
+    for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all():
+        resolved = _resolve_edge_for_mode(edge, mode)
+        if resolved is not None:
+            edges.append(resolved)
+    return nodes, edges
+
+
+def _resolve_edge_for_mode(edge: MapEdge, requested_mode: str) -> GraphEdge | None:
+    allowed_modes = tuple(mode for mode in (edge.allowed_modes or ["walk"]) if mode in TRANSPORT_MODES)
+    if not allowed_modes:
+        allowed_modes = ("walk",)
+
+    if requested_mode == "mixed":
+        transport_mode = min(allowed_modes, key=lambda mode: _edge_duration(edge, mode))
+    elif requested_mode in allowed_modes:
+        transport_mode = requested_mode
+    else:
+        return None
+
+    return GraphEdge(
+        id=edge.id,
+        from_node_id=edge.from_node_id,
+        to_node_id=edge.to_node_id,
+        distance=edge.distance,
+        duration=_edge_duration(edge, transport_mode),
+        geometry=edge.geometry,
+        congestion=_bounded_congestion(edge.congestion),
+        allowed_modes=allowed_modes,
+        transport_mode=transport_mode,
+    )
+
+
+def _edge_duration(edge: MapEdge, mode: str) -> float:
+    speed = {
+        "walk": edge.walk_speed or 1.2,
+        "bike": edge.bike_speed or 3.5,
+        "electric_cart": edge.electric_cart_speed or 4.5,
+    }.get(mode, edge.walk_speed or 1.2)
+    return edge.distance / max(speed * _bounded_congestion(edge.congestion), 0.1)
+
+
+def _bounded_congestion(congestion: float | None) -> float:
+    if congestion is None:
+        return 1.0
+    return max(0.2, min(float(congestion), 1.0))
+
+
+def _normalize_mode(mode: str | None) -> str:
+    if mode in {"walk", "bike", "electric_cart", "mixed"}:
+        return mode
+    return "walk"
+
+
+def _snap_duration(distance: float, mode: str) -> float:
+    if mode == "bike":
+        return distance / 3.5
+    return distance / 1.2
+
+
+def _mode_trace(mode: str) -> str:
+    if mode == "mixed":
+        return "any edge with at least one allowed transport mode; fastest allowed mode per edge"
+    return f"only edges allowing {mode}"

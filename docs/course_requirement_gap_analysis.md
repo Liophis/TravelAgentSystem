@@ -8,7 +8,6 @@ The project has a runnable MVP for the main demo chain: destination recommendati
 
 The main weakness is not API absence; it is requirement depth. Several features are still simplified demos where the course requirement asks for richer algorithms or interaction:
 
-- route strategy depth
 - indoor navigation
 - dynamic user interests and behavior
 - diary media and photo-driven AIGC
@@ -19,8 +18,8 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
-| P0 | Route strategy | Dijkstra supports `shortest_distance`; `shortest_time` maps to `walk_time` | No per-edge congestion, `mode` is accepted but ignored, no bicycle/electric-cart route constraints, no mixed transport | Add edge attributes: congestion, allowed modes, speed; implement weight/mode filtering and UI controls |
 | P0 | Indoor navigation | Feature matrix marks planned | No indoor nodes/edges/floors, no cross-floor routing, no indoor page | Build a small deterministic teaching-building graph and route API |
+| P1 | Route target selection | Route strategy depth is covered for demo: distance/time, congestion, walk/bike/electric-cart/mixed modes | Route planner still expects coordinates instead of selecting destination/facility names | Add target search/select controls connected to destination/facility APIs |
 | P1 | User preference dynamics | Seeded users/interests exist; frontend hard-codes `user_id=1` | Users cannot edit interests, favorite/rate destinations, or change recommendation state through UI | Add minimal auth/profile/interest editor and behavior/rating events |
 | P1 | Diary media | Text diary works; compression works | No image/video upload, no media preview, AIGC does not accept photos | Add media table/local upload and pass uploaded media metadata to mock AIGC |
 | P1 | Diary search | Title/body contains search works | No exact-title index/hash/trie; full-text is not an inverted index or DB full-text search | Add exact title lookup and lightweight inverted index or SQLite/Postgres FTS path |
@@ -36,10 +35,10 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | --- | --- | --- |
 | 旅游推荐 | Partial | Top-K heap and hot/rating/interest strategies exist. Missing editable user preference and dynamic behavior feedback. |
 | 景点/学校查询 | Mostly covered | Destination list supports keyword/category and hot/rating sort. Cross-source search does not yet sort all result types by heat/rating. |
-| 单点路线规划 | Partial | Dijkstra route and map polyline exist. Target input is coordinate-oriented; name/facility target selection should be improved. |
-| 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start. It is an approximation and lacks strategy/mode constraints. |
-| 最短时间/拥挤度 | Missing | `shortest_time` uses stored duration, but duration is currently deterministic walking time without congestion. |
-| 交通工具策略 | Missing | API accepts `mode`, but the graph does not filter walk/bike/electric-cart edges. |
+| 单点路线规划 | Partial | Dijkstra route and map polyline exist. Distance/time/mode strategies work. Target input is still coordinate-oriented. |
+| 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start. Candidate legs use the selected distance/time strategy, but it is still an approximation. |
+| 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
+| 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
 | 室内导航 | Missing | No indoor model, seed, API, or page. |
 | 场所查询 | Mostly covered | Category filtering, graph distance, and Top-K heap are implemented. Category-name text lookup remains. |
 | 旅游日记管理/交流 | Partial | Publish/list/detail/view/rating/comment/delete work. Media upload and admin moderation are missing. |
@@ -51,19 +50,16 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 ## Recommended Next Stages
 
-1. Stage 14: route strategies.
-   Add congestion, road mode constraints, walking/bicycle/electric-cart/mixed strategy, and route-planner UI controls.
-
-2. Stage 15: indoor navigation.
+1. Stage 15: indoor navigation.
    Add a small teaching-building graph with entrance, elevator, floors, rooms, and cross-floor route output.
 
-3. Stage 16: user preference loop.
+2. Stage 16: user preference loop.
    Add minimal profile interest editing, destination rating/favorite/behavior logging, and recommendation refresh.
 
-4. Stage 17: diary search and media.
+3. Stage 17: diary search and media.
    Add media upload, exact title lookup, inverted/full-text search, and interest-aware diary recommendations.
 
-5. Stage 18: query polish for facilities and food.
+4. Stage 18: query polish for facilities and food.
    Add category-name lookup, destination-scoped food filtering, and visible sort controls for heat/rating/distance.
 
 ## Harness Commands

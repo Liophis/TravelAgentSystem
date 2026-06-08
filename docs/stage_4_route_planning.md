@@ -49,8 +49,10 @@ Strategies:
 
 ```text
 shortest_distance -> edge distance weight
-shortest_time / fastest -> edge walk_time weight
+shortest_time / fastest -> edge duration weight
 ```
+
+Stage 14 extends this with per-edge congestion, ideal speeds, and walk/bike/electric-cart/mixed mode filtering.
 
 ## Validation
 
@@ -69,20 +71,14 @@ Expected backend result:
 12 passed
 ```
 
-## Known Gaps
+## Current Follow-up Status
 
-- The graph is deterministic seed data for 北京邮电大学沙河校区.
-- Real OSMnx / Overpass import is still planned.
-- Transport mode filtering is not implemented because seeded `map_edges` do not yet store walk/bike/cart permission flags.
-- Multi-point route planning is still planned.
-- Nearby facilities are not yet sorted by graph distance.
+- Stage 5 added graph-distance nearby facilities.
+- Stage 7 added OSM import.
+- Stage 12 added multi-point route planning.
+- Stage 14 added congestion, speed, and transport-mode routing.
+- The route planner page still uses coordinate-oriented target input.
 
 ## Next Stage
 
-Implement nearby facility search on the graph:
-
-- category filtering
-- candidate nearest-node lookup
-- Dijkstra distance from current location to each facility
-- Top-K nearest facilities by real graph distance
-- optional direct route path from current point to selected facility
+Implement indoor navigation and name-based route target selection.

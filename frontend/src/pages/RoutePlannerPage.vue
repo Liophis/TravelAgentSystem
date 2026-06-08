@@ -24,6 +24,19 @@
             <el-form-item label="终点纬度">
               <el-input-number v-model="form.end_lat" :precision="4" :step="0.001" />
             </el-form-item>
+            <el-form-item label="路线策略">
+              <el-segmented v-model="form.strategy" :options="strategyOptions" />
+            </el-form-item>
+            <el-form-item label="交通方式">
+              <el-select v-model="form.mode">
+                <el-option
+                  v-for="option in modeOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
+              </el-select>
+            </el-form-item>
             <el-form-item label="多终点">
               <el-input
                 v-model="multiPointText"
@@ -42,6 +55,7 @@
         <el-card v-if="route" shadow="never" class="result-card">
           <div class="stat"><span>总距离</span><strong>{{ route.distance }} m</strong></div>
           <div class="stat"><span>预计时间</span><strong>{{ Math.round(route.duration / 60) }} min</strong></div>
+          <div class="stat"><span>策略</span><strong>{{ route.strategy }} / {{ route.mode }}</strong></div>
           <div v-if="route.visit_order?.length" class="visit-order">
             <el-tag v-for="item in route.visit_order" :key="item.index" class="visit-tag">
               {{ item.name }}
@@ -72,6 +86,16 @@ const loading = ref(false);
 const route = ref<RoutePlanPayload | null>(null);
 const returnToStart = ref(false);
 const multiPointText = ref("教学楼,116.2842,40.1567\n图书馆,116.2862,40.1582");
+const strategyOptions = [
+  { label: "最短距离", value: "shortest_distance" },
+  { label: "最短时间", value: "shortest_time" },
+];
+const modeOptions = [
+  { label: "步行", value: "walk" },
+  { label: "自行车", value: "bike" },
+  { label: "电瓶车", value: "electric_cart" },
+  { label: "混合交通", value: "mixed" },
+];
 const form = reactive({
   start_lng: 116.28333,
   start_lat: 40.15608,

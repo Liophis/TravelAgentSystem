@@ -53,6 +53,11 @@ def import_osm_payload_to_db(
                 to_node_id=to_node.id,
                 distance=distance,
                 walk_time=float(edge_payload.get("walk_time") or distance / 1.2),
+                congestion=float(edge_payload.get("congestion") or 1.0),
+                walk_speed=float(edge_payload.get("walk_speed") or 1.2),
+                bike_speed=float(edge_payload.get("bike_speed") or 0.0),
+                electric_cart_speed=float(edge_payload.get("electric_cart_speed") or 0.0),
+                allowed_modes=edge_payload.get("allowed_modes") or ["walk"],
                 geometry=edge_payload.get("geometry") or [[from_node.lng, from_node.lat], [to_node.lng, to_node.lat]],
             )
         )
@@ -160,6 +165,11 @@ def build_osmnx_payload(
                 "to_external_id": to_external_id,
                 "distance": distance,
                 "walk_time": distance / 1.2 if distance else None,
+                "congestion": 1.0,
+                "walk_speed": 1.2,
+                "bike_speed": 0.0,
+                "electric_cart_speed": 0.0,
+                "allowed_modes": ["walk"],
                 "geometry": geometry,
             }
         )

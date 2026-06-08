@@ -100,14 +100,23 @@ def seed_demo_data(session: Session) -> dict[str, int]:
     def node_at(row: int, col: int) -> MapNode:
         return nodes[row * grid_cols + col]
 
-    def add_edge(from_node: MapNode, to_node: MapNode) -> None:
+    def add_edge(from_node: MapNode, to_node: MapNode, allowed_modes: list[str]) -> None:
         distance = round(approximate_distance_meters((from_node.lng, from_node.lat), (to_node.lng, to_node.lat)))
+        congestion = round(0.72 + (len(edges) % 8) * 0.035, 2)
+        walk_speed = 1.25
+        bike_speed = 3.8 if "bike" in allowed_modes else 0.0
+        electric_cart_speed = 5.2 if "electric_cart" in allowed_modes else 0.0
         edges.append(
             MapEdge(
                 from_node_id=from_node.id,
                 to_node_id=to_node.id,
                 distance=distance,
-                walk_time=distance / 1.2,
+                walk_time=distance / (walk_speed * congestion),
+                congestion=congestion,
+                walk_speed=walk_speed,
+                bike_speed=bike_speed,
+                electric_cart_speed=electric_cart_speed,
+                allowed_modes=allowed_modes,
                 geometry=[[from_node.lng, from_node.lat], [to_node.lng, to_node.lat]],
             )
         )
@@ -115,13 +124,19 @@ def seed_demo_data(session: Session) -> dict[str, int]:
     for row in range(grid_rows):
         for col in range(grid_cols):
             if col < grid_cols - 1:
-                add_edge(node_at(row, col), node_at(row, col + 1))
+                modes = ["walk", "bike"]
+                if row in {grid_rows // 2 - 1, grid_rows // 2}:
+                    modes.append("electric_cart")
+                add_edge(node_at(row, col), node_at(row, col + 1), modes)
             if row < grid_rows - 1:
-                add_edge(node_at(row, col), node_at(row + 1, col))
+                modes = ["walk", "bike"]
+                if col == grid_cols // 2:
+                    modes.append("electric_cart")
+                add_edge(node_at(row, col), node_at(row + 1, col), modes)
             if row < grid_rows - 1 and col < grid_cols - 1:
-                add_edge(node_at(row, col), node_at(row + 1, col + 1))
+                add_edge(node_at(row, col), node_at(row + 1, col + 1), ["walk"])
             if row < grid_rows - 1 and col > 0:
-                add_edge(node_at(row, col), node_at(row + 1, col - 1))
+                add_edge(node_at(row, col), node_at(row + 1, col - 1), ["walk"])
     session.add_all(edges)
 
     buildings = []

@@ -25,6 +25,8 @@ export interface BuildingItem {
 export interface RoadItem {
   id: string;
   path: Coordinate[];
+  congestion?: number;
+  allowed_modes?: string[];
 }
 
 export interface MapGeoJsonPayload {

@@ -24,6 +24,9 @@ class GraphEdge:
     distance: float
     duration: float
     geometry: list[list[float]]
+    congestion: float = 1.0
+    allowed_modes: tuple[str, ...] = ("walk",)
+    transport_mode: str = "walk"
 
 
 @dataclass(frozen=True)
@@ -71,6 +74,9 @@ def build_bidirectional_graph(edges: list[GraphEdge]) -> dict[int, list[GraphEdg
                 distance=edge.distance,
                 duration=edge.duration,
                 geometry=list(reversed(edge.geometry)),
+                congestion=edge.congestion,
+                allowed_modes=edge.allowed_modes,
+                transport_mode=edge.transport_mode,
             )
         )
     return graph

@@ -14,7 +14,7 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Map UI | AMap display for roads/buildings/facilities | `GET /api/v1/map/geojson` | MapGuidePage | `map_nodes`, `map_edges`, `buildings`, `facilities` | tested: DB-backed API + AMap overlay transform + typecheck/build |
 | Routing | Single-route distance/time response on OSM-shaped graph | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_nodes`, `map_edges` | tested: DB-backed Dijkstra API + page |
 | Routing | Multi-point optimized route on OSM graph | `POST /api/v1/routes/multi-point` | RoutePlannerPage | `map_nodes`, `map_edges` | tested: greedy TSP approximation + Dijkstra leg costs |
-| Routing | Congestion, transport modes, and mixed shortest-time strategy | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_edges` future congestion/mode fields | planned: required by `要求.md` |
+| Routing | Congestion, transport modes, and mixed shortest-time strategy | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_edges` congestion/mode/speed fields | tested: required by `要求.md` |
 | Facilities | Nearby by category and graph distance | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facilities`, `facility_categories`, `map_nodes`, `map_edges` | tested: DB-backed Dijkstra distance + Top-K heap |
 | Facilities | Category-name text lookup and fuzzy category input | `GET /api/v1/facilities/nearby` or future search API | NearbyFacilitiesPage | `facility_categories`, `facilities` | planned: required by `要求.md` |
 | Indoor | Building, floor, cross-floor route | `POST /api/indoor/routes` | Indoor Navigation | `indoor_nodes`, `indoor_edges` | planned |

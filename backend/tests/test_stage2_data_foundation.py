@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.db.base import Base
 from app.db.init_db import create_all
-from app.models import Building, Destination, Facility, FacilityCategory, User
+from app.models import Building, Destination, Facility, FacilityCategory, MapEdge, User
 from app.seed.sample_data import BUPT_SHAHE_CENTER
 from app.seed.seed_all import seed_demo_data
 
@@ -51,3 +51,9 @@ def test_seed_demo_data_meets_stage2_scale() -> None:
         assert session.scalars(select(Building).limit(1)).first() is not None
         assert session.scalars(select(Facility).limit(1)).first() is not None
         assert session.scalars(select(FacilityCategory).limit(1)).first() is not None
+        edges = session.scalars(select(MapEdge)).all()
+        first_edge = edges[0]
+        assert 0 < first_edge.congestion <= 1
+        assert "walk" in first_edge.allowed_modes
+        assert any("bike" in edge.allowed_modes for edge in edges)
+        assert any("electric_cart" in edge.allowed_modes for edge in edges)

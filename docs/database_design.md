@@ -20,6 +20,27 @@
 | `restaurants` | food locations |
 | `foods` | food items |
 
+## Map Edge Strategy Fields
+
+`map_edges` stores the route topology plus strategy metadata:
+
+```text
+distance
+walk_time
+congestion
+walk_speed
+bike_speed
+electric_cart_speed
+allowed_modes
+geometry
+```
+
+Route duration is computed as:
+
+```text
+duration = distance / (ideal_speed * congestion)
+```
+
 ## Demo Seed Counts
 
 ```text
