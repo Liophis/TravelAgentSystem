@@ -153,6 +153,7 @@ If the configured `OSM_DEFAULT_PLACE` is not found by Nominatim, the importer fa
 - `docs/stage_8_diaries.md`: diary community, search, rating, comments, and compression notes.
 - `docs/stage_9_food_aigc_admin.md`: food recommendation, AIGC placeholders, and admin dashboard notes.
 - `docs/stage_10_final_docs.md`: final documentation and demo-readiness notes.
+- `docs/stage_11_mainline_hardening.md`: smoke, merge-marker, and frontend error-handling hardening notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

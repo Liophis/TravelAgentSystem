@@ -54,6 +54,7 @@ Run from repository root:
 ```bash
 bash scripts/check_backend.sh
 bash scripts/check_frontend.sh
+bash scripts/check_merge_markers.sh
 bash scripts/check_all.sh
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh

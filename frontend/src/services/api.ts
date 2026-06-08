@@ -1,3 +1,5 @@
+import { ElMessage } from "element-plus";
+
 export type Coordinate = [number, number];
 
 export interface FacilityItem {
@@ -222,23 +224,51 @@ export interface AdminStatsPayload {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export async function apiGet<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`);
-  return parseResponse<T>(response);
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`);
+    return await parseResponse<T>(response);
+  } catch (error) {
+    notifyApiError(error);
+    throw error;
+  }
 }
 
 export async function apiPost<T>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  return parseResponse<T>(response);
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return await parseResponse<T>(response);
+  } catch (error) {
+    notifyApiError(error);
+    throw error;
+  }
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
-    const body = await response.text();
+    if (response.status === 401) {
+      throw new Error("登录状态已失效，请重新登录。");
+    }
+    const body = await readErrorBody(response);
     throw new Error(body || `Request failed with ${response.status}`);
   }
   return response.json() as Promise<T>;
+}
+
+async function readErrorBody(response: Response): Promise<string> {
+  const text = await response.text();
+  try {
+    const payload = JSON.parse(text) as { detail?: string };
+    return payload.detail ?? text;
+  } catch {
+    return text;
+  }
+}
+
+function notifyApiError(error: unknown) {
+  const message = error instanceof Error ? error.message : "请求失败，请稍后重试。";
+  ElMessage.error(message);
 }
