@@ -12,7 +12,7 @@ Use a hybrid route strategy:
 - If `AMAP_WEB_API_KEY` is available and mode is `walk`, `auto` uses AMap Web Service walking directions.
 - If AMap is unavailable, or `route_source=local_graph`, backend falls back to local Dijkstra over `map_nodes/map_edges`.
 - Local Dijkstra remains necessary for algorithm demonstration, transport-mode experiments, and network-free tests.
-- When manually supplied WGS84 campus topology is available, it should become the preferred local graph source after validation/import.
+- Manually supplied WGS84 campus topology can be imported with `backend/scripts/import_reference_campus.py` and should be the preferred local graph source for algorithmic campus Dijkstra.
 
 ## Coordinate Contract
 

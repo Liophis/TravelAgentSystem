@@ -32,7 +32,7 @@ Old overlays are cleared before redraw to avoid duplicate markers and stale rout
 
 - Fixture import: offline and test-safe.
 - OSMnx import: manual/network-enabled path.
-- Reference campus import: offline path from `data/reference/bupt-shahe/raw_wgs84/` and `data/reference/bupt-shahe/topology/`.
+- Reference campus import: offline path from `data/reference/bupt-shahe/raw_wgs84/` and `data/reference/bupt-shahe/topology/`, implemented by `backend/scripts/import_reference_campus.py`.
 - AMap POI import: manual/network-enabled facility enrichment path using `AMAP_WEB_API_KEY`.
 - If Nominatim place lookup fails, importer falls back to configured center point and radius.
 

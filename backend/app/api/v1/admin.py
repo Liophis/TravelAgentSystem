@@ -38,12 +38,19 @@ from app.services.osm_import_service import (
     import_osm_payload_to_db,
     import_osm_road_graph_to_db,
 )
+from app.services.reference_campus_import_service import (
+    ReferenceCampusImportError,
+    import_reference_campus_to_db,
+)
 
 router = APIRouter()
 
 
 class MapImportRequest(BaseModel):
-    source: str = Field(default="fixture", description="fixture, osmnx, osmnx_graph, osmnx_features, or amap_poi")
+    source: str = Field(
+        default="fixture",
+        description="fixture, osmnx, osmnx_graph, osmnx_features, amap_poi, or reference_campus",
+    )
     place_name: str | None = Field(default=None)
     center_lng: float | None = Field(default=None)
     center_lat: float | None = Field(default=None)
@@ -156,9 +163,16 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 reset_facilities=payload.reset_existing,
                 request_interval=payload.request_interval,
             )
+        if payload.source == "reference_campus":
+            return import_reference_campus_to_db(
+                session=db,
+                replace_campus_layers=payload.reset_existing,
+            )
     except AMapPoiImportError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except OsmImportError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except ReferenceCampusImportError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail=f"Map import failed: {exc}") from exc

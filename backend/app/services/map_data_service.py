@@ -49,7 +49,7 @@ def get_map_payload_from_db(session: Session, include_demo: bool = False) -> dic
             "include_demo": include_demo,
             "buildings": "OSM/imported building polygons only by default",
             "facilities": "AMap/OSM imported POIs only by default",
-            "roads": "OSM/imported roads only by default; local seed graph remains for algorithm demo",
+            "roads": "Reference campus or OSM/imported roads by default; local seed graph remains hidden for fallback",
         },
     }
 

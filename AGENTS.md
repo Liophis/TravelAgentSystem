@@ -75,6 +75,12 @@ bash scripts/reset_dev_db.sh
 bash scripts/smoke_features.sh
 ```
 
+Optional campus reference import:
+
+```bash
+PYTHONPATH=backend python backend/scripts/import_reference_campus.py --replace-campus-layers
+```
+
 Optional conda backend check:
 
 ```bash

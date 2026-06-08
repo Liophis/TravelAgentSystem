@@ -59,6 +59,7 @@ Destination recommendation/search is for tourist attractions and schools/campuse
 - `POST /admin/map/import`
   - `source=fixture`: offline fallback payload
   - `source=osmnx`: OSMnx road/building/POI import
+  - `source=reference_campus`: offline WGS84 campus scene/topology import from `data/reference/bupt-shahe/`
   - `source=amap_poi`: AMap Place Around facility enrichment, requires `AMAP_WEB_API_KEY`
 
 ## Response Rule

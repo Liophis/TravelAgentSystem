@@ -1,0 +1,1294 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "鸿雁路双向",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2779359,
+            40.1555779
+          ],
+          [
+            116.2817084699602,
+            40.15654254391606
+          ],
+          [
+            116.2817413,
+            40.1565518
+          ],
+          [
+            116.2832635,
+            40.1569478
+          ],
+          [
+            116.2850355,
+            40.1573886
+          ],
+          [
+            116.2868943,
+            40.1578866
+          ],
+          [
+            116.2881387,
+            40.1582056
+          ],
+          [
+            116.2880894,
+            40.158296
+          ],
+          [
+            116.2868421,
+            40.1579791
+          ],
+          [
+            116.2849921,
+            40.1574886
+          ],
+          [
+            116.2844105,
+            40.1573363
+          ],
+          [
+            116.2832376,
+            40.1570307
+          ],
+          [
+            116.2827535,
+            40.1569004
+          ],
+          [
+            116.282136,
+            40.1567441
+          ],
+          [
+            116.2817184,
+            40.1566341
+          ],
+          [
+            116.28166716586978,
+            40.15662157472988
+          ],
+          [
+            116.2779366,
+            40.1556407
+          ],
+          [
+            116.2779359,
+            40.1555779
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "国脉西路",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2808608,
+            40.1583724
+          ],
+          [
+            116.280967,
+            40.1581284
+          ],
+          [
+            116.2812394,
+            40.1575224
+          ],
+          [
+            116.2814599,
+            40.15703
+          ],
+          [
+            116.2816649,
+            40.1566259
+          ],
+          [
+            116.2817077,
+            40.1565442
+          ],
+          [
+            116.2819372,
+            40.1560779
+          ],
+          [
+            116.2819675,
+            40.1559945
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "国脉中街",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2825336,
+            40.1585377
+          ],
+          [
+            116.2826679,
+            40.1582271
+          ],
+          [
+            116.282831,
+            40.157867
+          ],
+          [
+            116.2828569,
+            40.1578089
+          ],
+          [
+            116.2832276,
+            40.1570316
+          ],
+          [
+            116.2832613,
+            40.1569491
+          ],
+          [
+            116.2838206,
+            40.1557326
+          ],
+          [
+            116.2841346,
+            40.155045
+          ],
+          [
+            116.2842679,
+            40.1547173
+          ],
+          [
+            116.284441,
+            40.1542985
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "国脉路",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2843742,
+            40.158778
+          ],
+          [
+            116.2844366,
+            40.1586599
+          ],
+          [
+            116.28464118499977,
+            40.15826024534571
+          ],
+          [
+            116.28486612970285,
+            40.15778002864846
+          ],
+          [
+            116.285001,
+            40.1574919
+          ],
+          [
+            116.2850492,
+            40.1573816
+          ],
+          [
+            116.2851758,
+            40.1571038
+          ],
+          [
+            116.2853872,
+            40.1566494
+          ],
+          [
+            116.2856001,
+            40.1562041
+          ],
+          [
+            116.2858199,
+            40.1557261
+          ],
+          [
+            116.2859211,
+            40.1555173
+          ],
+          [
+            116.2864893,
+            40.1543685
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "国脉东路",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2861631,
+            40.1591297
+          ],
+          [
+            116.2868428,
+            40.1579764
+          ],
+          [
+            116.2868895,
+            40.157894
+          ],
+          [
+            116.2874827,
+            40.1569076
+          ],
+          [
+            116.287587,
+            40.1567318
+          ],
+          [
+            116.2879609,
+            40.1560669
+          ],
+          [
+            116.2885658,
+            40.1549669
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "雁北中路",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2812231,
+            40.1575244
+          ],
+          [
+            116.2824152,
+            40.1577816
+          ],
+          [
+            116.2828259,
+            40.1578644
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "医前路"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.282652,
+            40.1582359
+          ],
+          [
+            116.2834035,
+            40.1584108
+          ],
+          [
+            116.2835116,
+            40.1584343
+          ],
+          [
+            116.2838397,
+            40.1585159
+          ],
+          [
+            116.2844374,
+            40.1586619
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "湖北路",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2837992,
+            40.1557397
+          ],
+          [
+            116.2840154,
+            40.1557909
+          ],
+          [
+            116.2844339,
+            40.1559028
+          ],
+          [
+            116.2856004,
+            40.1562169
+          ],
+          [
+            116.2868422,
+            40.1565345
+          ],
+          [
+            116.2875949,
+            40.1567397
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "湖南路",
+        "allowedModes": [
+          "walking",
+          "bicycle"
+        ]
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.28413221069809,
+            40.155050232114625
+          ],
+          [
+            116.28444931176418,
+            40.15513299202117
+          ],
+          [
+            116.2851739,
+            40.1553276
+          ],
+          [
+            116.2859245,
+            40.155518
+          ],
+          [
+            116.2879694,
+            40.1560518
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "west_gate",
+        "name": "西门",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2779334,
+          40.1555764
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "教学实验综合楼N入口",
+        "name": "教学实验综合楼N入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2851835,
+          40.1571068
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "教学实验综合楼S入口",
+        "name": "教学实验综合楼S入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.285392,
+          40.1566507
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "图书馆入口",
+        "name": "图书馆入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2851754,
+          40.157845
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2851667,
+            40.1578434
+          ],
+          [
+            116.28486612970285,
+            40.15778002864846
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "教学实验综合楼",
+        "name": "教学实验综合楼",
+        "tags": [
+          "study"
+        ],
+        "anchorKey": "教学实验综合楼N入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2862632,
+          40.1571249
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "library",
+        "name": "图书馆",
+        "nodeType": "library",
+        "tags": [
+          "study",
+          "landmark"
+        ],
+        "anchorKey": "图书馆入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2855448,
+          40.1583403
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "学生活动中心",
+        "name": "学生活动中心",
+        "anchorKey": "学活入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.284168,
+          40.1577865
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "学活入口",
+        "name": "学活入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2842667,
+          40.1575361
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "教工食堂",
+        "name": "教工食堂",
+        "anchorKey": "教工食堂入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2833529,
+          40.1575988
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "风味食堂",
+        "name": "风味食堂",
+        "anchorKey": "风味食堂入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2832342,
+          40.1581318
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "南区食堂",
+        "name": "南区食堂",
+        "anchorKey": "南区食堂入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2845755,
+          40.1548202
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "南区食堂入口",
+        "name": "南区食堂入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.28444931176418,
+          40.15513299202117
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2828562,
+            40.1578088
+          ],
+          [
+            116.283071,
+            40.1578634
+          ],
+          [
+            116.2833209,
+            40.1579307
+          ],
+          [
+            116.2835489,
+            40.1579922
+          ],
+          [
+            116.2836819,
+            40.1580286
+          ],
+          [
+            116.28464118499977,
+            40.15826024534571
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.28351138476069,
+            40.15843425032169
+          ],
+          [
+            116.28368093838317,
+            40.15802833921804
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2835489,
+            40.1579922
+          ],
+          [
+            116.283638,
+            40.1577916
+          ],
+          [
+            116.2837353,
+            40.1575601
+          ],
+          [
+            116.2838305,
+            40.1573363
+          ],
+          [
+            116.2843485,
+            40.157467
+          ],
+          [
+            116.2844105,
+            40.1573363
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2843485,
+            40.157467
+          ],
+          [
+            116.2842664,
+            40.1575361
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "教工食堂入口",
+        "name": "教工食堂入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.28307537185951,
+          40.15786457737553
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "风味食堂入口",
+        "name": "风味食堂入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.28331964109962,
+          40.15793036096841
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "天猫超市",
+        "name": "天猫超市",
+        "anchorKey": "天猫超市入口"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2838317,
+          40.1578386
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "天猫超市入口",
+        "name": "天猫超市入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.283638,
+          40.1577916
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "anchor_node",
+        "key": "地下超市入口",
+        "name": "地下超市入口",
+        "nodeType": "entrance"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2827014,
+          40.1570336
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2827007,
+            40.1570342
+          ],
+          [
+            116.2827535,
+            40.1569002
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "地下超市",
+        "name": "地下超市"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2824344,
+          40.1571306
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "小咖咖啡 MiniCo",
+        "name": "小咖咖啡"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2821046,
+          40.157115
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "虎头军煎饼",
+        "name": "虎头军煎饼"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2818877,
+          40.1569959
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "key": "地超内部路"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2826962,
+            40.1570388
+          ],
+          [
+            116.2826431,
+            40.1571781
+          ],
+          [
+            116.2824351,
+            40.1571305
+          ],
+          [
+            116.2821056,
+            40.1571154
+          ],
+          [
+            116.2818839,
+            40.1569971
+          ],
+          [
+            116.2820616,
+            40.1569066
+          ],
+          [
+            116.2821344,
+            40.1567441
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "西湖",
+        "name": "西湖"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2851928,
+          40.1557853
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "东湖",
+        "name": "东湖"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2862012,
+          40.1560461
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "观景区",
+        "name": "观景区"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2858162,
+          40.1557299
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "操场",
+        "name": "操场"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2801394,
+          40.1571472
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2814592,
+            40.1570309
+          ],
+          [
+            116.2803111,
+            40.1567194
+          ],
+          [
+            116.2801401,
+            40.1571417
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.285802,
+            40.1557217
+          ],
+          [
+            116.2855263,
+            40.155565
+          ],
+          [
+            116.2854188,
+            40.1554931
+          ],
+          [
+            116.2852641,
+            40.1554854
+          ],
+          [
+            116.2851532,
+            40.1555984
+          ],
+          [
+            116.285049,
+            40.1556215
+          ],
+          [
+            116.2849582,
+            40.1555984
+          ],
+          [
+            116.2847263,
+            40.155619
+          ],
+          [
+            116.2845515,
+            40.1556241
+          ],
+          [
+            116.2844305,
+            40.1556755
+          ],
+          [
+            116.2844372,
+            40.155768
+          ],
+          [
+            116.2844708,
+            40.155863
+          ],
+          [
+            116.28443120018393,
+            40.15590521067882
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2858149,
+            40.1557326
+          ],
+          [
+            116.2859964,
+            40.155766
+          ],
+          [
+            116.2861107,
+            40.1557428
+          ],
+          [
+            116.2862351,
+            40.1557428
+          ],
+          [
+            116.2863427,
+            40.1557891
+          ],
+          [
+            116.2863998,
+            40.1559381
+          ],
+          [
+            116.2864536,
+            40.15601
+          ],
+          [
+            116.2865679,
+            40.1560511
+          ],
+          [
+            116.28682,
+            40.1560614
+          ],
+          [
+            116.2868771,
+            40.1560511
+          ],
+          [
+            116.2869881,
+            40.1560922
+          ],
+          [
+            116.2870452,
+            40.1561899
+          ],
+          [
+            116.2869914,
+            40.1562978
+          ],
+          [
+            116.2868939,
+            40.1563928
+          ],
+          [
+            116.2868402,
+            40.1565341
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "蜜雪冰城",
+        "name": "蜜雪冰城"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2835396,
+          40.1575189
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "库迪咖啡",
+        "name": "库迪咖啡"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2834919,
+          40.1574002
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "醉面",
+        "name": "醉面"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2835027,
+          40.1575929
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2835029,
+            40.1575932
+          ],
+          [
+            116.2835216,
+            40.1575562
+          ],
+          [
+            116.2835394,
+            40.1575187
+          ],
+          [
+            116.2835831,
+            40.1574194
+          ],
+          [
+            116.2834919,
+            40.1574011
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2835387,
+            40.1575195
+          ],
+          [
+            116.28373552244068,
+            40.1575597078058
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "校医院",
+        "name": "校医院"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2835683,
+          40.1586879
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            116.2834066,
+            40.1584108
+          ],
+          [
+            116.2834173,
+            40.1585794
+          ],
+          [
+            116.2834828,
+            40.1586212
+          ],
+          [
+            116.2836538,
+            40.1586545
+          ],
+          [
+            116.2837375,
+            40.1586156
+          ],
+          [
+            116.28383953609776,
+            40.15851492028068
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kind": "poi",
+        "key": "防御塔景区",
+        "name": "防御塔景区"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.2843659,
+          40.1588058
+        ]
+      }
+    }
+  ]
+}

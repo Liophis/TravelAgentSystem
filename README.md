@@ -153,6 +153,14 @@ python backend/scripts/import_osm_campus.py --source osmnx --graph-only --dist 1
 python backend/scripts/import_osm_campus.py --source osmnx --features-only --dist 1800
 ```
 
+To import the manually supplied BUPT Shahe WGS84 campus topology:
+
+```bash
+PYTHONPATH=backend python backend/scripts/import_reference_campus.py --replace-campus-layers
+```
+
+This replaces visible OSM road nodes/edges with the reference campus graph, keeps the deterministic seed graph hidden as fallback, preserves existing building polygons and POIs, and imports reference campus facilities.
+
 The public map API hides seed/fallback layers by default. Use `include_demo=true` only for fallback inspection:
 
 ```bash
@@ -213,6 +221,9 @@ curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
 curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
   -H 'Content-Type: application/json' \
   -d '{"source":"amap_poi","dist":1800,"max_pages":3,"request_interval":0.5,"reset_existing":false}'
+curl -X POST http://127.0.0.1:8000/api/v1/admin/map/import \
+  -H 'Content-Type: application/json' \
+  -d '{"source":"reference_campus","reset_existing":true}'
 curl 'http://127.0.0.1:8000/api/v1/diaries?limit=5'
 curl 'http://127.0.0.1:8000/api/v1/foods/recommend?destination_id=1&limit=5'
 curl -X POST http://127.0.0.1:8000/api/v1/aigc/diary-draft \
@@ -281,6 +292,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_26_optional_map_smoke.md`: optional AMap browser screenshot smoke notes.
 - `docs/stage_27_real_map_layers.md`: real-priority OSM + AMap POI map layer cleanup and import notes.
 - `docs/campus_navigation_data_plan.md`: reference campus data placement, validation, and import plan.
+- `docs/stage_28_reference_campus_navigation.md`: supplied BUPT reference topology import and verification notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

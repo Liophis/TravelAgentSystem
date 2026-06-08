@@ -1,0 +1,5297 @@
+{
+  "scenes": [
+    {
+      "id": "scene_bupt_campus",
+      "name": "北京邮电大学校园",
+      "nodes": [
+        {
+          "id": "node_west_gate",
+          "sceneId": "scene_bupt_campus",
+          "name": "西门",
+          "nodeType": "entrance",
+          "x": 116.2779334,
+          "y": 40.1555764,
+          "floor": 0,
+          "tags": [
+            "entry"
+          ]
+        },
+        {
+          "id": "node_教学实验综合楼N入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "教学实验综合楼",
+          "nodeType": "poi",
+          "x": 116.2851835,
+          "y": 40.1571068,
+          "floor": 0,
+          "tags": [
+            "study"
+          ]
+        },
+        {
+          "id": "node_教学实验综合楼S入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "教学实验综合楼S入口",
+          "nodeType": "entrance",
+          "x": 116.285392,
+          "y": 40.1566507,
+          "floor": 0,
+          "tags": [
+            "entry",
+            "nav_only"
+          ]
+        },
+        {
+          "id": "node_图书馆入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "图书馆",
+          "nodeType": "library",
+          "x": 116.2851754,
+          "y": 40.157845,
+          "floor": 0,
+          "tags": [
+            "study",
+            "landmark"
+          ]
+        },
+        {
+          "id": "node_学活入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "学生活动中心",
+          "nodeType": "poi",
+          "x": 116.2842667,
+          "y": 40.1575361,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_南区食堂入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "南区食堂",
+          "nodeType": "canteen",
+          "x": 116.28444931176418,
+          "y": 40.15513299202117,
+          "floor": 0,
+          "tags": [
+            "food",
+            "rest"
+          ]
+        },
+        {
+          "id": "node_教工食堂入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "教工食堂",
+          "nodeType": "canteen",
+          "x": 116.28307537185951,
+          "y": 40.15786457737553,
+          "floor": 0,
+          "tags": [
+            "food",
+            "rest"
+          ]
+        },
+        {
+          "id": "node_风味食堂入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "风味食堂",
+          "nodeType": "canteen",
+          "x": 116.28331964109962,
+          "y": 40.15793036096841,
+          "floor": 0,
+          "tags": [
+            "food",
+            "rest"
+          ]
+        },
+        {
+          "id": "node_天猫超市入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "天猫超市",
+          "nodeType": "convenience_store",
+          "x": 116.283638,
+          "y": 40.1577916,
+          "floor": 0,
+          "tags": [
+            "shop",
+            "convenience"
+          ]
+        },
+        {
+          "id": "node_地下超市入口",
+          "sceneId": "scene_bupt_campus",
+          "name": "地下超市入口",
+          "nodeType": "entrance",
+          "x": 116.2827014,
+          "y": 40.1570336,
+          "floor": 0,
+          "tags": [
+            "outdoor",
+            "nav_only"
+          ]
+        },
+        {
+          "id": "node_auto_dda662aa",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_dda662aa",
+          "nodeType": "path_node",
+          "x": 116.2817084699602,
+          "y": 40.15654254391606,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_bd0b10a0",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_bd0b10a0",
+          "nodeType": "path_node",
+          "x": 116.2817413,
+          "y": 40.1565518,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_a7fa77ee",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_a7fa77ee",
+          "nodeType": "path_node",
+          "x": 116.2832635,
+          "y": 40.1569478,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_c205cd29",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_c205cd29",
+          "nodeType": "path_node",
+          "x": 116.2850355,
+          "y": 40.1573886,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_8bee4a0c",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_8bee4a0c",
+          "nodeType": "path_node",
+          "x": 116.2868943,
+          "y": 40.1578866,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_0ef18f17",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_0ef18f17",
+          "nodeType": "path_node",
+          "x": 116.2881387,
+          "y": 40.1582056,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_6f6a85a1",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_6f6a85a1",
+          "nodeType": "path_node",
+          "x": 116.2880894,
+          "y": 40.158296,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_d412f5bb",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_d412f5bb",
+          "nodeType": "path_node",
+          "x": 116.2868421,
+          "y": 40.1579791,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_f00fdaaf",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_f00fdaaf",
+          "nodeType": "path_node",
+          "x": 116.2849921,
+          "y": 40.1574886,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_ffbf01a5",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_ffbf01a5",
+          "nodeType": "path_node",
+          "x": 116.2844105,
+          "y": 40.1573363,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_eb53bb21",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_eb53bb21",
+          "nodeType": "path_node",
+          "x": 116.2832376,
+          "y": 40.1570307,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_8e350144",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_8e350144",
+          "nodeType": "path_node",
+          "x": 116.2827535,
+          "y": 40.1569004,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_78877ff3",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_78877ff3",
+          "nodeType": "path_node",
+          "x": 116.282136,
+          "y": 40.1567441,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_d761f6be",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_d761f6be",
+          "nodeType": "path_node",
+          "x": 116.2817184,
+          "y": 40.1566341,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_b8d7697a",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_b8d7697a",
+          "nodeType": "path_node",
+          "x": 116.28166716586978,
+          "y": 40.15662157472988,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_30d0c647",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_30d0c647",
+          "nodeType": "path_node",
+          "x": 116.2779366,
+          "y": 40.1556407,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_80e976d7",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_80e976d7",
+          "nodeType": "path_node",
+          "x": 116.2808608,
+          "y": 40.1583724,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_7974b54a",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_7974b54a",
+          "nodeType": "path_node",
+          "x": 116.280967,
+          "y": 40.1581284,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_47c33906",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_47c33906",
+          "nodeType": "path_node",
+          "x": 116.2812394,
+          "y": 40.1575224,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_32f0bbcb",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_32f0bbcb",
+          "nodeType": "path_node",
+          "x": 116.2814599,
+          "y": 40.15703,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_56725248",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_56725248",
+          "nodeType": "path_node",
+          "x": 116.2819372,
+          "y": 40.1560779,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_3ddb59d3",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3ddb59d3",
+          "nodeType": "path_node",
+          "x": 116.2819675,
+          "y": 40.1559945,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_f86a9a56",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_f86a9a56",
+          "nodeType": "path_node",
+          "x": 116.2825336,
+          "y": 40.1585377,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_9a3ea23f",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_9a3ea23f",
+          "nodeType": "path_node",
+          "x": 116.2826679,
+          "y": 40.1582271,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_909f6887",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_909f6887",
+          "nodeType": "path_node",
+          "x": 116.282831,
+          "y": 40.157867,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_3d4941df",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3d4941df",
+          "nodeType": "path_node",
+          "x": 116.2828569,
+          "y": 40.1578089,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_0e51c6cf",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_0e51c6cf",
+          "nodeType": "path_node",
+          "x": 116.2838206,
+          "y": 40.1557326,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_20f9808d",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_20f9808d",
+          "nodeType": "path_node",
+          "x": 116.2841346,
+          "y": 40.155045,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_38a3d81f",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_38a3d81f",
+          "nodeType": "path_node",
+          "x": 116.2842679,
+          "y": 40.1547173,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_ff642114",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_ff642114",
+          "nodeType": "path_node",
+          "x": 116.284441,
+          "y": 40.1542985,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_2d645e0f",
+          "sceneId": "scene_bupt_campus",
+          "name": "防御塔景区",
+          "nodeType": "poi",
+          "x": 116.2843742,
+          "y": 40.158778,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_01f899dd",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_01f899dd",
+          "nodeType": "path_node",
+          "x": 116.2844366,
+          "y": 40.1586599,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_dd92bd14",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_dd92bd14",
+          "nodeType": "path_node",
+          "x": 116.28464118499977,
+          "y": 40.15826024534571,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_5b2cab16",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_5b2cab16",
+          "nodeType": "path_node",
+          "x": 116.28486612970285,
+          "y": 40.15778002864846,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_0f7af2ec",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_0f7af2ec",
+          "nodeType": "path_node",
+          "x": 116.2856001,
+          "y": 40.1562041,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_244b633c",
+          "sceneId": "scene_bupt_campus",
+          "name": "观景区",
+          "nodeType": "poi",
+          "x": 116.2858199,
+          "y": 40.1557261,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_3b079b90",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3b079b90",
+          "nodeType": "path_node",
+          "x": 116.2859211,
+          "y": 40.1555173,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_adc8c985",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_adc8c985",
+          "nodeType": "path_node",
+          "x": 116.2864893,
+          "y": 40.1543685,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_d5f1c86a",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_d5f1c86a",
+          "nodeType": "path_node",
+          "x": 116.2861631,
+          "y": 40.1591297,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_7df18f8d",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_7df18f8d",
+          "nodeType": "path_node",
+          "x": 116.2874827,
+          "y": 40.1569076,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_5b97ba55",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_5b97ba55",
+          "nodeType": "path_node",
+          "x": 116.287587,
+          "y": 40.1567318,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_3c28d197",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3c28d197",
+          "nodeType": "path_node",
+          "x": 116.2879609,
+          "y": 40.1560669,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_6c7ce605",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_6c7ce605",
+          "nodeType": "path_node",
+          "x": 116.2885658,
+          "y": 40.1549669,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_3ca15c5a",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3ca15c5a",
+          "nodeType": "path_node",
+          "x": 116.2824152,
+          "y": 40.1577816,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_adc4c8c9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_adc4c8c9",
+          "nodeType": "path_node",
+          "x": 116.2834035,
+          "y": 40.1584108,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_1a6ca9d9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_1a6ca9d9",
+          "nodeType": "path_node",
+          "x": 116.2835116,
+          "y": 40.1584343,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_ec5e90e9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_ec5e90e9",
+          "nodeType": "path_node",
+          "x": 116.2838397,
+          "y": 40.1585159,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_64a2378f",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_64a2378f",
+          "nodeType": "path_node",
+          "x": 116.2840154,
+          "y": 40.1557909,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_455fba32",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_455fba32",
+          "nodeType": "path_node",
+          "x": 116.2844339,
+          "y": 40.1559028,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_2fa6de36",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_2fa6de36",
+          "nodeType": "path_node",
+          "x": 116.2868422,
+          "y": 40.1565345,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_ad9ac6f3",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_ad9ac6f3",
+          "nodeType": "path_node",
+          "x": 116.2851739,
+          "y": 40.1553276,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_26b4560b",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_26b4560b",
+          "nodeType": "path_node",
+          "x": 116.2835489,
+          "y": 40.1579922,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_a5b8aaea",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_a5b8aaea",
+          "nodeType": "path_node",
+          "x": 116.2836819,
+          "y": 40.1580286,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_c4a4a221",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_c4a4a221",
+          "nodeType": "path_node",
+          "x": 116.2837353,
+          "y": 40.1575601,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_24becaa8",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_24becaa8",
+          "nodeType": "path_node",
+          "x": 116.2838305,
+          "y": 40.1573363,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_7d5bc3fd",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_7d5bc3fd",
+          "nodeType": "path_node",
+          "x": 116.2843485,
+          "y": 40.157467,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_26fe3287",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_26fe3287",
+          "nodeType": "path_node",
+          "x": 116.2826431,
+          "y": 40.1571781,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_be06d284",
+          "sceneId": "scene_bupt_campus",
+          "name": "地下超市",
+          "nodeType": "convenience_store",
+          "x": 116.2824351,
+          "y": 40.1571305,
+          "floor": 0,
+          "tags": [
+            "shop",
+            "convenience"
+          ]
+        },
+        {
+          "id": "node_auto_6ad6fdff",
+          "sceneId": "scene_bupt_campus",
+          "name": "小咖咖啡",
+          "nodeType": "cafe",
+          "x": 116.2821056,
+          "y": 40.1571154,
+          "floor": 0,
+          "tags": [
+            "coffee",
+            "cafe",
+            "rest"
+          ]
+        },
+        {
+          "id": "node_auto_419d05ec",
+          "sceneId": "scene_bupt_campus",
+          "name": "虎头军煎饼",
+          "nodeType": "poi",
+          "x": 116.2818839,
+          "y": 40.1569971,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_ddf5600f",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_ddf5600f",
+          "nodeType": "path_node",
+          "x": 116.2820616,
+          "y": 40.1569066,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_16a2f89c",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_16a2f89c",
+          "nodeType": "path_node",
+          "x": 116.2803111,
+          "y": 40.1567194,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_1ab758d7",
+          "sceneId": "scene_bupt_campus",
+          "name": "操场",
+          "nodeType": "sports",
+          "x": 116.2801401,
+          "y": 40.1571417,
+          "floor": 0,
+          "tags": [
+            "sport",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_c45ad539",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_c45ad539",
+          "nodeType": "path_node",
+          "x": 116.2855263,
+          "y": 40.155565,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_569cadc9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_569cadc9",
+          "nodeType": "path_node",
+          "x": 116.2854188,
+          "y": 40.1554931,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_5e62e73b",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_5e62e73b",
+          "nodeType": "path_node",
+          "x": 116.2852641,
+          "y": 40.1554854,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_fdb222c0",
+          "sceneId": "scene_bupt_campus",
+          "name": "西湖",
+          "nodeType": "poi",
+          "x": 116.2851532,
+          "y": 40.1555984,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_a1d18526",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_a1d18526",
+          "nodeType": "path_node",
+          "x": 116.285049,
+          "y": 40.1556215,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_776c4e48",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_776c4e48",
+          "nodeType": "path_node",
+          "x": 116.2849582,
+          "y": 40.1555984,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_7062d344",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_7062d344",
+          "nodeType": "path_node",
+          "x": 116.2847263,
+          "y": 40.155619,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_9b49dea9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_9b49dea9",
+          "nodeType": "path_node",
+          "x": 116.2845515,
+          "y": 40.1556241,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_8a026331",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_8a026331",
+          "nodeType": "path_node",
+          "x": 116.2844305,
+          "y": 40.1556755,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_b39c330f",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_b39c330f",
+          "nodeType": "path_node",
+          "x": 116.2844372,
+          "y": 40.155768,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_1e2deaf4",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_1e2deaf4",
+          "nodeType": "path_node",
+          "x": 116.2844708,
+          "y": 40.155863,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_298f4be4",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_298f4be4",
+          "nodeType": "path_node",
+          "x": 116.2859964,
+          "y": 40.155766,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_3563bb2c",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3563bb2c",
+          "nodeType": "path_node",
+          "x": 116.2861107,
+          "y": 40.1557428,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_2b5d8572",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_2b5d8572",
+          "nodeType": "path_node",
+          "x": 116.2862351,
+          "y": 40.1557428,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_d9555501",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_d9555501",
+          "nodeType": "path_node",
+          "x": 116.2863427,
+          "y": 40.1557891,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_401462a0",
+          "sceneId": "scene_bupt_campus",
+          "name": "东湖",
+          "nodeType": "poi",
+          "x": 116.2863998,
+          "y": 40.1559381,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_3947aadc",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_3947aadc",
+          "nodeType": "path_node",
+          "x": 116.2864536,
+          "y": 40.15601,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_36ac20c9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_36ac20c9",
+          "nodeType": "path_node",
+          "x": 116.2865679,
+          "y": 40.1560511,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_4142ed44",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_4142ed44",
+          "nodeType": "path_node",
+          "x": 116.28682,
+          "y": 40.1560614,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_452b7f2f",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_452b7f2f",
+          "nodeType": "path_node",
+          "x": 116.2868771,
+          "y": 40.1560511,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_61619eb8",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_61619eb8",
+          "nodeType": "path_node",
+          "x": 116.2869881,
+          "y": 40.1560922,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_1ab5cdf2",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_1ab5cdf2",
+          "nodeType": "path_node",
+          "x": 116.2870452,
+          "y": 40.1561899,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_0fc50e7a",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_0fc50e7a",
+          "nodeType": "path_node",
+          "x": 116.2869914,
+          "y": 40.1562978,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_a3440b2e",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_a3440b2e",
+          "nodeType": "path_node",
+          "x": 116.2868939,
+          "y": 40.1563928,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_630c02c8",
+          "sceneId": "scene_bupt_campus",
+          "name": "醉面",
+          "nodeType": "poi",
+          "x": 116.2835029,
+          "y": 40.1575932,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_74b8def9",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_74b8def9",
+          "nodeType": "path_node",
+          "x": 116.2835216,
+          "y": 40.1575562,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_05fb54fb",
+          "sceneId": "scene_bupt_campus",
+          "name": "蜜雪冰城",
+          "nodeType": "poi",
+          "x": 116.2835394,
+          "y": 40.1575187,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_517eca7a",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_517eca7a",
+          "nodeType": "path_node",
+          "x": 116.2835831,
+          "y": 40.1574194,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_234f0a36",
+          "sceneId": "scene_bupt_campus",
+          "name": "库迪咖啡",
+          "nodeType": "cafe",
+          "x": 116.2834919,
+          "y": 40.1574011,
+          "floor": 0,
+          "tags": [
+            "coffee",
+            "cafe",
+            "rest"
+          ]
+        },
+        {
+          "id": "node_auto_749d92cc",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_749d92cc",
+          "nodeType": "path_node",
+          "x": 116.2834173,
+          "y": 40.1585794,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_368469db",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_368469db",
+          "nodeType": "path_node",
+          "x": 116.2834828,
+          "y": 40.1586212,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        },
+        {
+          "id": "node_auto_e65b2fce",
+          "sceneId": "scene_bupt_campus",
+          "name": "校医院",
+          "nodeType": "poi",
+          "x": 116.2836538,
+          "y": 40.1586545,
+          "floor": 0,
+          "tags": []
+        },
+        {
+          "id": "node_auto_0d7e756e",
+          "sceneId": "scene_bupt_campus",
+          "name": "node_auto_0d7e756e",
+          "nodeType": "path_node",
+          "x": 116.2837375,
+          "y": 40.1586156,
+          "floor": 0,
+          "tags": [
+            "nav_only",
+            "outdoor"
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "id": "edge_鸿雁路双向_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_west_gate",
+          "toNodeId": "node_auto_dda662aa",
+          "distanceMeters": 338.33436939607486,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dda662aa",
+          "toNodeId": "node_west_gate",
+          "distanceMeters": 338.33436939607486,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dda662aa",
+          "toNodeId": "node_auto_bd0b10a0",
+          "distanceMeters": 2.9738341309714214,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_bd0b10a0",
+          "toNodeId": "node_auto_dda662aa",
+          "distanceMeters": 2.9738341309714214,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_bd0b10a0",
+          "toNodeId": "node_auto_a7fa77ee",
+          "distanceMeters": 136.6520104567908,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a7fa77ee",
+          "toNodeId": "node_auto_bd0b10a0",
+          "distanceMeters": 136.6520104567908,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a7fa77ee",
+          "toNodeId": "node_auto_c205cd29",
+          "distanceMeters": 158.36735702389737,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c205cd29",
+          "toNodeId": "node_auto_a7fa77ee",
+          "distanceMeters": 158.36735702389737,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c205cd29",
+          "toNodeId": "node_auto_8bee4a0c",
+          "distanceMeters": 167.3916068849441,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8bee4a0c",
+          "toNodeId": "node_auto_c205cd29",
+          "distanceMeters": 167.3916068849441,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8bee4a0c",
+          "toNodeId": "node_auto_0ef18f17",
+          "distanceMeters": 111.54285975364273,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0ef18f17",
+          "toNodeId": "node_auto_8bee4a0c",
+          "distanceMeters": 111.54285975364273,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_07",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0ef18f17",
+          "toNodeId": "node_auto_6f6a85a1",
+          "distanceMeters": 10.89018830487974,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_07_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_6f6a85a1",
+          "toNodeId": "node_auto_0ef18f17",
+          "distanceMeters": 10.89018830487974,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_08",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_6f6a85a1",
+          "toNodeId": "node_auto_d412f5bb",
+          "distanceMeters": 111.70252595564432,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_08_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d412f5bb",
+          "toNodeId": "node_auto_6f6a85a1",
+          "distanceMeters": 111.70252595564432,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_09",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d412f5bb",
+          "toNodeId": "node_auto_f00fdaaf",
+          "distanceMeters": 166.41064055815457,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_09_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_f00fdaaf",
+          "toNodeId": "node_auto_d412f5bb",
+          "distanceMeters": 166.41064055815457,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_10",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_f00fdaaf",
+          "toNodeId": "node_auto_ffbf01a5",
+          "distanceMeters": 52.24717250648649,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_10_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ffbf01a5",
+          "toNodeId": "node_auto_f00fdaaf",
+          "distanceMeters": 52.24717250648649,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_11",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ffbf01a5",
+          "toNodeId": "node_auto_eb53bb21",
+          "distanceMeters": 105.31066553067387,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_11_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_eb53bb21",
+          "toNodeId": "node_auto_ffbf01a5",
+          "distanceMeters": 105.31066553067387,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_12",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_eb53bb21",
+          "toNodeId": "node_auto_8e350144",
+          "distanceMeters": 43.617532152403264,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_12_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8e350144",
+          "toNodeId": "node_auto_eb53bb21",
+          "distanceMeters": 43.617532152403264,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_13",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8e350144",
+          "toNodeId": "node_auto_78877ff3",
+          "distanceMeters": 55.28088936557908,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_13_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_78877ff3",
+          "toNodeId": "node_auto_8e350144",
+          "distanceMeters": 55.28088936557908,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_14",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_78877ff3",
+          "toNodeId": "node_auto_d761f6be",
+          "distanceMeters": 37.53816589712667,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_14_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d761f6be",
+          "toNodeId": "node_auto_78877ff3",
+          "distanceMeters": 37.53816589712667,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_15",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d761f6be",
+          "toNodeId": "node_auto_b8d7697a",
+          "distanceMeters": 4.571434347937703,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_15_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_b8d7697a",
+          "toNodeId": "node_auto_d761f6be",
+          "distanceMeters": 4.571434347937703,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_16",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_b8d7697a",
+          "toNodeId": "node_auto_30d0c647",
+          "distanceMeters": 335.27901160877394,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_16_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_30d0c647",
+          "toNodeId": "node_auto_b8d7697a",
+          "distanceMeters": 335.27901160877394,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_17",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_30d0c647",
+          "toNodeId": "node_west_gate",
+          "distanceMeters": 7.155004014789511,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_鸿雁路双向_17_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_west_gate",
+          "toNodeId": "node_auto_30d0c647",
+          "distanceMeters": 7.155004014789511,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_80e976d7",
+          "toNodeId": "node_auto_7974b54a",
+          "distanceMeters": 28.59326628072756,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7974b54a",
+          "toNodeId": "node_auto_80e976d7",
+          "distanceMeters": 28.59326628072756,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7974b54a",
+          "toNodeId": "node_auto_47c33906",
+          "distanceMeters": 71.24966179558882,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_47c33906",
+          "toNodeId": "node_auto_7974b54a",
+          "distanceMeters": 71.24966179558882,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_47c33906",
+          "toNodeId": "node_auto_32f0bbcb",
+          "distanceMeters": 57.87028793852036,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_32f0bbcb",
+          "toNodeId": "node_auto_47c33906",
+          "distanceMeters": 57.87028793852036,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_32f0bbcb",
+          "toNodeId": "node_auto_b8d7697a",
+          "distanceMeters": 48.71109570741171,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_b8d7697a",
+          "toNodeId": "node_auto_32f0bbcb",
+          "distanceMeters": 48.71109570741171,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_b8d7697a",
+          "toNodeId": "node_auto_dda662aa",
+          "distanceMeters": 9.462952245623738,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dda662aa",
+          "toNodeId": "node_auto_b8d7697a",
+          "distanceMeters": 9.462952245623738,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dda662aa",
+          "toNodeId": "node_auto_56725248",
+          "distanceMeters": 55.201810607972,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_56725248",
+          "toNodeId": "node_auto_dda662aa",
+          "distanceMeters": 55.201810607972,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_07",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_56725248",
+          "toNodeId": "node_auto_3ddb59d3",
+          "distanceMeters": 9.624532014398836,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉西路_07_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3ddb59d3",
+          "toNodeId": "node_auto_56725248",
+          "distanceMeters": 9.624532014398836,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_f86a9a56",
+          "toNodeId": "node_auto_9a3ea23f",
+          "distanceMeters": 36.37408236765328,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_9a3ea23f",
+          "toNodeId": "node_auto_f86a9a56",
+          "distanceMeters": 36.37408236765328,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_9a3ea23f",
+          "toNodeId": "node_auto_909f6887",
+          "distanceMeters": 42.37244254018321,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_909f6887",
+          "toNodeId": "node_auto_9a3ea23f",
+          "distanceMeters": 42.37244254018321,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_909f6887",
+          "toNodeId": "node_auto_3d4941df",
+          "distanceMeters": 6.825083297793948,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3d4941df",
+          "toNodeId": "node_auto_909f6887",
+          "distanceMeters": 6.825083297793948,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3d4941df",
+          "toNodeId": "node_auto_eb53bb21",
+          "distanceMeters": 92.38236028818211,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_eb53bb21",
+          "toNodeId": "node_auto_3d4941df",
+          "distanceMeters": 92.38236028818211,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_eb53bb21",
+          "toNodeId": "node_auto_a7fa77ee",
+          "distanceMeters": 9.47720466805112,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a7fa77ee",
+          "toNodeId": "node_auto_eb53bb21",
+          "distanceMeters": 9.47720466805112,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a7fa77ee",
+          "toNodeId": "node_auto_0e51c6cf",
+          "distanceMeters": 143.17846705966795,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0e51c6cf",
+          "toNodeId": "node_auto_a7fa77ee",
+          "distanceMeters": 143.17846705966795,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_07",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0e51c6cf",
+          "toNodeId": "node_auto_20f9808d",
+          "distanceMeters": 80.98081599231175,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_07_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_20f9808d",
+          "toNodeId": "node_auto_0e51c6cf",
+          "distanceMeters": 80.98081599231175,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_08",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_20f9808d",
+          "toNodeId": "node_auto_38a3d81f",
+          "distanceMeters": 38.159010622597094,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_08_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_38a3d81f",
+          "toNodeId": "node_auto_20f9808d",
+          "distanceMeters": 38.159010622597094,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_09",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_38a3d81f",
+          "toNodeId": "node_auto_ff642114",
+          "distanceMeters": 48.83688219452733,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉中街_09_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ff642114",
+          "toNodeId": "node_auto_38a3d81f",
+          "distanceMeters": 48.83688219452733,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_2d645e0f",
+          "toNodeId": "node_auto_01f899dd",
+          "distanceMeters": 14.16238168756831,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_01f899dd",
+          "toNodeId": "node_auto_2d645e0f",
+          "distanceMeters": 14.16238168756831,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_01f899dd",
+          "toNodeId": "node_auto_dd92bd14",
+          "distanceMeters": 47.71951039892321,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dd92bd14",
+          "toNodeId": "node_auto_01f899dd",
+          "distanceMeters": 47.71951039892321,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dd92bd14",
+          "toNodeId": "node_auto_5b2cab16",
+          "distanceMeters": 56.71638316680185,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5b2cab16",
+          "toNodeId": "node_auto_dd92bd14",
+          "distanceMeters": 56.71638316680185,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5b2cab16",
+          "toNodeId": "node_auto_f00fdaaf",
+          "distanceMeters": 34.12790750633873,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_f00fdaaf",
+          "toNodeId": "node_auto_5b2cab16",
+          "distanceMeters": 34.12790750633873,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_f00fdaaf",
+          "toNodeId": "node_auto_c205cd29",
+          "distanceMeters": 11.715227966546134,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c205cd29",
+          "toNodeId": "node_auto_f00fdaaf",
+          "distanceMeters": 11.715227966546134,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c205cd29",
+          "toNodeId": "node_教学实验综合楼N入口",
+          "distanceMeters": 33.764793912861315,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_教学实验综合楼N入口",
+          "toNodeId": "node_auto_c205cd29",
+          "distanceMeters": 33.764793912861315,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_07",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_教学实验综合楼N入口",
+          "toNodeId": "node_教学实验综合楼S入口",
+          "distanceMeters": 53.72228382735883,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_07_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_教学实验综合楼S入口",
+          "toNodeId": "node_教学实验综合楼N入口",
+          "distanceMeters": 53.72228382735883,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_08",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_教学实验综合楼S入口",
+          "toNodeId": "node_auto_0f7af2ec",
+          "distanceMeters": 52.71482144821266,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_08_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0f7af2ec",
+          "toNodeId": "node_教学实验综合楼S入口",
+          "distanceMeters": 52.71482144821266,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_09",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0f7af2ec",
+          "toNodeId": "node_auto_244b633c",
+          "distanceMeters": 56.33810265315538,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_09_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_244b633c",
+          "toNodeId": "node_auto_0f7af2ec",
+          "distanceMeters": 56.33810265315538,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_10",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_244b633c",
+          "toNodeId": "node_auto_3b079b90",
+          "distanceMeters": 24.759281812418727,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_10_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3b079b90",
+          "toNodeId": "node_auto_244b633c",
+          "distanceMeters": 24.759281812418727,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_11",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3b079b90",
+          "toNodeId": "node_auto_adc8c985",
+          "distanceMeters": 136.56340114979497,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉路_11_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_adc8c985",
+          "toNodeId": "node_auto_3b079b90",
+          "distanceMeters": 136.56340114979497,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d5f1c86a",
+          "toNodeId": "node_auto_d412f5bb",
+          "distanceMeters": 140.3513122284872,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d412f5bb",
+          "toNodeId": "node_auto_d5f1c86a",
+          "distanceMeters": 140.3513122284872,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d412f5bb",
+          "toNodeId": "node_auto_8bee4a0c",
+          "distanceMeters": 11.201392688056982,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8bee4a0c",
+          "toNodeId": "node_auto_d412f5bb",
+          "distanceMeters": 11.201392688056982,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8bee4a0c",
+          "toNodeId": "node_auto_7df18f8d",
+          "distanceMeters": 119.79523165428407,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7df18f8d",
+          "toNodeId": "node_auto_8bee4a0c",
+          "distanceMeters": 119.79523165428407,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7df18f8d",
+          "toNodeId": "node_auto_5b97ba55",
+          "distanceMeters": 21.463807715572784,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5b97ba55",
+          "toNodeId": "node_auto_7df18f8d",
+          "distanceMeters": 21.463807715572784,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5b97ba55",
+          "toNodeId": "node_auto_3c28d197",
+          "distanceMeters": 80.47277043205284,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3c28d197",
+          "toNodeId": "node_auto_5b97ba55",
+          "distanceMeters": 80.47277043205284,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3c28d197",
+          "toNodeId": "node_auto_6c7ce605",
+          "distanceMeters": 132.67855555876503,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_国脉东路_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_6c7ce605",
+          "toNodeId": "node_auto_3c28d197",
+          "distanceMeters": 132.67855555876503,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_雁北中路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_47c33906",
+          "toNodeId": "node_auto_3ca15c5a",
+          "distanceMeters": 103.99693688380331,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_雁北中路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3ca15c5a",
+          "toNodeId": "node_auto_47c33906",
+          "distanceMeters": 103.99693688380331,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_雁北中路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3ca15c5a",
+          "toNodeId": "node_auto_909f6887",
+          "distanceMeters": 36.5896771451251,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_雁北中路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_909f6887",
+          "toNodeId": "node_auto_3ca15c5a",
+          "distanceMeters": 36.5896771451251,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_9a3ea23f",
+          "toNodeId": "node_auto_adc4c8c9",
+          "distanceMeters": 65.76569842059396,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_adc4c8c9",
+          "toNodeId": "node_auto_9a3ea23f",
+          "distanceMeters": 65.76569842059396,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_adc4c8c9",
+          "toNodeId": "node_auto_1a6ca9d9",
+          "distanceMeters": 9.550998434415934,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1a6ca9d9",
+          "toNodeId": "node_auto_adc4c8c9",
+          "distanceMeters": 9.550998434415934,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1a6ca9d9",
+          "toNodeId": "node_auto_ec5e90e9",
+          "distanceMeters": 29.321867472467773,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ec5e90e9",
+          "toNodeId": "node_auto_1a6ca9d9",
+          "distanceMeters": 29.321867472467773,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ec5e90e9",
+          "toNodeId": "node_auto_01f899dd",
+          "distanceMeters": 53.192992852235996,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_医前路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_01f899dd",
+          "toNodeId": "node_auto_ec5e90e9",
+          "distanceMeters": 53.192992852235996,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0e51c6cf",
+          "toNodeId": "node_auto_64a2378f",
+          "distanceMeters": 17.77919083493959,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_64a2378f",
+          "toNodeId": "node_auto_0e51c6cf",
+          "distanceMeters": 17.77919083493959,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_64a2378f",
+          "toNodeId": "node_auto_455fba32",
+          "distanceMeters": 37.68013999052967,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_455fba32",
+          "toNodeId": "node_auto_64a2378f",
+          "distanceMeters": 37.68013999052967,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_455fba32",
+          "toNodeId": "node_auto_0f7af2ec",
+          "distanceMeters": 104.619355096931,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0f7af2ec",
+          "toNodeId": "node_auto_455fba32",
+          "distanceMeters": 104.619355096931,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0f7af2ec",
+          "toNodeId": "node_auto_2fa6de36",
+          "distanceMeters": 111.77026519017438,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_2fa6de36",
+          "toNodeId": "node_auto_0f7af2ec",
+          "distanceMeters": 111.77026519017438,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_2fa6de36",
+          "toNodeId": "node_auto_5b97ba55",
+          "distanceMeters": 66.99070423107445,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖北路_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5b97ba55",
+          "toNodeId": "node_auto_2fa6de36",
+          "distanceMeters": 66.99070423107445,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_20f9808d",
+          "toNodeId": "node_南区食堂入口",
+          "distanceMeters": 28.479701712367838,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_南区食堂入口",
+          "toNodeId": "node_auto_20f9808d",
+          "distanceMeters": 28.479701712367838,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_南区食堂入口",
+          "toNodeId": "node_auto_ad9ac6f3",
+          "distanceMeters": 65.27150797480842,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ad9ac6f3",
+          "toNodeId": "node_南区食堂入口",
+          "distanceMeters": 65.27150797480842,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ad9ac6f3",
+          "toNodeId": "node_auto_3b079b90",
+          "distanceMeters": 66.91333348377698,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3b079b90",
+          "toNodeId": "node_auto_ad9ac6f3",
+          "distanceMeters": 66.91333348377698,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3b079b90",
+          "toNodeId": "node_auto_3c28d197",
+          "distanceMeters": 183.81034384320157,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_湖南路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3c28d197",
+          "toNodeId": "node_auto_3b079b90",
+          "distanceMeters": 183.81034384320157,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking",
+            "bicycle"
+          ],
+          "idealSpeed": {
+            "bicycle": 252,
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_924932e9",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_图书馆入口",
+          "toNodeId": "node_auto_5b2cab16",
+          "distanceMeters": 27.2575770810844,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_924932e9_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5b2cab16",
+          "toNodeId": "node_图书馆入口",
+          "distanceMeters": 27.2575770810844,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3d4941df",
+          "toNodeId": "node_教工食堂入口",
+          "distanceMeters": 19.571414834399725,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_教工食堂入口",
+          "toNodeId": "node_auto_3d4941df",
+          "distanceMeters": 19.571414834399725,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_教工食堂入口",
+          "toNodeId": "node_风味食堂入口",
+          "distanceMeters": 22.00979124281233,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_风味食堂入口",
+          "toNodeId": "node_教工食堂入口",
+          "distanceMeters": 22.00979124281233,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_风味食堂入口",
+          "toNodeId": "node_auto_26b4560b",
+          "distanceMeters": 20.66089094158783,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_26b4560b",
+          "toNodeId": "node_风味食堂入口",
+          "distanceMeters": 20.66089094158783,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_26b4560b",
+          "toNodeId": "node_auto_a5b8aaea",
+          "distanceMeters": 12.005564660574548,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a5b8aaea",
+          "toNodeId": "node_auto_26b4560b",
+          "distanceMeters": 12.005564660574548,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a5b8aaea",
+          "toNodeId": "node_auto_dd92bd14",
+          "distanceMeters": 85.4950001877355,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_1281176b_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_dd92bd14",
+          "toNodeId": "node_auto_a5b8aaea",
+          "distanceMeters": 85.4950001877355,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_34b106f6",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1a6ca9d9",
+          "toNodeId": "node_auto_a5b8aaea",
+          "distanceMeters": 47.37643810806351,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_34b106f6_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a5b8aaea",
+          "toNodeId": "node_auto_1a6ca9d9",
+          "distanceMeters": 47.37643810806351,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_26b4560b",
+          "toNodeId": "node_天猫超市入口",
+          "distanceMeters": 23.555875520337455,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_天猫超市入口",
+          "toNodeId": "node_auto_26b4560b",
+          "distanceMeters": 23.555875520337455,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_天猫超市入口",
+          "toNodeId": "node_auto_c4a4a221",
+          "distanceMeters": 27.03711299658926,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c4a4a221",
+          "toNodeId": "node_天猫超市入口",
+          "distanceMeters": 27.03711299658926,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c4a4a221",
+          "toNodeId": "node_auto_24becaa8",
+          "distanceMeters": 26.16752636337466,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_24becaa8",
+          "toNodeId": "node_auto_c4a4a221",
+          "distanceMeters": 26.16752636337466,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_24becaa8",
+          "toNodeId": "node_auto_7d5bc3fd",
+          "distanceMeters": 46.358443015770156,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7d5bc3fd",
+          "toNodeId": "node_auto_24becaa8",
+          "distanceMeters": 46.358443015770156,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7d5bc3fd",
+          "toNodeId": "node_auto_ffbf01a5",
+          "distanceMeters": 15.458829275710578,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_13dfd5c8_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ffbf01a5",
+          "toNodeId": "node_auto_7d5bc3fd",
+          "distanceMeters": 15.458829275710578,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_edf04ff5",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7d5bc3fd",
+          "toNodeId": "node_学活入口",
+          "distanceMeters": 10.361594025629504,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_edf04ff5_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_学活入口",
+          "toNodeId": "node_auto_7d5bc3fd",
+          "distanceMeters": 10.361594025629504,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_58cf2946",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_地下超市入口",
+          "toNodeId": "node_auto_8e350144",
+          "distanceMeters": 15.458812151325153,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_58cf2946_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8e350144",
+          "toNodeId": "node_地下超市入口",
+          "distanceMeters": 15.458812151325153,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_地下超市入口",
+          "toNodeId": "node_auto_26fe3287",
+          "distanceMeters": 16.814209093511526,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_26fe3287",
+          "toNodeId": "node_地下超市入口",
+          "distanceMeters": 16.814209093511526,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_26fe3287",
+          "toNodeId": "node_auto_be06d284",
+          "distanceMeters": 18.452059220918308,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_be06d284",
+          "toNodeId": "node_auto_26fe3287",
+          "distanceMeters": 18.452059220918308,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_be06d284",
+          "toNodeId": "node_auto_6ad6fdff",
+          "distanceMeters": 28.052498285706758,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_6ad6fdff",
+          "toNodeId": "node_auto_be06d284",
+          "distanceMeters": 28.052498285706758,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_6ad6fdff",
+          "toNodeId": "node_auto_419d05ec",
+          "distanceMeters": 22.97865952927658,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_419d05ec",
+          "toNodeId": "node_auto_6ad6fdff",
+          "distanceMeters": 22.97865952927658,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_419d05ec",
+          "toNodeId": "node_auto_ddf5600f",
+          "distanceMeters": 18.147385856749242,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ddf5600f",
+          "toNodeId": "node_auto_419d05ec",
+          "distanceMeters": 18.147385856749242,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ddf5600f",
+          "toNodeId": "node_auto_78877ff3",
+          "distanceMeters": 19.143492667863644,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_地超内部路_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_78877ff3",
+          "toNodeId": "node_auto_ddf5600f",
+          "distanceMeters": 19.143492667863644,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_21ecbae2_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_32f0bbcb",
+          "toNodeId": "node_auto_16a2f89c",
+          "distanceMeters": 103.55873102066222,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_21ecbae2_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_16a2f89c",
+          "toNodeId": "node_auto_32f0bbcb",
+          "distanceMeters": 103.55873102066222,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_21ecbae2_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_16a2f89c",
+          "toNodeId": "node_auto_1ab758d7",
+          "distanceMeters": 49.15491213530628,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_21ecbae2_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1ab758d7",
+          "toNodeId": "node_auto_16a2f89c",
+          "distanceMeters": 49.15491213530628,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_244b633c",
+          "toNodeId": "node_auto_c45ad539",
+          "distanceMeters": 30.716235587602576,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c45ad539",
+          "toNodeId": "node_auto_244b633c",
+          "distanceMeters": 30.716235587602576,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c45ad539",
+          "toNodeId": "node_auto_569cadc9",
+          "distanceMeters": 12.140219337179131,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_569cadc9",
+          "toNodeId": "node_auto_c45ad539",
+          "distanceMeters": 12.140219337179131,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_569cadc9",
+          "toNodeId": "node_auto_5e62e73b",
+          "distanceMeters": 13.17518013431629,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5e62e73b",
+          "toNodeId": "node_auto_569cadc9",
+          "distanceMeters": 13.17518013431629,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_5e62e73b",
+          "toNodeId": "node_auto_fdb222c0",
+          "distanceMeters": 15.706983734406311,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_fdb222c0",
+          "toNodeId": "node_auto_5e62e73b",
+          "distanceMeters": 15.706983734406311,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_fdb222c0",
+          "toNodeId": "node_auto_a1d18526",
+          "distanceMeters": 9.220520803539117,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a1d18526",
+          "toNodeId": "node_auto_fdb222c0",
+          "distanceMeters": 9.220520803539117,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a1d18526",
+          "toNodeId": "node_auto_776c4e48",
+          "distanceMeters": 8.13298074961402,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_776c4e48",
+          "toNodeId": "node_auto_a1d18526",
+          "distanceMeters": 8.13298074961402,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_07",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_776c4e48",
+          "toNodeId": "node_auto_7062d344",
+          "distanceMeters": 19.840881254241218,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_07_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7062d344",
+          "toNodeId": "node_auto_776c4e48",
+          "distanceMeters": 19.840881254241218,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_08",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_7062d344",
+          "toNodeId": "node_auto_9b49dea9",
+          "distanceMeters": 14.866339520350865,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_08_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_9b49dea9",
+          "toNodeId": "node_auto_7062d344",
+          "distanceMeters": 14.866339520350865,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_09",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_9b49dea9",
+          "toNodeId": "node_auto_8a026331",
+          "distanceMeters": 11.764855927796997,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_09_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8a026331",
+          "toNodeId": "node_auto_9b49dea9",
+          "distanceMeters": 11.764855927796997,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_10",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_8a026331",
+          "toNodeId": "node_auto_b39c330f",
+          "distanceMeters": 10.301279682012467,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_10_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_b39c330f",
+          "toNodeId": "node_auto_8a026331",
+          "distanceMeters": 10.301279682012467,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_11",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_b39c330f",
+          "toNodeId": "node_auto_1e2deaf4",
+          "distanceMeters": 10.942663257786851,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_11_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1e2deaf4",
+          "toNodeId": "node_auto_b39c330f",
+          "distanceMeters": 10.942663257786851,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_12",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1e2deaf4",
+          "toNodeId": "node_auto_455fba32",
+          "distanceMeters": 5.4240055510344956,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_d3cf6c72_12_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_455fba32",
+          "toNodeId": "node_auto_1e2deaf4",
+          "distanceMeters": 5.4240055510344956,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_244b633c",
+          "toNodeId": "node_auto_298f4be4",
+          "distanceMeters": 15.642350827892178,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_298f4be4",
+          "toNodeId": "node_auto_244b633c",
+          "distanceMeters": 15.642350827892178,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_298f4be4",
+          "toNodeId": "node_auto_3563bb2c",
+          "distanceMeters": 10.050573229550004,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3563bb2c",
+          "toNodeId": "node_auto_298f4be4",
+          "distanceMeters": 10.050573229550004,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3563bb2c",
+          "toNodeId": "node_auto_2b5d8572",
+          "distanceMeters": 10.572215714046106,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_2b5d8572",
+          "toNodeId": "node_auto_3563bb2c",
+          "distanceMeters": 10.572215714046106,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_2b5d8572",
+          "toNodeId": "node_auto_d9555501",
+          "distanceMeters": 10.494107027918904,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d9555501",
+          "toNodeId": "node_auto_2b5d8572",
+          "distanceMeters": 10.494107027918904,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_d9555501",
+          "toNodeId": "node_auto_401462a0",
+          "distanceMeters": 17.264081599510778,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_401462a0",
+          "toNodeId": "node_auto_d9555501",
+          "distanceMeters": 17.264081599510778,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_06",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_401462a0",
+          "toNodeId": "node_auto_3947aadc",
+          "distanceMeters": 9.209983663202284,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_06_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3947aadc",
+          "toNodeId": "node_auto_401462a0",
+          "distanceMeters": 9.209983663202284,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_07",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_3947aadc",
+          "toNodeId": "node_auto_36ac20c9",
+          "distanceMeters": 10.735185450011446,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_07_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_36ac20c9",
+          "toNodeId": "node_auto_3947aadc",
+          "distanceMeters": 10.735185450011446,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_08",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_36ac20c9",
+          "toNodeId": "node_auto_4142ed44",
+          "distanceMeters": 21.45537580020181,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_08_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_4142ed44",
+          "toNodeId": "node_auto_36ac20c9",
+          "distanceMeters": 21.45537580020181,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_09",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_4142ed44",
+          "toNodeId": "node_auto_452b7f2f",
+          "distanceMeters": 4.985982890289878,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_09_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_452b7f2f",
+          "toNodeId": "node_auto_4142ed44",
+          "distanceMeters": 4.985982890289878,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_10",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_452b7f2f",
+          "toNodeId": "node_auto_61619eb8",
+          "distanceMeters": 10.482091486635303,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_10_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_61619eb8",
+          "toNodeId": "node_auto_452b7f2f",
+          "distanceMeters": 10.482091486635303,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_11",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_61619eb8",
+          "toNodeId": "node_auto_1ab5cdf2",
+          "distanceMeters": 11.898284652438912,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_11_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1ab5cdf2",
+          "toNodeId": "node_auto_61619eb8",
+          "distanceMeters": 11.898284652438912,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_12",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_1ab5cdf2",
+          "toNodeId": "node_auto_0fc50e7a",
+          "distanceMeters": 12.839600841942199,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_12_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0fc50e7a",
+          "toNodeId": "node_auto_1ab5cdf2",
+          "distanceMeters": 12.839600841942199,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_13",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0fc50e7a",
+          "toNodeId": "node_auto_a3440b2e",
+          "distanceMeters": 13.425579080731126,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_13_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a3440b2e",
+          "toNodeId": "node_auto_0fc50e7a",
+          "distanceMeters": 13.425579080731126,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_14",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_a3440b2e",
+          "toNodeId": "node_auto_2fa6de36",
+          "distanceMeters": 16.357455741195125,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_69418930_14_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_2fa6de36",
+          "toNodeId": "node_auto_a3440b2e",
+          "distanceMeters": 16.357455741195125,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_630c02c8",
+          "toNodeId": "node_auto_74b8def9",
+          "distanceMeters": 4.410472097648161,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_74b8def9",
+          "toNodeId": "node_auto_630c02c8",
+          "distanceMeters": 4.410472097648161,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_74b8def9",
+          "toNodeId": "node_auto_05fb54fb",
+          "distanceMeters": 4.435717404677822,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_05fb54fb",
+          "toNodeId": "node_auto_74b8def9",
+          "distanceMeters": 4.435717404677822,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_05fb54fb",
+          "toNodeId": "node_auto_517eca7a",
+          "distanceMeters": 11.649477452009299,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_517eca7a",
+          "toNodeId": "node_auto_05fb54fb",
+          "distanceMeters": 11.649477452009299,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_517eca7a",
+          "toNodeId": "node_auto_234f0a36",
+          "distanceMeters": 8.01317410003429,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_6ada15a4_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_234f0a36",
+          "toNodeId": "node_auto_517eca7a",
+          "distanceMeters": 8.01317410003429,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_7796c4c0",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_05fb54fb",
+          "toNodeId": "node_auto_c4a4a221",
+          "distanceMeters": 17.2729891379268,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_7796c4c0_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_c4a4a221",
+          "toNodeId": "node_auto_05fb54fb",
+          "distanceMeters": 17.2729891379268,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_01",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_adc4c8c9",
+          "toNodeId": "node_auto_749d92cc",
+          "distanceMeters": 18.784109862603433,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_01_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_749d92cc",
+          "toNodeId": "node_auto_adc4c8c9",
+          "distanceMeters": 18.784109862603433,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_02",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_749d92cc",
+          "toNodeId": "node_auto_368469db",
+          "distanceMeters": 7.251717605520585,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_02_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_368469db",
+          "toNodeId": "node_auto_749d92cc",
+          "distanceMeters": 7.251717605520585,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_03",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_368469db",
+          "toNodeId": "node_auto_e65b2fce",
+          "distanceMeters": 14.996252382323972,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_03_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_e65b2fce",
+          "toNodeId": "node_auto_368469db",
+          "distanceMeters": 14.996252382323972,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_04",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_e65b2fce",
+          "toNodeId": "node_auto_0d7e756e",
+          "distanceMeters": 8.324933597250297,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_04_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0d7e756e",
+          "toNodeId": "node_auto_e65b2fce",
+          "distanceMeters": 8.324933597250297,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_05",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_0d7e756e",
+          "toNodeId": "node_auto_ec5e90e9",
+          "distanceMeters": 14.083131831652636,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        },
+        {
+          "id": "edge_auto_38c4494d_05_rev",
+          "sceneId": "scene_bupt_campus",
+          "fromNodeId": "node_auto_ec5e90e9",
+          "toNodeId": "node_auto_0d7e756e",
+          "distanceMeters": 14.083131831652636,
+          "congestionFactor": 0,
+          "allowedModes": [
+            "walking"
+          ],
+          "idealSpeed": {
+            "walking": 84
+          },
+          "isIndoor": false
+        }
+      ]
+    }
+  ]
+}

@@ -15,7 +15,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
 | P1 | Map demo verification | AMap component exists, converts WGS84 to GCJ-02, and optional Playwright harness exists | Screenshot proof still depends on a valid `VITE_AMAP_KEY`, backend server, and local Playwright install | Run `bash scripts/check_map_frontend_optional.sh` in a prepared demo environment |
-| P2 | Real map data repeatability | Local dev DB now has OSM graph/buildings plus AMap/OSM POIs; seed layers are hidden by default | Re-running live imports still depends on network availability and external map service quotas | Use documented import scripts and keep fallback seed for tests |
+| P2 | Real map data repeatability | Local dev DB now can use offline BUPT reference topology plus AMap/OSM POIs; seed layers are hidden by default | OSM/AMap live imports still depend on network/quota, but reference campus import is offline | Use `backend/scripts/import_reference_campus.py --replace-campus-layers` for repeatable campus routing |
 
 ## Requirement Coverage By Module
 
