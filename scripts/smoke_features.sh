@@ -18,7 +18,7 @@ from app.services.facility_service import get_nearby_facilities_from_db
 from app.services.food_service import nearby_foods_from_db, recommend_foods_from_db
 from app.services.map_data_service import get_map_stats_from_db
 from app.services.recommendation_service import recommend_destinations_from_db
-from app.services.route_service import plan_route_from_db
+from app.services.route_service import plan_multi_point_route_from_db, plan_route_from_db
 from app.services.search_service import search_places_from_db
 
 
@@ -72,6 +72,26 @@ with Session(engine) as session:
     print(
         "[smoke] route: "
         f"distance={route['distance']}m duration={route['duration']}s steps={len(route['steps'])}"
+    )
+
+    multi_route = plan_multi_point_route_from_db(
+        session,
+        {
+            "start_lng": 116.28333,
+            "start_lat": 40.15608,
+            "points": [
+                {"name": "教学楼", "lng": 116.2842, "lat": 40.1567},
+                {"name": "图书馆", "lng": 116.2862, "lat": 40.1582},
+            ],
+            "return_to_start": False,
+            "strategy": "shortest_distance",
+            "mode": "walk",
+        },
+    )
+    require("multi-point route segments", len(multi_route["segments"]), 2)
+    print(
+        "[smoke] multi-point route: "
+        f"distance={multi_route['distance']}m segments={len(multi_route['segments'])}"
     )
 
     facilities = get_nearby_facilities_from_db(

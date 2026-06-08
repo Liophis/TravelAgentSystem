@@ -50,6 +50,15 @@ export interface RoutePlanPayload {
   path: Coordinate[];
   node_ids?: number[];
   steps: Array<{ text: string; distance: number }>;
+  visit_order?: Array<{ index: number; name: string; lng: number; lat: number }>;
+  segments?: Array<{
+    from: string;
+    to: string;
+    distance: number;
+    duration: number;
+    path: Coordinate[];
+    node_ids?: number[];
+  }>;
   algorithm_trace: Record<string, string>;
 }
 

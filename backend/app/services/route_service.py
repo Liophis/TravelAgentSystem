@@ -78,10 +78,147 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
     }
 
 
+def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, Any]:
+    points = list(payload.get("points") or [])
+    if not points:
+        raise RouteNotFoundError("At least one destination point is required.")
+
+    current = {
+        "name": "起点",
+        "lng": float(payload["start_lng"]),
+        "lat": float(payload["start_lat"]),
+    }
+    start = dict(current)
+    remaining = [
+        {
+            "index": index,
+            "name": point.get("name") or f"终点 {index + 1}",
+            "lng": float(point["lng"]),
+            "lat": float(point["lat"]),
+        }
+        for index, point in enumerate(points)
+    ]
+    segments = []
+    visit_order = []
+    full_path: list[list[float]] = []
+    node_ids: list[int] = []
+    total_distance = 0
+    total_duration = 0
+
+    while remaining:
+        best_index, best_route = _nearest_route(session, current, remaining, payload)
+        target = remaining.pop(best_index)
+        segment = _serialize_segment(current, target, best_route)
+        segments.append(segment)
+        visit_order.append(target)
+        total_distance += int(best_route["distance"])
+        total_duration += int(best_route["duration"])
+        _extend_path(full_path, best_route["path"])
+        node_ids.extend(best_route.get("node_ids", []))
+        current = target
+
+    if payload.get("return_to_start"):
+        return_route = _plan_between(session, current, start, payload)
+        segments.append(_serialize_segment(current, start, return_route))
+        total_distance += int(return_route["distance"])
+        total_duration += int(return_route["duration"])
+        _extend_path(full_path, return_route["path"])
+        node_ids.extend(return_route.get("node_ids", []))
+
+    return {
+        "strategy": payload.get("strategy", "shortest_distance"),
+        "mode": payload.get("mode", "walk"),
+        "distance": total_distance,
+        "duration": total_duration,
+        "path": full_path,
+        "node_ids": _dedupe_ints(node_ids),
+        "visit_order": visit_order,
+        "segments": segments,
+        "steps": _build_multi_point_steps(segments),
+        "algorithm_trace": {
+            "stage": "stage-12-multi-point-route",
+            "algorithm": "Greedy TSP approximation, each candidate leg scored by Dijkstra graph distance",
+            "points": str(len(points)),
+            "segments": str(len(segments)),
+            "return_to_start": str(bool(payload.get("return_to_start"))),
+        },
+    }
+
+
 def _resolve_weight(strategy: str | None) -> WeightMode:
     if strategy in {"shortest_time", "fastest"}:
         return "duration"
     return "distance"
+
+
+def _nearest_route(
+    session: Session,
+    current: dict[str, Any],
+    remaining: list[dict[str, Any]],
+    payload: dict[str, Any],
+) -> tuple[int, dict[str, Any]]:
+    scored = []
+    for index, point in enumerate(remaining):
+        route = _plan_between(session, current, point, payload)
+        scored.append((int(route["distance"]), index, route))
+    scored.sort(key=lambda item: (item[0], item[1]))
+    _, index, route = scored[0]
+    return index, route
+
+
+def _plan_between(
+    session: Session,
+    start: dict[str, Any],
+    end: dict[str, Any],
+    payload: dict[str, Any],
+) -> dict[str, Any]:
+    return plan_route_from_db(
+        session,
+        {
+            "start_lng": start["lng"],
+            "start_lat": start["lat"],
+            "end_lng": end["lng"],
+            "end_lat": end["lat"],
+            "strategy": payload.get("strategy", "shortest_distance"),
+            "mode": payload.get("mode", "walk"),
+        },
+    )
+
+
+def _serialize_segment(start: dict[str, Any], end: dict[str, Any], route: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "from": start["name"],
+        "to": end["name"],
+        "distance": route["distance"],
+        "duration": route["duration"],
+        "path": route["path"],
+        "node_ids": route.get("node_ids", []),
+    }
+
+
+def _extend_path(full_path: list[list[float]], segment_path: list[list[float]]) -> None:
+    for coordinate in segment_path:
+        if full_path and approximate_distance_meters(tuple(full_path[-1]), tuple(coordinate)) < 0.5:
+            continue
+        full_path.append(coordinate)
+
+
+def _dedupe_ints(values: list[int]) -> list[int]:
+    results = []
+    for value in values:
+        if not results or results[-1] != value:
+            results.append(value)
+    return results
+
+
+def _build_multi_point_steps(segments: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "text": f"第 {index} 段：{segment['from']} 到 {segment['to']}",
+            "distance": segment["distance"],
+        }
+        for index, segment in enumerate(segments, start=1)
+    ]
 
 
 def build_path_coordinates(

@@ -52,7 +52,7 @@
 - [x] Single-route planning uses seeded `map_nodes` / `map_edges` and Dijkstra instead of mock route data.
 - [x] Route scaffold is drawn as polyline on map.
 - [x] Route drawing calls fit-view behavior after rendering.
-- [ ] Multi-point planning returns optimized order and closed loop.
+- [x] Multi-point planning returns optimized order and closed loop.
 - [x] Nearby facilities are sorted by graph distance, not straight-line distance.
 - [x] Nearby facility query filters by category before route-distance ranking.
 - [x] Nearby facility query returns Top-K results with route paths for AMap drawing.

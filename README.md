@@ -114,6 +114,9 @@ curl http://127.0.0.1:8000/api/v1/map/stats
 curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"end_lng":116.2862,"end_lat":40.1582}'
+curl -X POST http://127.0.0.1:8000/api/v1/routes/multi-point \
+  -H 'Content-Type: application/json' \
+  -d '{"start_lng":116.28333,"start_lat":40.15608,"points":[{"name":"教学楼","lng":116.2842,"lat":40.1567},{"name":"图书馆","lng":116.2862,"lat":40.1582}],"return_to_start":true}'
 curl 'http://127.0.0.1:8000/api/v1/facilities/nearby?current_lng=116.28333&current_lat=40.15608&category=water&radius=5000&limit=3'
 curl 'http://127.0.0.1:8000/api/v1/destinations?category=campus&q=导览点&limit=5'
 curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=厕所&limit=5'
@@ -154,6 +157,7 @@ If the configured `OSM_DEFAULT_PLACE` is not found by Nominatim, the importer fa
 - `docs/stage_9_food_aigc_admin.md`: food recommendation, AIGC placeholders, and admin dashboard notes.
 - `docs/stage_10_final_docs.md`: final documentation and demo-readiness notes.
 - `docs/stage_11_mainline_hardening.md`: smoke, merge-marker, and frontend error-handling hardening notes.
+- `docs/stage_12_multi_point_routes.md`: multi-point route planning notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

@@ -6,11 +6,11 @@ from app.algorithms.route_planning import (
     build_bidirectional_graph,
     dijkstra_shortest_path,
 )
-from app.api.v1.routes import RoutePlanRequest, plan_route
+from app.api.v1.routes import MultiPointRouteRequest, RoutePlanRequest, RoutePointRequest, plan_multi_point_route, plan_route
 from app.db.init_db import create_all
 from app.seed.sample_data import BUPT_SHAHE_CENTER
 from app.seed.seed_all import seed_demo_data
-from app.services.route_service import plan_route_from_db
+from app.services.route_service import plan_multi_point_route_from_db, plan_route_from_db
 
 
 def test_dijkstra_prefers_shorter_weighted_path() -> None:
@@ -67,3 +67,52 @@ def test_route_api_handler_uses_seeded_database() -> None:
     assert route["algorithm_trace"]["topology_source"] == "map_nodes/map_edges seeded database"
     assert route["distance"] > 0
     assert route["path"][0] == [116.28333, 40.15608]
+
+
+def test_multi_point_route_returns_visit_order_and_segments() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        route = plan_multi_point_route_from_db(
+            session,
+            {
+                "start_lng": BUPT_SHAHE_CENTER[0],
+                "start_lat": BUPT_SHAHE_CENTER[1],
+                "points": [
+                    {"name": "A", "lng": BUPT_SHAHE_CENTER[0] + 0.0015, "lat": BUPT_SHAHE_CENTER[1] + 0.0012},
+                    {"name": "B", "lng": BUPT_SHAHE_CENTER[0] + 0.0005, "lat": BUPT_SHAHE_CENTER[1] + 0.0004},
+                ],
+                "return_to_start": True,
+                "strategy": "shortest_distance",
+                "mode": "walk",
+            },
+        )
+
+    assert route["algorithm_trace"]["stage"] == "stage-12-multi-point-route"
+    assert len(route["visit_order"]) == 2
+    assert len(route["segments"]) == 3
+    assert route["distance"] > 0
+    assert len(route["path"]) >= 3
+
+
+def test_multi_point_route_api_handler() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        route = plan_multi_point_route(
+            MultiPointRouteRequest(
+                points=[
+                    RoutePointRequest(lng=116.2842, lat=40.1567, name="教学楼"),
+                    RoutePointRequest(lng=116.2862, lat=40.1582, name="图书馆"),
+                ]
+            ),
+            session,
+        )
+
+    assert route["mode"] == "walk"
+    assert len(route["segments"]) == 2
+    assert route["steps"][0]["text"].startswith("第 1 段")

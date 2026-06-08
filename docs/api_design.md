@@ -7,6 +7,7 @@ Base path: `/api/v1`.
 - `GET /map/stats`
 - `GET /map/geojson`
 - `POST /routes/plan`
+- `POST /routes/multi-point`
 - `GET /facilities/nearby`
 
 ## Search And Recommendation

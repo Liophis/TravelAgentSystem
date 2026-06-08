@@ -34,3 +34,15 @@ Supported weights:
 ## Nearby Facilities
 
 Nearby facility search filters facility category first, then computes graph distance from the current point to each candidate facility and returns Top-K by distance.
+
+## Multi-Point Route
+
+`POST /api/v1/routes/multi-point` accepts a start point and 1-12 destination points. The service uses a greedy TSP approximation: for each step, it evaluates remaining destinations by actual Dijkstra graph distance and visits the nearest next point. It returns:
+
+- optimized `visit_order`
+- route `segments`
+- merged `path`
+- total `distance`
+- total `duration`
+
+`return_to_start=true` adds a final segment back to the origin.
