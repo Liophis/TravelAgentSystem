@@ -37,7 +37,7 @@ Search targets:
 - destination category
 - interest tags and keywords
 
-Search results can be sorted by popularity or rating. Place search may still include buildings/facilities for map and route input, but that is a separate campus navigation workflow, not the tourism recommendation candidate pool.
+Search results can be sorted by popularity or rating. Place search may still include buildings/facilities/named topology nodes for map and route input, but that is a separate campus navigation workflow, not the tourism recommendation candidate pool.
 
 ## Food Recommendation
 

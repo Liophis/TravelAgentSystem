@@ -52,6 +52,7 @@ Supported route place IDs in the BUPT campus navigation UI are the IDs returned 
 
 - `building-8`
 - `facility-203`
+- `node-42`
 
 `destination-{id}` remains available only for backward-compatible API calls. It should not be exposed as a campus route endpoint.
 

@@ -76,6 +76,13 @@ def test_place_search_scope_separates_campus_navigation_from_tourism_destination
             limit=5,
             scope="campus",
         )
+        initial_campus_results = search_places_from_db(
+            session,
+            keyword="",
+            category=None,
+            limit=20,
+            scope="campus",
+        )
 
     assert destination_results["items"][0]["source"] == "destination"
     assert campus_results["scope"] == "campus"
@@ -83,6 +90,8 @@ def test_place_search_scope_separates_campus_navigation_from_tourism_destination
     assert all(item["source"] in {"building", "facility"} for item in campus_results["items"])
     assert all(item["source"] in {"building", "facility"} for item in facility_results["items"])
     assert any(item["source"] == "facility" for item in facility_results["items"])
+    assert initial_campus_results["items"]
+    assert all(item["source"] in {"building", "facility", "node"} for item in initial_campus_results["items"])
 
 
 def test_recommendations_return_top_10_with_reasons() -> None:

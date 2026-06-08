@@ -3,7 +3,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models import Building, Destination, Facility
+from app.models import Building, Destination, Facility, MapNode
 
 BUPT_SHAHE_CAMPUS_BOUNDS = {
     "min_lng": 116.2770,
@@ -23,14 +23,15 @@ def search_places_from_db(
     normalized_keyword = keyword.casefold().strip()
     normalized_scope = _normalize_scope(scope)
     results: list[dict[str, Any]] = []
-    if normalized_keyword:
+    if normalized_keyword or normalized_scope == "campus":
         if normalized_scope in {"all", "destinations"}:
             results.extend(_search_destinations(session, normalized_keyword, category))
         if normalized_scope in {"all", "campus"}:
             results.extend(_search_buildings(session, normalized_keyword, category, campus_only=normalized_scope == "campus"))
             results.extend(_search_facilities(session, normalized_keyword, category, campus_only=normalized_scope == "campus"))
+            results.extend(_search_map_nodes(session, normalized_keyword, category, campus_only=normalized_scope == "campus"))
 
-    ranked = sorted(results, key=lambda item: (item["rank"], item["source"], item["name"]))[:limit]
+    ranked = sorted(results, key=lambda item: (item["rank"], _source_priority(item["source"], normalized_scope), item["name"]))[:limit]
     for item in ranked:
         item.pop("rank", None)
     return {
@@ -155,6 +156,40 @@ def _search_facilities(
     return results
 
 
+def _search_map_nodes(
+    session: Session,
+    keyword: str,
+    category: str | None,
+    campus_only: bool = False,
+) -> list[dict[str, Any]]:
+    if category and category not in {"node", "campus_node", "route_node"}:
+        return []
+    nodes = session.scalars(select(MapNode).order_by(MapNode.id)).all()
+    results = []
+    for node in nodes:
+        if not node.name:
+            continue
+        if campus_only and not _is_in_bupt_shahe_bounds(node.lng, node.lat):
+            continue
+        text = " ".join([node.name, node.external_id, "campus_node", "route_node"]).casefold()
+        if keyword and keyword not in text:
+            continue
+        results.append(
+            {
+                "id": f"node-{node.id}",
+                "source": "node",
+                "source_id": node.id,
+                "name": node.name,
+                "category": "campus_node",
+                "lng": node.lng,
+                "lat": node.lat,
+                "description": "BUPT Shahe named topology node.",
+                "rank": _rank(node.name, "campus_node", keyword),
+            }
+        )
+    return results
+
+
 def _normalize_scope(scope: str | None) -> str:
     if scope in {"all", "destinations", "campus"}:
         return scope
@@ -164,8 +199,23 @@ def _normalize_scope(scope: str | None) -> str:
 def _scope_sources(scope: str) -> str:
     return {
         "destinations": "destinations",
-        "campus": "BUPT Shahe campus buildings, facilities",
+        "campus": "BUPT Shahe campus buildings, facilities, named topology nodes",
     }.get(scope, "destinations, buildings, facilities")
+
+
+def _source_priority(source: str, scope: str) -> int:
+    if scope == "campus":
+        return {
+            "node": 0,
+            "building": 1,
+            "facility": 2,
+        }.get(source, 9)
+    return {
+        "destination": 0,
+        "building": 1,
+        "facility": 2,
+        "node": 3,
+    }.get(source, 9)
 
 
 def _building_center(polygon: list[list[float]]) -> tuple[float, float]:

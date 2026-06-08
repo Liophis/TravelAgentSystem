@@ -359,6 +359,17 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
             "lng": lng,
             "lat": lat,
         }
+    if source == "node":
+        node = session.get(MapNode, model_id)
+        if node is None:
+            raise RouteNotFoundError(f"Map node {place_id} was not found.")
+        return {
+            "id": place_id,
+            "source": "node",
+            "name": node.name or f"道路节点 {node.id}",
+            "lng": node.lng,
+            "lat": node.lat,
+        }
     raise RouteNotFoundError(f"Unsupported route place id: {place_id}.")
 
 

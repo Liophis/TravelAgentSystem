@@ -16,7 +16,7 @@ Input:
 - `mode`
 - `route_source`
 
-The user-facing campus navigation page is scoped to 北京邮电大学沙河校区内部场所. It should prefer `start_place_id` and `end_place_id` selected from `GET /api/v1/search/places?scope=campus`, which returns only campus buildings and facilities inside the BUPT Shahe coordinate boundary. Raw coordinates remain as a fallback for debugging, imported data issues, and algorithm tests.
+The user-facing campus navigation page is scoped to 北京邮电大学沙河校区内部场所. It should prefer `start_place_id` and `end_place_id` selected from `GET /api/v1/search/places?scope=campus`, which returns only campus buildings, facilities, and named topology nodes inside the BUPT Shahe coordinate boundary. Raw coordinates remain as a fallback for debugging, imported data issues, and algorithm tests.
 
 Output:
 
@@ -47,6 +47,7 @@ If a place ID is provided, the service resolves it first:
 
 - `building-{id}` uses the building polygon center
 - `facility-{id}` uses facility coordinates
+- `node-{id}` uses a named `map_nodes` coordinate from the imported campus topology
 
 Then the resolved coordinate is snapped to the nearest graph node.
 

@@ -57,7 +57,7 @@
 
 - [x] Navigation scope is school/campus internal after a campus destination is selected.
 - [x] RoutePlannerPage is labeled as 北京邮电大学沙河校区内部场所导航, not cross-city tourism routing.
-- [x] `GET /api/v1/search/places?scope=campus` returns only BUPT Shahe campus buildings/facilities and excludes nationwide attraction/school destinations.
+- [x] `GET /api/v1/search/places?scope=campus` returns only BUPT Shahe campus buildings/facilities/named topology nodes and excludes nationwide attraction/school destinations.
 - [x] Map page displays roads, buildings, and facilities.
 - [x] Map page scaffold uses AMap JS API for rendering.
 - [x] Backend map data and route topology boundary is documented as OSMnx/OpenStreetMap, not AMap routing.
@@ -70,7 +70,7 @@
 - [x] Building polygons clear old overlays before filters redraw.
 - [x] Single-route planning returns path steps, distance, time, and mode.
 - [x] Single-route planning uses local `map_nodes` / `map_edges` and Dijkstra instead of mock route data.
-- [x] Route target can be selected by BUPT Shahe campus building/facility name, not only typed coordinates.
+- [x] Route target can be selected by BUPT Shahe campus building/facility/named topology node, not only typed coordinates.
 - [x] RoutePlannerPage defaults to `route_source=local_graph` over the imported BUPT Shahe campus topology.
 - [x] Route API can still use AMap walking directions when explicitly requested, while the campus navigation page defaults to local topology.
 - [x] Route API keeps `local_graph` mode for Dijkstra demonstration and network-free tests.

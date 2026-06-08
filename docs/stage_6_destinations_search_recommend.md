@@ -7,7 +7,7 @@ This stage implements the remaining recommendation and search work from the proj
 Destination scope:
 
 - Tourism recommendation candidates are real China attractions and schools/universities from `destinations`.
-- Campus buildings/facilities remain map and route entities; they are not mixed into the tourism recommendation candidate pool.
+- Campus buildings/facilities/named topology nodes remain map and route entities; they are not mixed into the tourism recommendation candidate pool.
 - Rating/popularity are deterministic demo signals so Top-K, hot sort, and rating sort remain repeatable in tests.
 
 ## Delivered
@@ -18,7 +18,7 @@ Destination scope:
 - Added place search across destinations, buildings, and facilities:
   - `GET /api/v1/search/places`
   - `scope=destinations` returns attraction/school destination records for tourism search.
-  - `scope=campus` returns only BUPT Shahe campus buildings/facilities for campus navigation endpoints.
+  - `scope=campus` returns only BUPT Shahe campus buildings/facilities/named topology nodes for campus navigation endpoints.
 - Added destination recommendation service and API:
   - `GET /api/v1/recommendations`
 - Recommendation uses:

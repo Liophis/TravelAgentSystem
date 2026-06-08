@@ -22,7 +22,7 @@ Base path: `/api/v1`.
 - `GET /destinations/{id}`
 - `GET /search/places`
   - `scope=destinations`: nationwide attraction/school destinations
-  - `scope=campus`: BUPT Shahe campus buildings/facilities only
+  - `scope=campus`: BUPT Shahe campus buildings/facilities/named topology nodes only
 - `GET /recommendations`
 
 Destination recommendation/search is for tourist attractions and schools/campuses. Campus navigation must use `scope=campus` so route endpoints do not come from the nationwide destination pool.

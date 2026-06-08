@@ -71,7 +71,7 @@ const modules = [
   },
   {
     title: "校内导航",
-    description: "选择校门、楼宇或设施，使用参考校园拓扑绘制校内路线。",
+    description: "选择校门、楼宇、设施或命名校内点，使用参考校园拓扑绘制校内路线。",
     path: "/routes",
   },
   {

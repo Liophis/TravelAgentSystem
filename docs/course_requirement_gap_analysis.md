@@ -23,7 +23,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | --- | --- | --- |
 | 旅游推荐 | Mostly covered | Recommendation candidates are 207 real China attraction/university destination records. Top-K heap, hot/rating/interest/behavior strategies, editable interests, favorites, ratings, browse logs, and recommendation refresh exist. |
 | 景点/学校查询 | Mostly covered | Destination list supports attraction/school keyword/category and hot/rating sort. `scope=destinations` keeps tourism search separate from campus route endpoints. |
-| 单点路线规划 | Mostly covered | RoutePlannerPage is scoped to BUPT Shahe campus-internal buildings/facilities via `scope=campus`; it defaults to local Dijkstra over the imported campus topology. AMap walking remains API-level optional behavior. |
+| 单点路线规划 | Mostly covered | RoutePlannerPage is scoped to BUPT Shahe campus-internal buildings/facilities/named topology nodes via `scope=campus`; it defaults to local Dijkstra over the imported campus topology. AMap walking remains API-level optional behavior. |
 | 多点路线规划 | Partial | Greedy multi-point route exists for BUPT Shahe campus-internal route planning and supports return-to-start, campus place IDs, and local-graph legs. Candidate ordering is still greedy approximation. |
 | 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |

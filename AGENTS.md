@@ -49,9 +49,9 @@ data/reference/     committed reference source data for real campus navigation i
 
 - Destination recommendation covers attractions and schools/campuses.
 - Destination search/recommendation uses `destinations` rows and `GET /api/v1/search/places?scope=destinations` when place-search autocomplete is needed.
-- Campus buildings/facilities are route and map entities, not tourism recommendation candidates unless also modeled in `destinations`.
+- Campus buildings/facilities/named topology nodes are route and map entities, not tourism recommendation candidates unless also modeled in `destinations`.
 - Navigation features are BUPT Shahe campus-internal for the current demo.
-- RoutePlannerPage endpoint autocomplete must use `GET /api/v1/search/places?scope=campus`, and must not expose `destination-{id}` as route endpoints.
+- RoutePlannerPage endpoint autocomplete must use `GET /api/v1/search/places?scope=campus`, may expose `building-{id}`, `facility-{id}`, and `node-{id}`, and must not expose `destination-{id}` as route endpoints.
 - Backend stores and plans routes using OSM/PostGIS data.
 - Manually supplied campus source files live under `data/reference/bupt-shahe/`.
 - `data/reference/bupt-shahe/raw_wgs84/` stores original WGS84 JSON/GeoJSON source layers.

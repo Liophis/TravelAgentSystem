@@ -23,7 +23,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索北邮沙河校区内场所"
+                placeholder="搜索北邮沙河校区内场所或校内点"
                 @change="handlePlaceChange('start', startPlaceId)"
               >
                 <el-option
@@ -43,7 +43,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索北邮沙河校区内场所"
+                placeholder="搜索北邮沙河校区内场所或校内点"
                 @change="handlePlaceChange('end', endPlaceId)"
               >
                 <el-option
@@ -77,7 +77,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索并选择多个校内地点"
+                placeholder="搜索并选择多个校内场所或校内点"
               >
                 <el-option
                   v-for="option in routeOptions"
@@ -219,12 +219,9 @@ const campusFacilities = computed<FacilityItem[]>(() =>
 
 async function searchRoutePlaces(query: string) {
   const keyword = query.trim();
-  if (!keyword) {
-    return;
-  }
   placeLoading.value = true;
   try {
-    const params = new URLSearchParams({ keyword, limit: "20", scope: "campus" });
+    const params = new URLSearchParams({ keyword, limit: keyword ? "30" : "100", scope: "campus" });
     const payload = await apiGet<SearchPlacesPayload>(`/api/v1/search/places?${params}`);
     mergeRouteOptions(payload.items.filter(isCampusRoutePlace));
     error.value = "";
@@ -249,12 +246,13 @@ function placeLabel(item: SearchPlaceItem) {
     {
       building: "楼宇",
       facility: "设施",
+      node: "校内点",
     }[item.source] ?? item.source;
   return `${item.name} · ${source}`;
 }
 
 function isCampusRoutePlace(item: SearchPlaceItem) {
-  return item.source === "building" || item.source === "facility";
+  return item.source === "building" || item.source === "facility" || item.source === "node";
 }
 
 function routeSourceLabel(source?: string) {
@@ -391,6 +389,7 @@ onMounted(async () => {
   } catch (requestError) {
     error.value = requestError instanceof Error ? requestError.message : "校园地图数据加载失败";
   }
+  await searchRoutePlaces("");
   await primeRouteOptions();
   void planRoute();
 });

@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/places")
 def search_places(
-    keyword: str = Query(min_length=1),
+    keyword: str = Query(default="", min_length=0),
     category: str | None = Query(default=None),
     scope: str = Query(default="all", pattern="^(all|destinations|campus)$"),
     limit: int = Query(default=20, ge=1, le=100),
