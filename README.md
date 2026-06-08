@@ -329,6 +329,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_31_admin_user_auth.md`: role-aware user/admin login-state implementation notes and acceptance criteria.
 - `docs/stage_32_aigc_agent.md`: AIGC Agent workflow implementation, API contract, trace schema, and acceptance criteria.
 - `docs/stage_33_campus_map_restore.md`: reset-safe BUPT Shahe campus map restore notes.
+- `docs/stage_34_nearby_facility_origin.md`: nearby-facility origin selection plan and acceptance criteria.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

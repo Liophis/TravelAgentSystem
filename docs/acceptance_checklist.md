@@ -94,6 +94,11 @@
 - [x] Nearby facility query filters by category before route-distance ranking.
 - [x] Nearby facility query returns Top-K results with route paths for AMap drawing.
 - [x] Nearby facility query supports category-name text input and fuzzy category lookup.
+- [ ] NearbyFacilitiesPage lets the user choose the current campus place/origin.
+- [ ] NearbyFacilitiesPage can set the origin from a map click.
+- [ ] Nearby facility API accepts `origin_place_id` and resolves it before Dijkstra ranking.
+- [ ] Coordinate inputs remain available only as fallback/debug controls.
+- [ ] Nearby facility result displays origin, resolved category, route distance, duration, and route path.
 
 ## Indoor Navigation
 

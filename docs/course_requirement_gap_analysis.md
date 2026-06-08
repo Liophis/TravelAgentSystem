@@ -16,6 +16,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
 | P1 | Map demo verification | AMap component exists, converts WGS84 to GCJ-02, and optional Playwright harness exists | Screenshot proof still depends on a valid `VITE_AMAP_KEY`, backend server, and local Playwright install | Run `bash scripts/check_map_frontend_optional.sh` in a prepared demo environment |
+| P1 | Nearby facility origin selection | Backend graph-distance ranking exists, but the page still defaults to a fixed BUPT center coordinate | Requirement says the user selects a scenic/campus place, then finds nearby facilities in range | Stage 34: add explicit origin place selector, map-click origin, and `origin_place_id` API support |
 | P2 | Real map data repeatability | `reset_dev_db.sh` now restores offline BUPT reference topology plus OSM building/POI layers; seed layers remain hidden by default | OSM/AMap live imports still depend on network/quota, but local demo reset is repeatable | Use `bash scripts/restore_campus_map.sh` when campus map layers need manual repair |
 
 ## Requirement Coverage By Module
@@ -29,7 +30,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
 | 室内导航 | Covered for demo | Indoor nodes/edges, cross-floor Dijkstra, elevator/stair steps, and frontend page are implemented. |
-| 场所查询 | Covered for demo | Category-name lookup, category filtering, graph distance, and Top-K heap are implemented. |
+| 场所查询 | Partial | Category-name lookup, category filtering, graph distance, and Top-K heap are implemented. The remaining gap is explicit user-selected origin: the page must let users choose a campus place or map click before querying nearby facilities. |
 | 旅游日记管理/交流 | Mostly covered | Text diary publish/list/detail/view/rating/comment/delete work, all-user list exists, admin delete exists, and image/video media URL metadata is supported. Browser multipart upload and richer moderation statuses remain optional enhancements. |
 | 日记热度/评分/兴趣推荐 | Covered for demo | Views are heat; list sort supports hot/rating; `GET /api/v1/diaries/recommend` uses views + rating + personal interest with Top-K heap. |
 | 目的地相关日记查询排序 | Covered for demo | `GET /api/v1/diaries?destination_id=...&sort=hot|rating` filters destination-related diaries and sorts by heat/rating. Frontend destination selector can be made more explicit in a polish stage. |
@@ -58,6 +59,9 @@ The main weakness is no longer API absence; it is browser-level verification dep
 
 6. Stage 32: AIGC Agent workflow.
    Implemented `POST /api/v1/aigc/agent/run`, kept legacy AIGC endpoints, and shows deterministic tool orchestration and trace on the frontend.
+
+7. Stage 34: nearby-facility origin selection.
+   Planned next stage: make NearbyFacilitiesPage select a campus origin/map-click point, send `origin_place_id` or clicked coordinates, and show origin plus route-distance Top-K results.
 
 ## Harness Commands
 

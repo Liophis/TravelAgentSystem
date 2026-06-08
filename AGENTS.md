@@ -66,6 +66,15 @@ data/external/      downloaded third-party OSM/AMap source payloads before clean
 - AMap overlays must receive `[lng, lat]`.
 - Default map center: `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
 
+## Nearby Facility Contract
+
+- Nearby facility search must be centered on an explicit user-selected origin.
+- Preferred origin input is `origin_place_id` from `GET /api/v1/search/places?scope=campus`.
+- Coordinate input is allowed only as map-click or debug fallback.
+- Results must be ranked by Dijkstra graph distance plus snap distance, never by straight-line distance.
+- Category lookup must support dropdown category codes and Chinese text aliases.
+- Frontend should show the origin, resolved category, Top-K route distance, and selected route polyline.
+
 ## AIGC Contract
 
 - AIGC animation remains a deterministic local simulation unless a real external model provider is explicitly configured.

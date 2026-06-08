@@ -25,6 +25,10 @@ Base path: `/api/v1`.
   - each point accepts `place_id` or coordinate fallback
   - passes `route_source` to each route leg
 - `GET /facilities/nearby`
+  - current stable parameters: `current_lng`, `current_lat`, `category`, `radius`, `limit`
+  - Stage 34 target: also accept `origin_place_id` from `GET /search/places?scope=campus`
+  - `origin_place_id` is preferred for normal users; coordinate input remains a map-click/debug fallback
+  - response should include origin, resolved category, Dijkstra route distance, route path, and Top-K trace
 
 ## Search And Recommendation
 
