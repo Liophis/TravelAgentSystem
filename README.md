@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 25 admin moderation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗、路线地点选择输入、高德真实步行路线兜底、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐，以及后台目的地/设施/美食编辑和游记审核删除。
+当前仓库处于 **Stage 27 real map layer cleanup** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、高德真实步行路线兜底、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理，以及真实优先地图图层：旧 seed 方框默认隐藏并已从本地库清理，当前本地库包含 2045 条 OSM 可视道路、188 个 OSM 建筑、516 个高德 POI 和 49 个 OSM POI。
 
 ## Target Stack
 
@@ -47,7 +47,7 @@ Set the AMap Web Service key only when importing real POIs:
 AMAP_WEB_API_KEY=your_amap_web_service_api_key
 ```
 
-The frontend `VITE_AMAP_KEY` is used only for browser rendering. Backend route topology still comes from OSMnx/OpenStreetMap or the deterministic seed graph. Backend `AMAP_WEB_API_KEY` is optional and only enriches local `facilities` with real AMap POIs; it does not call AMap routing.
+The frontend `VITE_AMAP_KEY` is used only for browser rendering. Backend map layers now prefer real imported data: OSMnx/OpenStreetMap for roads and building polygons, AMap Web Service for dense POIs, and OSM amenities as an additional POI source. The deterministic seed graph remains hidden by default and is retained for offline tests and local Dijkstra fallback.
 
 Default campus:
 
@@ -105,6 +105,7 @@ docker compose up --build
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
 bash scripts/smoke_features.sh
+bash scripts/clean_demo_map_layers.sh
 ```
 
 These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, 20 diaries, and sample user feedback rows.
@@ -121,6 +122,26 @@ Use `--reset-facilities` when you want AMap POIs to replace seeded facility poin
 
 ```bash
 PYTHONPATH=backend python backend/scripts/import_amap_pois.py --radius 3000 --max-pages 3 --request-interval 0.8 --reset-facilities
+```
+
+To remove old offline square building/facility layers:
+
+```bash
+bash scripts/clean_demo_map_layers.sh
+```
+
+To merge real OSM road graph, OSM building polygons, and OSM amenities while preserving AMap POIs:
+
+```bash
+python backend/scripts/import_osm_campus.py --source osmnx --graph-only --dist 1800
+python backend/scripts/import_osm_campus.py --source osmnx --features-only --dist 1800
+```
+
+The public map API hides seed/fallback layers by default. Use `include_demo=true` only for fallback inspection:
+
+```bash
+curl 'http://127.0.0.1:8000/api/v1/map/geojson'
+curl 'http://127.0.0.1:8000/api/v1/map/geojson?include_demo=true'
 ```
 
 The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run the backend from the repository root so the SQLite relative path matches `scripts/reset_dev_db.sh`:
@@ -242,6 +263,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_24_destination_food_scope.md`: restaurant destination linkage and scoped food API notes.
 - `docs/stage_25_admin_moderation.md`: admin edit endpoints and diary moderation notes.
 - `docs/stage_26_optional_map_smoke.md`: optional AMap browser screenshot smoke notes.
+- `docs/stage_27_real_map_layers.md`: real-priority OSM + AMap POI map layer cleanup and import notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

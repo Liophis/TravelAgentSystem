@@ -28,19 +28,22 @@ from app.models import (
 from app.services.amap_import_service import AMapPoiImportError, import_amap_pois_to_db
 from app.services.destination_service import serialize_destination
 from app.services.food_service import serialize_food
+from app.services.map_data_service import cleanup_demo_map_layers
 from app.services.osm_import_service import (
     OsmImportError,
     build_osmnx_payload,
     get_map_import_status,
     import_fixture_osm_payload,
+    import_osm_feature_layers_to_db,
     import_osm_payload_to_db,
+    import_osm_road_graph_to_db,
 )
 
 router = APIRouter()
 
 
 class MapImportRequest(BaseModel):
-    source: str = Field(default="fixture", description="fixture, osmnx, or amap_poi")
+    source: str = Field(default="fixture", description="fixture, osmnx, osmnx_graph, osmnx_features, or amap_poi")
     place_name: str | None = Field(default=None)
     center_lng: float | None = Field(default=None)
     center_lat: float | None = Field(default=None)
@@ -114,6 +117,33 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 dist=payload.dist or settings.osm_fallback_dist,
             )
             return import_osm_payload_to_db(db, osm_payload, reset_existing=payload.reset_existing)
+        if payload.source == "osmnx_features":
+            osm_payload = build_osmnx_payload(
+                place_name=payload.place_name or settings.osm_default_place,
+                center_lng=payload.center_lng or settings.osm_fallback_lng,
+                center_lat=payload.center_lat or settings.osm_fallback_lat,
+                dist=payload.dist or settings.osm_fallback_dist,
+            )
+            return import_osm_feature_layers_to_db(
+                db,
+                osm_payload,
+                remove_demo_layers=True,
+                replace_osm_layers=payload.reset_existing,
+                import_facilities=True,
+            )
+        if payload.source == "osmnx_graph":
+            osm_payload = build_osmnx_payload(
+                place_name=payload.place_name or settings.osm_default_place,
+                center_lng=payload.center_lng or settings.osm_fallback_lng,
+                center_lat=payload.center_lat or settings.osm_fallback_lat,
+                dist=payload.dist or settings.osm_fallback_dist,
+            )
+            return import_osm_road_graph_to_db(
+                db,
+                osm_payload,
+                replace_osm_roads=payload.reset_existing,
+                rebind_facilities=True,
+            )
         if payload.source == "amap_poi":
             return import_amap_pois_to_db(
                 session=db,
@@ -134,6 +164,11 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
         raise HTTPException(status_code=502, detail=f"Map import failed: {exc}") from exc
 
     raise HTTPException(status_code=400, detail="Unsupported import source.")
+
+
+@router.post("/map/cleanup-demo-layers")
+def cleanup_demo_layers(db: Session = Depends(get_db)) -> dict:
+    return cleanup_demo_map_layers(db, remove_buildings=True, remove_facilities=True)
 
 
 @router.get("/diaries")

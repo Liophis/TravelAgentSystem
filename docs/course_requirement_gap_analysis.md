@@ -6,17 +6,16 @@ Source: `要求.md`. The current source file contains a complete functional-requ
 
 The project has a runnable MVP for the main demo chain: destination recommendation, destination search, map display, single-route planning, multi-point route planning, nearby facilities, diary community, diary compression, food recommendation, AIGC placeholder, and admin stats.
 
-The main weakness is no longer API absence; it is demo-data and visual-verification depth. Several features are still simplified demos where the course requirement asks for richer operational management or verified real map interaction:
+The main weakness is no longer API absence; it is browser-level verification depth. Several features are still simplified demos where the course requirement asks for verified real map interaction:
 
 - browser-level map verification requires optional AMap key and Playwright environment
-- real building/walkable-topology richness when external map data is sparse
 
 ## Highest-Risk Gaps
 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
 | P1 | Map demo verification | AMap component exists, converts WGS84 to GCJ-02, and optional Playwright harness exists | Screenshot proof still depends on a valid `VITE_AMAP_KEY`, backend server, and local Playwright install | Run `bash scripts/check_map_frontend_optional.sh` in a prepared demo environment |
-| P2 | Real map data richness | Dense deterministic BUPT seed is documented as offline fallback; OSM import path exists; AMap POI importer exists; clean live AMap import replaced facility seed with 516 real facility rows locally | Building polygons and walkable campus topology may still be sparse if OSM data is incomplete | Keep OSM/manual graph data for routes and use AMap import for POI density |
+| P2 | Real map data repeatability | Local dev DB now has OSM graph/buildings plus AMap/OSM POIs; seed layers are hidden by default | Re-running live imports still depends on network availability and external map service quotas | Use documented import scripts and keep fallback seed for tests |
 
 ## Requirement Coverage By Module
 
@@ -48,7 +47,10 @@ The main weakness is no longer API absence; it is demo-data and visual-verificat
 3. Stage 25: admin moderation and editing.
    Implemented destination/facility/food edit endpoints and diary moderation delete flow.
 
-4. Optional browser map smoke.
+4. Stage 27: real map layer cleanup and OSM+POI merge.
+   Implemented real-priority map APIs, seed-layer cleanup, OSM road graph import, OSM building/amenity import, AMap POI preservation, and facility rebind.
+
+5. Optional browser map smoke.
    `bash scripts/check_map_frontend_optional.sh` skips cleanly without key/browser and runs screenshot verification when the environment is prepared.
 
 ## Harness Commands

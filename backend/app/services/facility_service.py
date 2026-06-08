@@ -7,11 +7,11 @@ from app.algorithms.ranking import top_k_smallest
 from app.algorithms.route_planning import (
     GraphEdge,
     GraphNode,
+    NearestNode,
     RouteNotFoundError,
     approximate_distance_meters,
     build_bidirectional_graph,
     dijkstra_shortest_path,
-    find_nearest_node,
 )
 from app.models import Facility, FacilityCategory, MapEdge, MapNode
 from app.services.route_service import build_path_coordinates
@@ -30,24 +30,23 @@ def get_nearby_facilities_from_db(
         raise RouteNotFoundError("No map edges are available.")
 
     start = (current_lng, current_lat)
-    start_snap = find_nearest_node(current_lng, current_lat, nodes)
-    nodes_by_id = {node.id: node for node in nodes}
     graph = build_bidirectional_graph(edges)
+    components = _connected_components(nodes, edges)
 
     resolved_category = _resolve_category_code(session, category)
     candidates = _load_facilities(session, resolved_category)
     enriched = []
     for facility in candidates:
-        facility_node = _resolve_facility_node(facility, nodes, nodes_by_id)
         facility_point = (facility.lng, facility.lat)
         try:
-            route = dijkstra_shortest_path(graph, start_snap.node.id, facility_node.id)
+            start_snap, facility_snap = _snap_to_best_component(start, facility_point, components)
+            route = dijkstra_shortest_path(graph, start_snap.node.id, facility_snap.node.id)
         except RouteNotFoundError:
             continue
 
         facility_snap_distance = approximate_distance_meters(
             facility_point,
-            (facility_node.lng, facility_node.lat),
+            (facility_snap.node.lng, facility_snap.node.lat),
         )
         distance = start_snap.distance + route.graph_distance + facility_snap_distance
         if distance > radius:
@@ -62,10 +61,10 @@ def get_nearby_facilities_from_db(
                 "lng": facility.lng,
                 "lat": facility.lat,
                 "description": facility.description,
-                "nearest_node_id": facility_node.id,
+                "nearest_node_id": facility_snap.node.id,
                 "distance": round(distance),
                 "duration": round(route.graph_duration + (start_snap.distance + facility_snap_distance) / 1.2),
-                "routePath": build_path_coordinates(start, facility_point, start_snap.node, facility_node, route.edges),
+                "routePath": build_path_coordinates(start, facility_point, start_snap.node, facility_snap.node, route.edges),
                 "node_ids": route.node_ids,
             }
         )
@@ -88,6 +87,7 @@ def get_nearby_facilities_from_db(
             "returned": str(len(ranked)),
             "nodes": str(len(nodes)),
             "edges": str(len(edges)),
+            "connected_components": str(len(components)),
         },
     }
 
@@ -164,11 +164,53 @@ def _resolve_category_code(session: Session, category: str | None) -> str | None
     return category
 
 
-def _resolve_facility_node(
-    facility: Facility,
-    nodes: list[GraphNode],
-    nodes_by_id: dict[int, GraphNode],
-) -> GraphNode:
-    if facility.nearest_node_id and facility.nearest_node_id in nodes_by_id:
-        return nodes_by_id[facility.nearest_node_id]
-    return find_nearest_node(facility.lng, facility.lat, nodes).node
+def _connected_components(nodes: list[GraphNode], edges: list[GraphEdge]) -> list[list[GraphNode]]:
+    node_by_id = {node.id: node for node in nodes}
+    adjacency: dict[int, set[int]] = {}
+    for edge in edges:
+        adjacency.setdefault(edge.from_node_id, set()).add(edge.to_node_id)
+        adjacency.setdefault(edge.to_node_id, set()).add(edge.from_node_id)
+
+    components: list[list[GraphNode]] = []
+    visited: set[int] = set()
+    for node_id in adjacency:
+        if node_id in visited:
+            continue
+        stack = [node_id]
+        visited.add(node_id)
+        component_nodes: list[GraphNode] = []
+        while stack:
+            current = stack.pop()
+            node = node_by_id.get(current)
+            if node is not None:
+                component_nodes.append(node)
+            for next_id in adjacency.get(current, set()):
+                if next_id not in visited:
+                    visited.add(next_id)
+                    stack.append(next_id)
+        if component_nodes:
+            components.append(component_nodes)
+    return components
+
+
+def _snap_to_best_component(
+    start: tuple[float, float],
+    facility_point: tuple[float, float],
+    components: list[list[GraphNode]],
+) -> tuple[NearestNode, NearestNode]:
+    best: tuple[float, NearestNode, NearestNode] | None = None
+    for component_nodes in components:
+        start_snap = _nearest_node_in_component(start, component_nodes)
+        facility_snap = _nearest_node_in_component(facility_point, component_nodes)
+        score = start_snap.distance + facility_snap.distance
+        if best is None or score < best[0]:
+            best = (score, start_snap, facility_snap)
+    if best is None:
+        raise RouteNotFoundError("No connected route graph component is available.")
+    _, start_snap, facility_snap = best
+    return start_snap, facility_snap
+
+
+def _nearest_node_in_component(target: tuple[float, float], nodes: list[GraphNode]) -> NearestNode:
+    node = min(nodes, key=lambda item: approximate_distance_meters(target, (item.lng, item.lat)))
+    return NearestNode(node=node, distance=approximate_distance_meters(target, (node.lng, node.lat)))

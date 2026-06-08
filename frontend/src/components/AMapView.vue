@@ -77,6 +77,8 @@ function drawOverlays() {
     const marker = new AMap.Marker({
       position,
       title: facility.name,
+      content: `<div class="facility-dot"></div>`,
+      offset: new AMap.Pixel(-5, -5),
     });
     marker.on("click", () => {
       if (!infoWindow) {
@@ -174,5 +176,14 @@ watch(
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)),
     repeating-linear-gradient(45deg, #eef2f7 0, #eef2f7 10px, #e2e8f0 10px, #e2e8f0 20px);
+}
+
+:global(.facility-dot) {
+  width: 10px;
+  height: 10px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #0f766e;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.28);
 }
 </style>

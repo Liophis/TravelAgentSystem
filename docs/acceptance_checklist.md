@@ -12,12 +12,14 @@
 
 - [x] Seed users count >= 10.
 - [x] Destinations count >= 200.
-- [ ] At least one real OSM campus/scenic map can be imported.
+- [x] At least one real OSM campus/scenic map can be imported.
 - [x] Deterministic campus seed is documented as offline fallback, not real collected data.
 - [x] AMap Web Service POI import path exists for real facility enrichment.
 - [x] AMap POI import converts GCJ-02 coordinates to backend WGS84 before storage.
 - [x] AMap POI import de-duplicates repeated keyword hits.
 - [x] AMap POI live import has been run with a real key and produced 516 clean BUPT Shahe surrounding facility rows after replacing offline facility seed rows.
+- [x] OSMnx live import has been run for BUPT Shahe fallback point and produced 681 OSM nodes, 2045 OSM road edges, 188 building polygons, and 49 OSM POIs.
+- [x] Old offline square building polygons are removed from the local dev DB and hidden by default from public map APIs.
 - [x] `map_edges` count >= 450.
 - [x] `buildings` count >= 60.
 - [x] `facilities` count >= 120.

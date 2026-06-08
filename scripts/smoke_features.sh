@@ -35,10 +35,12 @@ def require(label: str, value: int, minimum: int = 1) -> None:
 engine = create_app_engine(settings.api_database_url)
 
 with Session(engine) as session:
-    stats = get_map_stats_from_db(session)
-    require("map nodes", stats["nodes"])
-    require("map roads", stats["roads"])
-    print(f"[smoke] map: {stats}")
+    visible_stats = get_map_stats_from_db(session)
+    raw_stats = get_map_stats_from_db(session, include_demo=True)
+    require("map nodes", raw_stats["nodes"])
+    require("route graph roads", raw_stats["roads"])
+    print(f"[smoke] map visible: {visible_stats}")
+    print(f"[smoke] map raw: {raw_stats}")
 
     destinations = list_destinations_from_db(session, None, None, "popularity", 3, 0)
     require("destinations", destinations["total"])

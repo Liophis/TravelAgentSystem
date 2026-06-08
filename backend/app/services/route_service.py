@@ -7,12 +7,12 @@ from app.core.config import settings
 from app.algorithms.route_planning import (
     GraphEdge,
     GraphNode,
+    NearestNode,
     RouteNotFoundError,
     WeightMode,
     approximate_distance_meters,
     build_bidirectional_graph,
     dijkstra_shortest_path,
-    find_nearest_node,
 )
 from app.models import Building, Destination, Facility, MapEdge, MapNode
 from app.services.amap_route_service import AMapRouteError, plan_amap_walking_route
@@ -68,8 +68,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
     if not edges:
         raise RouteNotFoundError(f"No map edges are available for mode {mode}.")
 
-    start_snap = find_nearest_node(start[0], start[1], nodes)
-    end_snap = find_nearest_node(end[0], end[1], nodes)
+    start_snap, end_snap, component_count = _find_connected_snaps(start, end, nodes, edges)
     weight = _resolve_weight(payload.get("strategy"))
 
     route = dijkstra_shortest_path(
@@ -104,6 +103,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
             "congestion_model": "duration = distance / (ideal_speed * congestion)",
             "nodes": str(len(nodes)),
             "edges": str(len(edges)),
+            "connected_components": str(component_count),
             "start_node_id": str(start_snap.node.id),
             "end_node_id": str(end_snap.node.id),
             "rendering": "AMap Polyline on frontend",
@@ -180,6 +180,60 @@ def _resolve_weight(strategy: str | None) -> WeightMode:
     if strategy in {"shortest_time", "fastest", "transport_time", "mixed_time"}:
         return "duration"
     return "distance"
+
+
+def _find_connected_snaps(
+    start: tuple[float, float],
+    end: tuple[float, float],
+    nodes: list[GraphNode],
+    edges: list[GraphEdge],
+) -> tuple[NearestNode, NearestNode, int]:
+    node_by_id = {node.id: node for node in nodes}
+    adjacency: dict[int, set[int]] = {}
+    for edge in edges:
+        adjacency.setdefault(edge.from_node_id, set()).add(edge.to_node_id)
+        adjacency.setdefault(edge.to_node_id, set()).add(edge.from_node_id)
+
+    components: list[list[GraphNode]] = []
+    visited: set[int] = set()
+    for node_id in adjacency:
+        if node_id in visited:
+            continue
+        stack = [node_id]
+        visited.add(node_id)
+        component_nodes: list[GraphNode] = []
+        while stack:
+            current = stack.pop()
+            node = node_by_id.get(current)
+            if node is not None:
+                component_nodes.append(node)
+            for next_id in adjacency.get(current, set()):
+                if next_id not in visited:
+                    visited.add(next_id)
+                    stack.append(next_id)
+        if component_nodes:
+            components.append(component_nodes)
+
+    if not components:
+        raise RouteNotFoundError("No connected route graph component is available.")
+
+    best: tuple[float, NearestNode, NearestNode] | None = None
+    for component_nodes in components:
+        start_snap = _nearest_node_in_component(start, component_nodes)
+        end_snap = _nearest_node_in_component(end, component_nodes)
+        score = start_snap.distance + end_snap.distance
+        if best is None or score < best[0]:
+            best = (score, start_snap, end_snap)
+
+    if best is None:
+        raise RouteNotFoundError("No reachable node pair is available.")
+    _, start_snap, end_snap = best
+    return start_snap, end_snap, len(components)
+
+
+def _nearest_node_in_component(target: tuple[float, float], nodes: list[GraphNode]) -> NearestNode:
+    node = min(nodes, key=lambda item: approximate_distance_meters(target, (item.lng, item.lat)))
+    return NearestNode(node=node, distance=approximate_distance_meters(target, (node.lng, node.lat)))
 
 
 def _normalize_route_source(route_source: str | None) -> str:

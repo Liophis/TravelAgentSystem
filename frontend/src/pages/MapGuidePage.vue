@@ -3,7 +3,7 @@
     <div class="page-heading">
       <div>
         <h1>地图导览</h1>
-        <p>高德地图负责展示，后端接口提供 OSM 道路、建筑和设施数据。</p>
+        <p>高德地图负责展示，后端提供真实优先的道路、OSM 建筑和高德/OSM 设施图层。</p>
       </div>
       <el-select v-model="category" placeholder="设施类别" clearable class="category-select">
         <el-option
@@ -24,6 +24,8 @@
           <div class="stat"><span>建筑</span><strong>{{ payload?.statistics.buildings ?? "-" }}</strong></div>
           <div class="stat"><span>设施</span><strong>{{ filteredFacilities.length }}</strong></div>
           <div class="stat"><span>类别</span><strong>{{ payload?.statistics.categories ?? "-" }}</strong></div>
+          <div class="stat"><span>隐藏演示建筑</span><strong>{{ payload?.statistics.hidden_demo_buildings ?? "-" }}</strong></div>
+          <div class="stat"><span>隐藏演示道路</span><strong>{{ payload?.statistics.hidden_demo_roads ?? "-" }}</strong></div>
         </el-card>
       </el-col>
       <el-col :span="18">

@@ -44,12 +44,16 @@ export interface MapGeoJsonPayload {
     buildings: number;
     facilities: number;
     categories: number;
+    hidden_demo_roads?: number;
+    hidden_demo_buildings?: number;
+    hidden_demo_facilities?: number;
   };
   roads: RoadItem[];
   buildings: BuildingItem[];
   facilities: FacilityItem[];
   facility_categories: string[];
   source: string;
+  layer_policy?: Record<string, unknown>;
 }
 
 export interface RoutePlanPayload {

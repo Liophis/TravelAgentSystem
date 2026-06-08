@@ -13,7 +13,9 @@ from app.db.session import create_app_engine
 from app.services.osm_import_service import (
     build_osmnx_payload,
     import_fixture_osm_payload,
+    import_osm_feature_layers_to_db,
     import_osm_payload_to_db,
+    import_osm_road_graph_to_db,
 )
 
 
@@ -26,6 +28,16 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--center-lat", type=float, default=settings.osm_fallback_lat)
     parser.add_argument("--dist", type=int, default=settings.osm_fallback_dist)
     parser.add_argument("--keep-existing", action="store_true")
+    parser.add_argument(
+        "--features-only",
+        action="store_true",
+        help="Import only OSM buildings/amenities, remove demo polygons, and keep existing AMap POIs/route graph.",
+    )
+    parser.add_argument(
+        "--graph-only",
+        action="store_true",
+        help="Import only OSM walking road graph, keep existing seed fallback graph and POI/building layers.",
+    )
     return parser.parse_args()
 
 
@@ -43,7 +55,23 @@ def main() -> None:
                 center_lat=args.center_lat,
                 dist=args.dist,
             )
-            summary = import_osm_payload_to_db(session, payload, reset_existing=not args.keep_existing)
+            if args.features_only:
+                summary = import_osm_feature_layers_to_db(
+                    session,
+                    payload,
+                    remove_demo_layers=True,
+                    replace_osm_layers=not args.keep_existing,
+                    import_facilities=True,
+                )
+            elif args.graph_only:
+                summary = import_osm_road_graph_to_db(
+                    session,
+                    payload,
+                    replace_osm_roads=not args.keep_existing,
+                    rebind_facilities=True,
+                )
+            else:
+                summary = import_osm_payload_to_db(session, payload, reset_existing=not args.keep_existing)
 
     print("[osm-import] database:", args.database_url)
     for key, value in summary.items():
