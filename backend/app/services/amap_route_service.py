@@ -73,17 +73,20 @@ def _request_walking_route(
     destination: str,
     timeout: float,
 ) -> dict[str, Any]:
-    response = httpx.get(
-        AMAP_WALKING_ROUTE_ENDPOINT,
-        params={
-            "key": api_key,
-            "origin": origin,
-            "destination": destination,
-            "output": "json",
-        },
-        timeout=timeout,
-    )
-    response.raise_for_status()
+    try:
+        response = httpx.get(
+            AMAP_WALKING_ROUTE_ENDPOINT,
+            params={
+                "key": api_key,
+                "origin": origin,
+                "destination": destination,
+                "output": "json",
+            },
+            timeout=timeout,
+        )
+        response.raise_for_status()
+    except httpx.HTTPError as exc:
+        raise AMapRouteError(f"AMap walking route request failed: {exc}") from exc
     payload = response.json()
     if str(payload.get("status")) != "1":
         info = payload.get("info") or "unknown error"

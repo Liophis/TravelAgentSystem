@@ -13,6 +13,10 @@ class Restaurant(Base):
     lng: Mapped[float] = mapped_column(Float)
     lat: Mapped[float] = mapped_column(Float)
     heat: Mapped[int] = mapped_column(Integer, default=0)
+    source: Mapped[str] = mapped_column(String(32), default="seed")
+    external_id: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    address: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    category: Mapped[str | None] = mapped_column(String(128), nullable=True)
 
     foods: Mapped[list["Food"]] = relationship(back_populates="restaurant")
 

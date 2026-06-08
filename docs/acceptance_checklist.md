@@ -140,13 +140,16 @@
 - [x] Cuisine filter works.
 - [x] Fuzzy search handles close spelling.
 - [x] Fuzzy search covers food name, cuisine, restaurant name, and window/canteen name.
+- [x] Fuzzy search covers real restaurant address after AMap food POI import.
 - [x] Search uses Top-K heap ranking and can sort by match, heat, rating, and distance.
 - [x] Food recommendations change with current location.
 - [x] Food recommendation can be scoped to the selected destination/school.
+- [x] Food recommendation supports scenic-spot nearby restaurants, with Summer Palace AMap POI restore data.
 - [x] Food recommendation supports Top-10 by composite score, heat, rating, and distance without fully sorting all candidates.
 - [x] Distance recommendation uses graph route distance when the local route graph can connect the restaurant, with coordinate fallback.
 - [x] Food fuzzy search results can be explicitly sorted by heat, rating, and distance.
-- [x] Food page defaults to BUPT Shahe for the seeded campus food dataset and exposes current-location coordinates.
+- [x] Food page defaults to Summer Palace for the real scenic food dataset and exposes current-location coordinates.
+- [x] Real AMap food rows are marked with `restaurant_source=amap`; seed rows remain explicit fallback.
 
 ## AIGC
 

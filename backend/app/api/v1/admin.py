@@ -25,6 +25,7 @@ from app.models import (
     UserFavorite,
     UserRating,
 )
+from app.services.amap_food_import_service import import_amap_foods_to_db
 from app.services.amap_import_service import AMapPoiImportError, import_amap_pois_to_db
 from app.services.destination_service import serialize_destination
 from app.services.food_service import serialize_food
@@ -50,9 +51,10 @@ router = APIRouter(dependencies=[Depends(require_admin)])
 class MapImportRequest(BaseModel):
     source: str = Field(
         default="fixture",
-        description="fixture, osmnx, osmnx_graph, osmnx_features, amap_poi, or reference_campus",
+        description="fixture, osmnx, osmnx_graph, osmnx_features, amap_poi, amap_food, or reference_campus",
     )
     scene_key: str = Field(default="bupt_shahe")
+    destination_id: int | None = Field(default=None)
     place_name: str | None = Field(default=None)
     center_lng: float | None = Field(default=None)
     center_lat: float | None = Field(default=None)
@@ -175,6 +177,21 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 max_pages=payload.max_pages,
                 reset_facilities=payload.reset_existing,
                 scene_key=payload.scene_key,
+                request_interval=payload.request_interval,
+            )
+        if payload.source == "amap_food":
+            if payload.destination_id is None:
+                raise HTTPException(status_code=400, detail="destination_id is required for amap_food import.")
+            return import_amap_foods_to_db(
+                session=db,
+                api_key=settings.amap_web_api_key or "",
+                destination_id=payload.destination_id,
+                center_lng=payload.center_lng,
+                center_lat=payload.center_lat,
+                radius=payload.dist or 3000,
+                keywords=payload.keywords,
+                max_pages=payload.max_pages,
+                reset_destination=payload.reset_existing,
                 request_interval=payload.request_interval,
             )
         if payload.source == "reference_campus":

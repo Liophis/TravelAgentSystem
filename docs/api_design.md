@@ -78,6 +78,7 @@ Destination recommendation/search is for tourist attractions and schools/campuse
 - `GET /foods/search`
 - `GET /foods/recommend`
 - `GET /foods/nearby`
+  - supports real destination-nearby AMap restaurant rows when imported through `backend/scripts/import_amap_foods.py`
 
 ## AIGC
 
@@ -105,6 +106,7 @@ Destination recommendation/search is for tourist attractions and schools/campuse
   - `source=osmnx_features`: OSMnx building/POI feature import
   - `source=reference_campus`: offline WGS84 campus scene/topology import from `data/reference/bupt-shahe/`
   - `source=amap_poi`: AMap Place Around facility enrichment, requires `AMAP_WEB_API_KEY`
+  - `source=amap_food`: AMap Place Around restaurant enrichment for a `destination_id`, requires `AMAP_WEB_API_KEY`
 
 Auth rule: all `/admin/*` endpoints require bearer token with `role=admin`. Missing/invalid token returns `401`; valid non-admin token returns `403`.
 

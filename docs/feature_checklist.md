@@ -33,6 +33,8 @@ Run this after `bash scripts/reset_dev_db.sh`.
 - [x] `GET /api/v1/foods/search`
 - [x] `GET /api/v1/foods/recommend`
 - [x] `GET /api/v1/foods/nearby`
+- [x] `backend/scripts/import_amap_foods.py`
+- [x] `POST /api/v1/admin/map/import` with `source=amap_food`
 - [x] `POST /api/v1/aigc/diary-draft`
 - [x] `POST /api/v1/aigc/storyboard`
 - [x] `POST /api/v1/aigc/agent/run`

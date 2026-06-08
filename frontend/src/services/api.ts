@@ -300,6 +300,10 @@ export interface RestaurantItem {
   lng: number;
   lat: number;
   heat: number;
+  source?: string;
+  external_id?: string | null;
+  address?: string | null;
+  category?: string | null;
   food_count: number;
   cuisines: string[];
 }
@@ -312,6 +316,10 @@ export interface FoodItem {
   restaurant_lng: number;
   restaurant_lat: number;
   restaurant_heat: number;
+  restaurant_source?: string;
+  restaurant_external_id?: string | null;
+  restaurant_address?: string | null;
+  restaurant_category?: string | null;
   name: string;
   cuisine: string;
   price: number;

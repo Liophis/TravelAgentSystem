@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.algorithms.ranking import top_k_smallest, top_k_smallest_tuple
 from app.algorithms.route_planning import RouteNotFoundError, approximate_distance_meters
+from app.core.config import settings
 from app.models import Destination, Food, Restaurant, UserInterest
 from app.seed.sample_data import BUPT_SHAHE_CENTER
 from app.services.route_service import plan_route_from_db
@@ -30,7 +31,7 @@ def list_restaurants_from_db(
         "offset": offset,
         "algorithm_trace": {
             "stage": "stage-9-food-aigc-admin",
-            "source": "restaurants seeded database with optional destination scope",
+            "source": "restaurants table with AMap real POI rows and seed fallback rows",
             "returned": str(len(items)),
         },
     }
@@ -105,6 +106,7 @@ def search_foods_from_db(
             "candidate_count": str(len(scored)),
             "matched": str(len(scored)),
             "returned": str(len(results)),
+            "data_source": _food_data_source_trace(results),
         },
     }
 
@@ -154,6 +156,7 @@ def recommend_foods_from_db(
             "candidate_count": str(len(foods)),
             "returned": str(len(items)),
             "interest_tags": ",".join(sorted(interests)) if interests else "",
+            "data_source": _food_data_source_trace(items),
         },
     }
 
@@ -191,6 +194,7 @@ def nearby_foods_from_db(
             "scope": "destination-linked or nearby restaurants" if destination is not None else "all restaurants",
             "ranking": "Top-K heap by route distance",
             "returned": str(len(items)),
+            "data_source": _food_data_source_trace(items),
         },
     }
 
@@ -204,6 +208,10 @@ def serialize_restaurant(restaurant: Restaurant) -> dict[str, Any]:
         "lng": restaurant.lng,
         "lat": restaurant.lat,
         "heat": restaurant.heat,
+        "source": restaurant.source,
+        "external_id": restaurant.external_id,
+        "address": restaurant.address,
+        "category": restaurant.category,
         "food_count": len(restaurant.foods),
         "cuisines": cuisines,
     }
@@ -218,6 +226,10 @@ def serialize_food(food: Food) -> dict[str, Any]:
         "restaurant_lng": food.restaurant.lng,
         "restaurant_lat": food.restaurant.lat,
         "restaurant_heat": food.restaurant.heat,
+        "restaurant_source": food.restaurant.source,
+        "restaurant_external_id": food.restaurant.external_id,
+        "restaurant_address": food.restaurant.address,
+        "restaurant_category": food.restaurant.category,
         "name": food.name,
         "cuisine": food.cuisine,
         "price": food.price,
@@ -289,6 +301,8 @@ def _food_match_rank(food: Food, keyword: str) -> int | None:
         food.name.casefold(),
         food.cuisine.casefold(),
         food.restaurant.name.casefold(),
+        (food.restaurant.address or "").casefold(),
+        (food.restaurant.category or "").casefold(),
     ]
     if any(field == keyword for field in fields):
         return 0
@@ -365,11 +379,12 @@ def _score_food(
 
 
 def _food_reason(food: Food, cuisine_score: float, distance_score: float) -> str:
+    source_prefix = "真实高德餐饮 POI，" if food.restaurant.source == "amap" else ""
     if cuisine_score > 0:
-        return f"匹配口味偏好，{food.cuisine}，评分 {food.rating:.1f}"
+        return f"{source_prefix}匹配口味偏好，{food.cuisine}，评分 {food.rating:.1f}"
     if distance_score > 0.8:
-        return f"距离当前位置较近，评分 {food.rating:.1f}，热度 {food.heat}"
-    return f"综合热度与评分较高，评分 {food.rating:.1f}，热度 {food.heat}"
+        return f"{source_prefix}距离当前位置较近，评分 {food.rating:.1f}，热度 {food.heat}"
+    return f"{source_prefix}综合热度与评分较高，评分 {food.rating:.1f}，热度 {food.heat}"
 
 
 def _attach_routes_to_items(session: Session, items: list[dict[str, Any]], current: tuple[float, float]) -> None:
@@ -379,6 +394,7 @@ def _attach_routes_to_items(session: Session, items: list[dict[str, Any]], curre
             current,
             float(item["restaurant_lng"]),
             float(item["restaurant_lat"]),
+            prefer_external=bool(item.get("restaurant_source") == "amap"),
         )
         item.update(route)
 
@@ -388,7 +404,13 @@ def _route_to_restaurant(
     current: tuple[float, float],
     restaurant: Restaurant,
 ) -> dict[str, Any]:
-    return _route_to_coordinates(session, current, restaurant.lng, restaurant.lat)
+    return _route_to_coordinates(
+        session,
+        current,
+        restaurant.lng,
+        restaurant.lat,
+        prefer_external=restaurant.source == "amap",
+    )
 
 
 def _route_to_coordinates(
@@ -396,7 +418,10 @@ def _route_to_coordinates(
     current: tuple[float, float],
     target_lng: float,
     target_lat: float,
+    prefer_external: bool = False,
 ) -> dict[str, Any]:
+    if prefer_external and not settings.amap_web_api_key:
+        return _fallback_coordinate_route(current, target_lng, target_lat)
     try:
         route = plan_route_from_db(
             session,
@@ -407,7 +432,7 @@ def _route_to_coordinates(
                 "end_lat": target_lat,
                 "strategy": "shortest_distance",
                 "mode": "walk",
-                "route_source": "local_graph",
+                "route_source": "amap_walking" if prefer_external else "local_graph",
             },
         )
         route_path = route["path"]
@@ -420,13 +445,27 @@ def _route_to_coordinates(
             "node_ids": route["node_ids"],
         }
     except RouteNotFoundError:
-        distance = approximate_distance_meters(current, (target_lng, target_lat))
-        return {
-            "distance": round(distance),
-            "duration": round(distance / 1.2),
-            "routePath": [[current[0], current[1]], [target_lng, target_lat]],
-            "node_ids": [],
-        }
+        return _fallback_coordinate_route(current, target_lng, target_lat)
+
+
+def _fallback_coordinate_route(
+    current: tuple[float, float],
+    target_lng: float,
+    target_lat: float,
+) -> dict[str, Any]:
+    distance = approximate_distance_meters(current, (target_lng, target_lat))
+    return {
+        "distance": round(distance),
+        "duration": round(distance / 1.2),
+        "routePath": [[current[0], current[1]], [target_lng, target_lat]],
+        "node_ids": [],
+    }
+
+
+def _food_data_source_trace(items: list[dict[str, Any]]) -> str:
+    if any(item.get("restaurant_source") == "amap" for item in items):
+        return "includes real AMap Place Around restaurant POIs"
+    return "seed fallback restaurant data"
 
 
 def _load_destination(session: Session, destination_id: int | None) -> Destination | None:

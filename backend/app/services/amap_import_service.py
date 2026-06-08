@@ -283,22 +283,25 @@ def _request_amap_page(
     retry_interval: float,
 ) -> dict[str, Any]:
     for attempt in range(retries + 1):
-        response = httpx.get(
-            AMAP_PLACE_AROUND_ENDPOINT,
-            params={
-                "key": api_key,
-                "location": location,
-                "radius": radius,
-                "keywords": keyword,
-                "offset": AMAP_OFFSET,
-                "page": page,
-                "extensions": "all",
-                "sortrule": "distance",
-                "output": "json",
-            },
-            timeout=timeout,
-        )
-        response.raise_for_status()
+        try:
+            response = httpx.get(
+                AMAP_PLACE_AROUND_ENDPOINT,
+                params={
+                    "key": api_key,
+                    "location": location,
+                    "radius": radius,
+                    "keywords": keyword,
+                    "offset": AMAP_OFFSET,
+                    "page": page,
+                    "extensions": "all",
+                    "sortrule": "distance",
+                    "output": "json",
+                },
+                timeout=timeout,
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            raise AMapPoiImportError(f"AMap POI request failed: {exc}") from exc
         payload = response.json()
         if str(payload.get("status")) == "1":
             return payload

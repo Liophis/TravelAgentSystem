@@ -22,3 +22,9 @@ if [ -f data/external/summer-palace/osm/osmnx_summer_palace_payload.json ]; then
 else
   echo "[db] skipping Summer Palace restore; offline payload not found"
 fi
+
+if [ -f data/external/summer-palace/amap_gcj02/food_pois_raw.json ]; then
+  bash scripts/restore_summer_palace_foods.sh
+else
+  echo "[db] skipping Summer Palace food restore; AMap raw payload not found"
+fi

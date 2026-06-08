@@ -2,7 +2,7 @@
 
 景点/学校推荐 + 多场景内部导航平台 MVP。
 
-当前仓库处于 **Stage 36 Food Recommendation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC Agent 和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层、北邮沙河参考校园拓扑导入、双 POI 数据集、游记管理/交流的讲义要求对齐、管理员/普通用户角色登录与后台权限保护、AIGC 可解释轻量 Agent 工作流、北京颐和园内部导航场景，以及讲义要求下的美食 Top-K 推荐/模糊查询/路线距离排序。
+当前仓库处于 **Stage 37 Real Destination Food POI** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC Agent 和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层、北邮沙河参考校园拓扑导入、双 POI 数据集、游记管理/交流的讲义要求对齐、管理员/普通用户角色登录与后台权限保护、AIGC 可解释轻量 Agent 工作流、北京颐和园内部导航场景、讲义要求下的美食 Top-K 推荐/模糊查询/路线距离排序，以及颐和园周边真实高德餐饮 POI 导入。
 
 Scope clarification:
 
@@ -123,13 +123,14 @@ bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
 bash scripts/restore_campus_map.sh
 bash scripts/restore_summer_palace_map.sh
+bash scripts/restore_summer_palace_foods.sh
 bash scripts/smoke_features.sh
 bash scripts/clean_demo_map_layers.sh
 ```
 
 These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 11 users, including `user01` as a normal user and `admin01` as an admin, 207 real China attraction/university destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, 20 diaries, and sample user feedback rows.
 
-`bash scripts/reset_dev_db.sh` resets the SQLite demo database and then calls `bash scripts/restore_campus_map.sh` plus `bash scripts/restore_summer_palace_map.sh` when the saved payload exists, so BUPT Shahe and Summer Palace navigation keep visible roads, buildings, and facilities after reset.
+`bash scripts/reset_dev_db.sh` resets the SQLite demo database and then calls `bash scripts/restore_campus_map.sh`, `bash scripts/restore_summer_palace_map.sh`, and `bash scripts/restore_summer_palace_foods.sh` when saved payloads exist, so BUPT Shahe, Summer Palace navigation, and Summer Palace nearby food recommendations survive reset.
 
 `bash scripts/seed_all.sh` is incremental once a dev DB already exists: it creates missing tables/columns, upgrades old `北邮沙河导览点` destination rows to real attraction/university rows, assigns existing restaurants to nearby destinations, and backfills sample favorites/ratings/behavior logs without deleting real imported AMap facilities.
 
@@ -153,12 +154,20 @@ PYTHONPATH=backend python backend/scripts/import_amap_pois.py --dataset campus_n
 PYTHONPATH=backend python backend/scripts/import_amap_pois.py --dataset campus_navigation --radius 1500 --campus-only --reset-dataset --load-raw data/external/bupt-shahe/amap_gcj02/campus_navigation_raw.json
 ```
 
+Destination-nearby restaurant POIs are imported separately into `restaurants` and `foods`. The current saved Summer Palace food payload imports 202 real nearby restaurants:
+
+```bash
+PYTHONPATH=backend python backend/scripts/import_amap_foods.py --destination-id 103 --radius 3000 --max-pages 2 --request-interval 0.5 --reset-destination --save-raw data/external/summer-palace/amap_gcj02/food_pois_raw.json
+bash scripts/restore_summer_palace_foods.sh
+```
+
 To capture external source payloads without changing the database:
 
 ```bash
 PYTHONPATH=backend python backend/scripts/import_osm_campus.py --source osmnx --dist 900 --download-only --save-payload data/external/bupt-shahe/osm/osmnx_campus_payload.json
 PYTHONPATH=backend python backend/scripts/import_amap_pois.py --dataset campus_navigation --campus-only --download-only --save-raw data/external/bupt-shahe/amap_gcj02/campus_navigation_raw.json
 conda run -n travel-agent python backend/scripts/import_osm_campus.py --source osmnx --scene-key summer_palace --place-name "Summer Palace, Beijing, China" --center-lng 116.2755 --center-lat 39.9996 --dist 1800 --download-only --save-payload data/external/summer-palace/osm/osmnx_summer_palace_payload.json
+PYTHONPATH=backend python backend/scripts/import_amap_foods.py --destination-id 103 --radius 3000 --max-pages 2 --download-only --save-raw data/external/summer-palace/amap_gcj02/food_pois_raw.json
 ```
 
 To remove old offline square building/facility layers:
@@ -335,6 +344,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_34_nearby_facility_origin.md`: nearby-facility origin selection plan and acceptance criteria.
 - `docs/stage_35_multi_scene_scenic_navigation.md`: multi-scene navigation and Summer Palace scenic navigation plan.
 - `docs/stage_36_food_recommendation.md`: food Top-K recommendation, fuzzy search, sort modes, and data boundary notes.
+- `docs/stage_37_real_food_poi.md`: real destination-nearby restaurant POI import and Summer Palace food data notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

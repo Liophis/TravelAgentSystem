@@ -49,10 +49,9 @@ composite
 
 ## Data Boundary
 
-- Current food rows are deterministic BUPT Shahe campus demo data in `restaurants` and `foods`.
-- Destination scoping uses direct `restaurants.destination_id` plus a 1500m destination-nearby rule.
-- The implementation does not claim these food rows are live AMap/OSM restaurant data.
-- Later real-data work can replace the seed rows with imported canteen/restaurant POIs without changing the API contract.
+- Stage 36 completed the algorithm and UI contract while still relying on deterministic BUPT Shahe seed food data.
+- Stage 37 adds real AMap restaurant POIs around Summer Palace and keeps the same API contract.
+- Destination scoping uses direct `restaurants.destination_id` plus a 1500m destination-nearby rule for fallback rows.
 
 ## Frontend
 

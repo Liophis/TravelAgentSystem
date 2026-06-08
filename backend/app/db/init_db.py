@@ -37,3 +37,11 @@ def ensure_compatible_schema(engine: Engine) -> None:
             restaurant_columns = {column["name"] for column in inspector.get_columns("restaurants")}
             if "destination_id" not in restaurant_columns:
                 connection.execute(text("ALTER TABLE restaurants ADD COLUMN destination_id INTEGER"))
+            if "source" not in restaurant_columns:
+                connection.execute(text("ALTER TABLE restaurants ADD COLUMN source VARCHAR(32) NOT NULL DEFAULT 'seed'"))
+            if "external_id" not in restaurant_columns:
+                connection.execute(text("ALTER TABLE restaurants ADD COLUMN external_id VARCHAR(128)"))
+            if "address" not in restaurant_columns:
+                connection.execute(text("ALTER TABLE restaurants ADD COLUMN address VARCHAR(256)"))
+            if "category" not in restaurant_columns:
+                connection.execute(text("ALTER TABLE restaurants ADD COLUMN category VARCHAR(128)"))

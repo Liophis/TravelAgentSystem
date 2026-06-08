@@ -78,7 +78,7 @@ Expected backend result after this stage:
 
 - AIGC is deterministic mock logic; no external model API is called.
 - Stage 31 adds role-based admin access control; this stage originally delivered the dashboard shell.
-- Food data still comes from deterministic seed rows.
+- This stage used deterministic seed food rows; Stage 37 later adds real AMap restaurant POIs around Summer Palace.
 - Food search uses lightweight fuzzy matching, not PostgreSQL trigram/full-text search yet.
 
 ## Next Stage

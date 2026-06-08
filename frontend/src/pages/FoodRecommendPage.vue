@@ -3,7 +3,7 @@
     <div class="page-heading">
       <div>
         <h1>美食推荐</h1>
-        <p>选择景点或学校范围后，按菜系、热度、评分和距离输出 Top-10 美食。</p>
+        <p>选择景点或学校后，按周边餐厅、菜系、热度、评分和距离输出 Top-10。</p>
       </div>
       <div class="heading-actions">
         <el-segmented v-model="sort" :options="sortOptions" />
@@ -16,7 +16,7 @@
         <el-card shadow="never">
           <el-form label-position="top">
             <el-form-item label="关键词">
-              <el-input v-model="keyword" clearable placeholder="菜名、菜系、饭店或窗口" @keyup.enter="searchFoods" />
+              <el-input v-model="keyword" clearable placeholder="餐厅、菜系、地址或窗口" @keyup.enter="searchFoods" />
             </el-form-item>
             <el-form-item label="目的地范围">
               <el-select v-model="selectedDestinationId" clearable placeholder="全部目的地" @change="reloadScopedFood">
@@ -59,6 +59,7 @@
           <div class="stat"><span>结果</span><strong>{{ foods.length }}</strong></div>
           <div class="stat"><span>候选</span><strong>{{ lastTrace?.candidate_count ?? totalCandidates }}</strong></div>
           <div class="stat"><span>排序</span><strong>{{ sortLabel(lastTrace?.sort ?? sort) }}</strong></div>
+          <div class="stat"><span>来源</span><strong>{{ sourceLabel }}</strong></div>
           <div class="stat"><span>路线</span><strong>{{ routePath.length > 0 ? "已绘制" : "未选择" }}</strong></div>
         </el-card>
       </el-col>
@@ -66,14 +67,22 @@
       <el-col :xs="24" :lg="10">
         <el-card shadow="never">
           <el-table :data="foods" v-loading="loading" size="small">
-            <el-table-column prop="name" label="菜品" min-width="136" />
-            <el-table-column prop="restaurant_name" label="饭店/窗口" min-width="128" />
+            <el-table-column prop="restaurant_name" label="餐厅/美食点" min-width="148" />
+            <el-table-column prop="name" label="推荐项" width="96" />
             <el-table-column prop="cuisine" label="菜系" width="96" />
+            <el-table-column prop="restaurant_address" label="地址" min-width="150" show-overflow-tooltip />
             <el-table-column prop="score" label="得分" width="82">
               <template #default="{ row }">{{ row.score ? row.score.toFixed(3) : "-" }}</template>
             </el-table-column>
             <el-table-column prop="rating" label="评分" width="76" />
             <el-table-column prop="heat" label="热度" width="76" />
+            <el-table-column label="来源" width="76">
+              <template #default="{ row }">
+                <el-tag size="small" :type="row.restaurant_source === 'amap' ? 'success' : 'info'">
+                  {{ row.restaurant_source === "amap" ? "高德" : "Seed" }}
+                </el-tag>
+              </template>
+            </el-table-column>
             <el-table-column prop="distance" label="距离" width="88">
               <template #default="{ row }">{{ row.distance ? `${row.distance}m` : "-" }}</template>
             </el-table-column>
@@ -135,10 +144,18 @@ const totalCandidates = ref(0);
 const currentLng = ref(116.28333);
 const currentLat = ref(40.15608);
 
-const cuisineOptions = computed(() => cuisines.value.length > 0 ? cuisines.value : ["home-style", "noodle", "cafe", "halal", "snack"]);
+const cuisineOptions = computed(() =>
+  cuisines.value.length > 0
+    ? cuisines.value
+    : ["中餐", "地方菜", "小吃快餐", "咖啡茶饮", "面食粉类", "火锅烧烤"],
+);
 const selectedDestination = computed(() =>
   destinationOptions.value.find((destination) => destination.id === selectedDestinationId.value) ?? null,
 );
+const sourceLabel = computed(() => {
+  if (foods.value.some((food) => food.restaurant_source === "amap")) return "真实 POI";
+  return "离线兜底";
+});
 const sortOptions = [
   { label: "综合", value: "composite" },
   { label: "匹配", value: "match" },
@@ -154,7 +171,7 @@ const foodMarkers = computed<FacilityItem[]>(() =>
     category_name: food.cuisine,
     lng: food.restaurant_lng,
     lat: food.restaurant_lat,
-    description: food.reason ?? `评分 ${food.rating}，热度 ${food.heat}`,
+    description: food.restaurant_address ?? food.reason ?? `评分 ${food.rating}，热度 ${food.heat}`,
     distance: food.distance,
     duration: food.duration,
     routePath: food.routePath,
@@ -183,8 +200,9 @@ async function loadItems() {
 async function loadDestinations() {
   const payload = await apiGet<DestinationListPayload>("/api/v1/destinations?limit=100&sort=popularity");
   destinationOptions.value = payload.items;
+  const summerPalace = payload.items.find((item) => item.name.includes("颐和园"));
   const bupt = payload.items.find((item) => item.name.includes("北京邮电大学沙河校区"));
-  selectedDestinationId.value = bupt?.id ?? payload.items[0]?.id ?? null;
+  selectedDestinationId.value = summerPalace?.id ?? bupt?.id ?? payload.items[0]?.id ?? null;
   useDestinationCenter();
 }
 

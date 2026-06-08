@@ -75,4 +75,4 @@ Expected:
 ## Remaining Limits
 
 - Road topology still needs stronger real campus walk-path data.
-- Destination and food seed data remain demo data and should be cleaned or linked to real campus sources in a later stage.
+- Destination seed data is now a curated real attraction/school list; Stage 37 later links food recommendation to real AMap restaurant POIs around Summer Palace.

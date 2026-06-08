@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.v1.admin import (
@@ -14,7 +15,9 @@ from app.api.v1.admin import (
 )
 from app.api.v1.aigc import DiaryDraftRequest, StoryboardRequest, diary_draft, storyboard
 from app.db.init_db import create_all
+from app.models import Destination
 from app.seed.seed_all import seed_demo_data
+from app.services.amap_food_import_service import import_amap_food_items_to_db
 from app.services.food_service import (
     list_food_items_from_db,
     list_restaurants_from_db,
@@ -122,6 +125,74 @@ def test_food_list_search_recommend_and_nearby() -> None:
     assert "graph route distance" in recommend_distance["algorithm_trace"]["distance_metric"]
     assert len(nearby["items"]) == 3
     assert len(nearby["items"][0]["routePath"]) >= 2
+
+
+def test_amap_food_import_feeds_scenic_restaurant_recommendation() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        destination = session.scalar(select(Destination).where(Destination.name == "颐和园"))
+        assert destination is not None
+
+        summary = import_amap_food_items_to_db(
+            session=session,
+            destination_id=destination.id,
+            center_lng=destination.lng,
+            center_lat=destination.lat,
+            radius=3000,
+            reset_destination=True,
+            fetch_trace={"fixture": "amap food poi"},
+            pois=[
+                {
+                    "id": "B000A-tingliguan",
+                    "name": "听鹂馆饭庄",
+                    "location": "116.281900,40.001000",
+                    "type": "餐饮服务;中餐厅;北京菜",
+                    "typecode": "050100",
+                    "address": "颐和园公园内",
+                    "biz_ext": {"rating": "4.7", "cost": "122"},
+                    "_query_keyword": "餐厅",
+                },
+                {
+                    "id": "B000A-coffee",
+                    "name": "颐和园咖啡",
+                    "location": "116.283000,40.000500",
+                    "type": "餐饮服务;咖啡厅;咖啡厅",
+                    "typecode": "050500",
+                    "address": "新建宫门附近",
+                    "biz_ext": {"rating": "4.5", "cost": "38"},
+                    "_query_keyword": "咖啡",
+                },
+            ],
+        )
+        recommend = recommend_foods_from_db(
+            session=session,
+            cuisine=None,
+            destination_id=destination.id,
+            user_id=1,
+            current_lng=destination.lng,
+            current_lat=destination.lat,
+            sort="rating",
+            limit=10,
+        )
+        search = search_foods_from_db(
+            session=session,
+            q="听鹂馆",
+            cuisine=None,
+            destination_id=destination.id,
+            current_lng=destination.lng,
+            current_lat=destination.lat,
+            limit=5,
+        )
+
+    assert summary["restaurants_imported"] == 2
+    assert recommend["total"] == 2
+    assert recommend["items"][0]["restaurant_source"] == "amap"
+    assert "AMap Place Around" in recommend["algorithm_trace"]["data_source"]
+    assert search["items"][0]["restaurant_name"] == "听鹂馆饭庄"
+    assert search["items"][0]["restaurant_address"] == "颐和园公园内"
 
 
 def test_aigc_placeholder_handlers_return_prompts() -> None:
