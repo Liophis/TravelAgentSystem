@@ -14,6 +14,8 @@
 | `buildings` | map polygon overlays |
 | `facility_categories` | facility category dictionary |
 | `facilities` | service POIs |
+| `indoor_nodes` | indoor route graph nodes |
+| `indoor_edges` | indoor route graph edges |
 | `diaries` | compressed diary records |
 | `diary_comments` | comments |
 | `diary_ratings` | ratings |
@@ -51,6 +53,8 @@ map_edges: 641
 buildings: 60
 facility_categories: 10
 facilities: 120
+indoor_nodes: 19
+indoor_edges: 20
 restaurants: 12
 foods: 72
 diaries: 20

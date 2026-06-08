@@ -8,6 +8,8 @@ Run this after `bash scripts/reset_dev_db.sh`.
 - [x] `GET /api/v1/map/stats`
 - [x] `GET /api/v1/map/geojson`
 - [x] `POST /api/v1/routes/plan`
+- [x] `POST /api/v1/routes/multi-point`
+- [x] `POST /api/v1/indoor/routes`
 - [x] `GET /api/v1/facilities/nearby`
 - [x] `GET /api/v1/destinations`
 - [x] `GET /api/v1/search/places`
@@ -27,6 +29,7 @@ Run this after `bash scripts/reset_dev_db.sh`.
 - [x] Destinations
 - [x] Map Guide
 - [x] Route Planner
+- [x] Indoor Navigation
 - [x] Nearby Facilities
 - [x] Diary Community
 - [x] Food Recommendation

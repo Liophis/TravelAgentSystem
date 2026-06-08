@@ -6,6 +6,7 @@ import DestinationListPage from "../pages/DestinationListPage.vue";
 import DiaryCommunityPage from "../pages/DiaryCommunityPage.vue";
 import FoodRecommendPage from "../pages/FoodRecommendPage.vue";
 import HomePage from "../pages/HomePage.vue";
+import IndoorNavigationPage from "../pages/IndoorNavigationPage.vue";
 import MapGuidePage from "../pages/MapGuidePage.vue";
 import NearbyFacilitiesPage from "../pages/NearbyFacilitiesPage.vue";
 import RoutePlannerPage from "../pages/RoutePlannerPage.vue";
@@ -17,6 +18,7 @@ const router = createRouter({
     { path: "/destinations", name: "destinations", component: DestinationListPage },
     { path: "/map", name: "map-guide", component: MapGuidePage },
     { path: "/routes", name: "route-planner", component: RoutePlannerPage },
+    { path: "/indoor", name: "indoor-navigation", component: IndoorNavigationPage },
     { path: "/facilities", name: "nearby-facilities", component: NearbyFacilitiesPage },
     { path: "/diaries", name: "diaries", component: DiaryCommunityPage },
     { path: "/foods", name: "foods", component: FoodRecommendPage },

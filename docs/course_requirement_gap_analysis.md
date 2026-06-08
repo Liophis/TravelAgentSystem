@@ -8,7 +8,6 @@ The project has a runnable MVP for the main demo chain: destination recommendati
 
 The main weakness is not API absence; it is requirement depth. Several features are still simplified demos where the course requirement asks for richer algorithms or interaction:
 
-- indoor navigation
 - dynamic user interests and behavior
 - diary media and photo-driven AIGC
 - exact/full-text/fuzzy search algorithm evidence
@@ -18,7 +17,6 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
-| P0 | Indoor navigation | Feature matrix marks planned | No indoor nodes/edges/floors, no cross-floor routing, no indoor page | Build a small deterministic teaching-building graph and route API |
 | P1 | Route target selection | Route strategy depth is covered for demo: distance/time, congestion, walk/bike/electric-cart/mixed modes | Route planner still expects coordinates instead of selecting destination/facility names | Add target search/select controls connected to destination/facility APIs |
 | P1 | User preference dynamics | Seeded users/interests exist; frontend hard-codes `user_id=1` | Users cannot edit interests, favorite/rate destinations, or change recommendation state through UI | Add minimal auth/profile/interest editor and behavior/rating events |
 | P1 | Diary media | Text diary works; compression works | No image/video upload, no media preview, AIGC does not accept photos | Add media table/local upload and pass uploaded media metadata to mock AIGC |
@@ -39,7 +37,7 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start. Candidate legs use the selected distance/time strategy, but it is still an approximation. |
 | 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
-| 室内导航 | Missing | No indoor model, seed, API, or page. |
+| 室内导航 | Covered for demo | Indoor nodes/edges, cross-floor Dijkstra, elevator/stair steps, and frontend page are implemented. |
 | 场所查询 | Mostly covered | Category filtering, graph distance, and Top-K heap are implemented. Category-name text lookup remains. |
 | 旅游日记管理/交流 | Partial | Publish/list/detail/view/rating/comment/delete work. Media upload and admin moderation are missing. |
 | 日记推荐 | Partial | Views + rating Top-K exists. Personal interest is not included. |
@@ -50,16 +48,13 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 ## Recommended Next Stages
 
-1. Stage 15: indoor navigation.
-   Add a small teaching-building graph with entrance, elevator, floors, rooms, and cross-floor route output.
-
-2. Stage 16: user preference loop.
+1. Stage 16: user preference loop.
    Add minimal profile interest editing, destination rating/favorite/behavior logging, and recommendation refresh.
 
-3. Stage 17: diary search and media.
+2. Stage 17: diary search and media.
    Add media upload, exact title lookup, inverted/full-text search, and interest-aware diary recommendations.
 
-4. Stage 18: query polish for facilities and food.
+3. Stage 18: query polish for facilities and food.
    Add category-name lookup, destination-scoped food filtering, and visible sort controls for heat/rating/distance.
 
 ## Harness Commands

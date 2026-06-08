@@ -17,7 +17,7 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Routing | Congestion, transport modes, and mixed shortest-time strategy | `POST /api/v1/routes/plan` | RoutePlannerPage | `map_edges` congestion/mode/speed fields | tested: required by `要求.md` |
 | Facilities | Nearby by category and graph distance | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facilities`, `facility_categories`, `map_nodes`, `map_edges` | tested: DB-backed Dijkstra distance + Top-K heap |
 | Facilities | Category-name text lookup and fuzzy category input | `GET /api/v1/facilities/nearby` or future search API | NearbyFacilitiesPage | `facility_categories`, `facilities` | planned: required by `要求.md` |
-| Indoor | Building, floor, cross-floor route | `POST /api/indoor/routes` | Indoor Navigation | `indoor_nodes`, `indoor_edges` | planned |
+| Indoor | Building, floor, cross-floor route | `GET /api/v1/indoor/buildings`, `GET /api/v1/indoor/nodes`, `POST /api/v1/indoor/routes` | IndoorNavigationPage | `indoor_nodes`, `indoor_edges` | tested: Dijkstra indoor graph + page |
 | Diaries | Publish, browse, rating, comments | `POST /api/v1/diaries`, `GET /api/v1/diaries`, `POST /api/v1/diaries/{id}/rating`, `POST /api/v1/diaries/{id}/comments` | Diary Community | `diaries`, `diary_comments`, `diary_ratings` | tested: DB-backed API + page |
 | Diaries | Title/body search and recommendation | `GET /api/v1/diaries/search`, `GET /api/v1/diaries/recommend` | Diary Community | `diaries` | tested: contains search + Top-K recommendation |
 | Diaries | Compression stats | `GET /api/v1/diaries/{id}/compression` | Diary Community | `diaries` | tested: zlib compression/decompression |

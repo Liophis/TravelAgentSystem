@@ -19,6 +19,8 @@ from app.models import (
     Facility,
     FacilityCategory,
     Food,
+    IndoorEdge,
+    IndoorNode,
     MapEdge,
     MapNode,
     Restaurant,
@@ -216,8 +218,71 @@ def seed_demo_data(session: Session) -> dict[str, int]:
     ]
     session.add_all(diaries)
 
+    _seed_indoor_navigation(session)
+
     session.commit()
     return count_seeded_data(session)
+
+
+def _seed_indoor_navigation(session: Session) -> None:
+    building_name = "综合教学楼"
+    nodes: list[IndoorNode] = []
+    lookup: dict[str, IndoorNode] = {}
+
+    def add_node(key: str, floor: int, name: str, node_type: str, x: float, y: float) -> None:
+        node = IndoorNode(
+            building_name=building_name,
+            floor=floor,
+            name=name,
+            node_type=node_type,
+            x=x,
+            y=y,
+        )
+        nodes.append(node)
+        lookup[key] = node
+
+    add_node("f1-gate", 1, "一层大门", "entrance", 0, 0)
+    for floor in range(1, 4):
+        prefix = ["一", "二", "三"][floor - 1]
+        add_node(f"f{floor}-hall", floor, f"{prefix}层大厅", "hall", 20, 0)
+        add_node(f"f{floor}-elevator", floor, f"{prefix}层电梯", "elevator", 36, 0)
+        add_node(f"f{floor}-stairs", floor, f"{prefix}层楼梯", "stairs", 52, 0)
+        add_node(f"f{floor}-toilet", floor, f"{prefix}层卫生间", "toilet", 68, 0)
+        add_node(f"f{floor}-room-a", floor, f"{floor}01 教室", "room", 36, 24)
+        add_node(f"f{floor}-room-b", floor, f"{floor}05 教室", "room", 68, 24)
+
+    session.add_all(nodes)
+    session.flush()
+
+    edges: list[IndoorEdge] = []
+
+    def add_edge(from_key: str, to_key: str, distance: float, access_type: str) -> None:
+        speed = 1.15 if access_type == "corridor" else 0.7
+        if access_type == "elevator":
+            speed = 0.5
+        edges.append(
+            IndoorEdge(
+                building_name=building_name,
+                from_node_id=lookup[from_key].id,
+                to_node_id=lookup[to_key].id,
+                distance=distance,
+                duration=distance / speed,
+                access_type=access_type,
+            )
+        )
+
+    add_edge("f1-gate", "f1-hall", 20, "corridor")
+    for floor in range(1, 4):
+        add_edge(f"f{floor}-hall", f"f{floor}-elevator", 16, "corridor")
+        add_edge(f"f{floor}-elevator", f"f{floor}-stairs", 16, "corridor")
+        add_edge(f"f{floor}-stairs", f"f{floor}-toilet", 16, "corridor")
+        add_edge(f"f{floor}-elevator", f"f{floor}-room-a", 24, "corridor")
+        add_edge(f"f{floor}-stairs", f"f{floor}-room-b", 24, "corridor")
+    for floor in range(1, 3):
+        add_edge(f"f{floor}-elevator", f"f{floor + 1}-elevator", 4, "elevator")
+        add_edge(f"f{floor}-stairs", f"f{floor + 1}-stairs", 12, "stairs")
+
+    session.add_all(edges)
 
 
 def count_seeded_data(session: Session) -> dict[str, int]:
@@ -229,6 +294,8 @@ def count_seeded_data(session: Session) -> dict[str, int]:
         "buildings": Building,
         "facility_categories": FacilityCategory,
         "facilities": Facility,
+        "indoor_nodes": IndoorNode,
+        "indoor_edges": IndoorEdge,
         "restaurants": Restaurant,
         "foods": Food,
         "diaries": Diary,

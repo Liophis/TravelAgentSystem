@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1 import admin, aigc, destinations, diaries, facilities, foods, health, map, recommendations, routes, search
+from app.api.v1 import admin, aigc, destinations, diaries, facilities, foods, health, indoor, map, recommendations, routes, search
 
 api_router = APIRouter()
 api_router.include_router(health.router, tags=["health"])
@@ -14,3 +14,4 @@ api_router.include_router(search.router, prefix="/search", tags=["search"])
 api_router.include_router(map.router, prefix="/map", tags=["map"])
 api_router.include_router(routes.router, prefix="/routes", tags=["routes"])
 api_router.include_router(facilities.router, prefix="/facilities", tags=["facilities"])
+api_router.include_router(indoor.router, prefix="/indoor", tags=["indoor"])

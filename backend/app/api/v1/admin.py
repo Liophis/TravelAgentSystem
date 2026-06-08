@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.session import get_db
-from app.models import Destination, Diary, Facility, Food, Restaurant, User
+from app.models import Destination, Diary, Facility, Food, IndoorEdge, IndoorNode, Restaurant, User
 from app.services.osm_import_service import (
     OsmImportError,
     build_osmnx_payload,
@@ -37,6 +37,8 @@ def admin_stats(db: Session = Depends(get_db)) -> dict:
             "restaurants": _count(db, Restaurant),
             "foods": _count(db, Food),
             "diaries": _count(db, Diary),
+            "indoor_nodes": _count(db, IndoorNode),
+            "indoor_edges": _count(db, IndoorEdge),
         },
     }
 

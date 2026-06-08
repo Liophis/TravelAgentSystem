@@ -66,9 +66,9 @@
 
 ## Indoor Navigation
 
-- [ ] User can choose building and floor.
-- [ ] Indoor nodes include entrance, elevator/stairs, room, toilet.
-- [ ] Indoor route supports cross-floor steps.
+- [x] User can choose building and floor.
+- [x] Indoor nodes include entrance, elevator/stairs, room, toilet.
+- [x] Indoor route supports cross-floor steps.
 
 ## Diary Community
 

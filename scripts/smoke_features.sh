@@ -16,6 +16,7 @@ from app.services.destination_service import list_destinations_from_db
 from app.services.diary_service import list_diaries_from_db
 from app.services.facility_service import get_nearby_facilities_from_db
 from app.services.food_service import nearby_foods_from_db, recommend_foods_from_db
+from app.services.indoor_service import plan_indoor_route_from_db
 from app.services.map_data_service import get_map_stats_from_db
 from app.services.recommendation_service import recommend_destinations_from_db
 from app.services.route_service import plan_multi_point_route_from_db, plan_route_from_db
@@ -92,6 +93,20 @@ with Session(engine) as session:
     print(
         "[smoke] multi-point route: "
         f"distance={multi_route['distance']}m segments={len(multi_route['segments'])}"
+    )
+
+    indoor_route = plan_indoor_route_from_db(
+        session,
+        {
+            "building_name": "综合教学楼",
+            "start_name": "一层大门",
+            "end_name": "305 教室",
+        },
+    )
+    require("indoor route steps", len(indoor_route["steps"]), 2)
+    print(
+        "[smoke] indoor route: "
+        f"distance={indoor_route['distance']}m floors={indoor_route['end']['floor']}"
     )
 
     facilities = get_nearby_facilities_from_db(

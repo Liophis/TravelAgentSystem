@@ -77,3 +77,5 @@ def test_admin_stats_reports_core_table_counts() -> None:
     assert stats["tables"]["users"] == 10
     assert stats["tables"]["foods"] >= 72
     assert stats["tables"]["diaries"] == 20
+    assert stats["tables"]["indoor_nodes"] >= 19
+    assert stats["tables"]["indoor_edges"] >= 20

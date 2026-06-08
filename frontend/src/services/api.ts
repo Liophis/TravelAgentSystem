@@ -64,6 +64,40 @@ export interface RoutePlanPayload {
   algorithm_trace: Record<string, string>;
 }
 
+export interface IndoorBuildingItem {
+  building_name: string;
+  floors: number[];
+}
+
+export interface IndoorNodeItem {
+  id: number;
+  building_name: string;
+  floor: number;
+  name: string;
+  node_type: string;
+  x: number;
+  y: number;
+}
+
+export interface IndoorRoutePayload {
+  building_name: string;
+  start: IndoorNodeItem;
+  end: IndoorNodeItem;
+  distance: number;
+  duration: number;
+  path: IndoorNodeItem[];
+  steps: Array<{
+    text: string;
+    from_node_id: number;
+    to_node_id: number;
+    floor: number;
+    distance: number;
+    duration: number;
+    access_type: string;
+  }>;
+  algorithm_trace: Record<string, string>;
+}
+
 export interface NearbyFacilitiesPayload {
   items: FacilityItem[];
   total: number;

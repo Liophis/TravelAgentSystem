@@ -13,6 +13,7 @@
         <el-menu-item index="/destinations">目的地</el-menu-item>
         <el-menu-item index="/map">地图导览</el-menu-item>
         <el-menu-item index="/routes">路线规划</el-menu-item>
+        <el-menu-item index="/indoor">室内导航</el-menu-item>
         <el-menu-item index="/facilities">附近设施</el-menu-item>
         <el-menu-item index="/diaries">游记社区</el-menu-item>
         <el-menu-item index="/foods">美食推荐</el-menu-item>

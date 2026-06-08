@@ -97,7 +97,7 @@ bash scripts/reset_dev_db.sh
 bash scripts/smoke_features.sh
 ```
 
-These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 12 restaurants, 72 foods, and 20 diaries.
+These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, and 20 diaries.
 
 The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run the backend from the repository root so the SQLite relative path matches `scripts/reset_dev_db.sh`:
 
@@ -161,6 +161,7 @@ If the configured `OSM_DEFAULT_PLACE` is not found by Nominatim, the importer fa
 - `docs/stage_12_multi_point_routes.md`: multi-point route planning notes.
 - `docs/stage_13_campus_data_density.md`: campus data density and AMap coordinate drift notes.
 - `docs/stage_14_route_strategies.md`: congestion and transport-mode route strategy notes.
+- `docs/stage_15_indoor_navigation.md`: indoor graph and cross-floor route notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

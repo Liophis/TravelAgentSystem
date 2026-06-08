@@ -20,6 +20,8 @@ def test_core_table_metadata_is_registered() -> None:
         "buildings",
         "facility_categories",
         "facilities",
+        "indoor_nodes",
+        "indoor_edges",
         "diaries",
         "restaurants",
         "foods",
