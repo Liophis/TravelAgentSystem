@@ -4,6 +4,7 @@
 
 - The previous live AMap POI import used append mode, so offline fallback facility rows remained mixed with real POIs.
 - Route planning exposed raw longitude/latitude as the primary UI input. This is useful for algorithm debugging, but it is not a reasonable default user workflow.
+- Later destination data cleanup separated nationwide attraction/school recommendation from campus-internal navigation. Route endpoints must not come from the tourism destination pool.
 
 ## Data Cleaning
 
@@ -41,17 +42,18 @@ Raw coordinates are reasonable at the service/algorithm boundary because Dijkstr
 
 The route planner now uses:
 
-- place search for start/end selection
+- campus-scoped place search for start/end selection: `GET /api/v1/search/places?scope=campus`
 - `start_place_id` and `end_place_id` in `POST /api/v1/routes/plan`
 - `place_id` for multi-point destinations
 - coordinate fallback inside an advanced panel for debugging and edge cases
-- `route_source` selection added in Stage 21: real AMap walking route by default, local graph for Dijkstra demonstration
+- `route_source=local_graph` by default on RoutePlannerPage, using the BUPT Shahe reference campus topology
 
-Supported route place IDs are the same IDs returned by `GET /api/v1/search/places`, for example:
+Supported route place IDs in the BUPT campus navigation UI are the IDs returned by `GET /api/v1/search/places?scope=campus`, for example:
 
-- `destination-12`
 - `building-8`
 - `facility-203`
+
+`destination-{id}` remains available only for backward-compatible API calls. It should not be exposed as a campus route endpoint.
 
 ## Validation
 

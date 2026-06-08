@@ -13,7 +13,7 @@
         <el-menu-item index="/profile">个人偏好</el-menu-item>
         <el-menu-item index="/destinations">景点/学校</el-menu-item>
         <el-menu-item index="/map">地图导览</el-menu-item>
-        <el-menu-item index="/routes">路线规划</el-menu-item>
+        <el-menu-item index="/routes">校内导航</el-menu-item>
         <el-menu-item index="/indoor">室内导航</el-menu-item>
         <el-menu-item index="/facilities">附近设施</el-menu-item>
         <el-menu-item index="/diaries">游记社区</el-menu-item>

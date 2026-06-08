@@ -49,6 +49,42 @@ def test_place_search_covers_destinations_buildings_and_facilities() -> None:
     assert any(item["source"] == "facility" for item in facility_results["items"])
 
 
+def test_place_search_scope_separates_campus_navigation_from_tourism_destinations() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        destination_results = search_places_from_db(
+            session,
+            keyword="长城",
+            category=None,
+            limit=5,
+            scope="destinations",
+        )
+        campus_results = search_places_from_db(
+            session,
+            keyword="长城",
+            category=None,
+            limit=5,
+            scope="campus",
+        )
+        facility_results = search_places_from_db(
+            session,
+            keyword="饮水点",
+            category=None,
+            limit=5,
+            scope="campus",
+        )
+
+    assert destination_results["items"][0]["source"] == "destination"
+    assert campus_results["scope"] == "campus"
+    assert campus_results["total"] == 0
+    assert all(item["source"] in {"building", "facility"} for item in campus_results["items"])
+    assert all(item["source"] in {"building", "facility"} for item in facility_results["items"])
+    assert any(item["source"] == "facility" for item in facility_results["items"])
+
+
 def test_recommendations_return_top_10_with_reasons() -> None:
     engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
     create_all(engine)
@@ -78,7 +114,7 @@ def test_stage6_api_handlers_use_seeded_database() -> None:
     with Session(engine) as session:
         seed_demo_data(session)
         destinations = list_destinations(category=None, q=None, sort="popularity", limit=3, offset=0, db=session)
-        places = search_places(keyword="厕所", category=None, limit=3, db=session)
+        places = search_places(keyword="厕所", category=None, scope="campus", limit=3, db=session)
         recommendations = recommend_destinations(
             user_id=1,
             strategy="composite",

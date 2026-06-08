@@ -22,9 +22,9 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | Requirement Module | Coverage | Notes |
 | --- | --- | --- |
 | 旅游推荐 | Mostly covered | Recommendation candidates are 207 real China attraction/university destination records. Top-K heap, hot/rating/interest/behavior strategies, editable interests, favorites, ratings, browse logs, and recommendation refresh exist. |
-| 景点/学校查询 | Mostly covered | Destination list supports attraction/school keyword/category and hot/rating sort. Cross-source place search also returns campus buildings/facilities for route input, but these are not tourism recommendation candidates. |
-| 单点路线规划 | Mostly covered | Navigation is campus-internal after selecting a school/campus map. Place-name start/end selection works. Walking routes can use AMap real route geometry; local Dijkstra remains available for algorithm demo. |
-| 多点路线规划 | Partial | Greedy multi-point route exists for campus-internal route planning and supports return-to-start, place IDs, and per-leg route source selection. Candidate ordering is still greedy approximation. |
+| 景点/学校查询 | Mostly covered | Destination list supports attraction/school keyword/category and hot/rating sort. `scope=destinations` keeps tourism search separate from campus route endpoints. |
+| 单点路线规划 | Mostly covered | RoutePlannerPage is scoped to BUPT Shahe campus-internal buildings/facilities via `scope=campus`; it defaults to local Dijkstra over the imported campus topology. AMap walking remains API-level optional behavior. |
+| 多点路线规划 | Partial | Greedy multi-point route exists for BUPT Shahe campus-internal route planning and supports return-to-start, campus place IDs, and local-graph legs. Candidate ordering is still greedy approximation. |
 | 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
 | 室内导航 | Covered for demo | Indoor nodes/edges, cross-floor Dijkstra, elevator/stair steps, and frontend page are implemented. |
@@ -47,8 +47,8 @@ The main weakness is no longer API absence; it is browser-level verification dep
 3. Stage 25: admin moderation and editing.
    Implemented destination/facility/food edit endpoints and diary moderation delete flow.
 
-4. Stage 27: real map layer cleanup and OSM+POI merge.
-   Implemented real-priority map APIs, seed-layer cleanup, OSM road graph import, OSM building/amenity import, AMap POI preservation, and facility rebind.
+4. Stage 28: reference campus navigation.
+   Implemented BUPT Shahe WGS84 reference topology import, campus-scoped endpoint search, and RoutePlannerPage defaulting to the imported campus graph.
 
 5. Optional browser map smoke.
    `bash scripts/check_map_frontend_optional.sh` skips cleanly without key/browser and runs screenshot verification when the environment is prepared.

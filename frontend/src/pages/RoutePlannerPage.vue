@@ -2,11 +2,13 @@
   <section class="page-stack">
     <div class="page-heading">
       <div>
-        <h1>路线规划</h1>
-        <p>选择校园地点，生成道路图路线。</p>
+        <h1>北邮校内导航</h1>
+        <p>选择北京邮电大学沙河校区内部场所，使用校园拓扑生成校内路线。</p>
       </div>
       <el-button type="primary" :loading="loading" @click="planRoute">规划路线</el-button>
     </div>
+
+    <el-alert v-if="error" :title="error" type="error" show-icon />
 
     <el-row :gutter="16">
       <el-col :span="7">
@@ -21,7 +23,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索校门、楼宇、设施"
+                placeholder="搜索北邮沙河校区内场所"
                 @change="handlePlaceChange('start', startPlaceId)"
               >
                 <el-option
@@ -41,7 +43,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索校门、楼宇、设施"
+                placeholder="搜索北邮沙河校区内场所"
                 @change="handlePlaceChange('end', endPlaceId)"
               >
                 <el-option
@@ -65,9 +67,6 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="路线数据">
-              <el-segmented v-model="form.route_source" :options="routeSourceOptions" />
-            </el-form-item>
             <el-form-item label="多终点">
               <el-select
                 v-model="multiPlaceIds"
@@ -78,7 +77,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索并选择多个地点"
+                placeholder="搜索并选择多个校内地点"
               >
                 <el-option
                   v-for="option in routeOptions"
@@ -89,7 +88,7 @@
               </el-select>
             </el-form-item>
             <el-collapse class="advanced-panel">
-              <el-collapse-item title="高级坐标" name="coordinates">
+              <el-collapse-item title="调试坐标" name="coordinates">
                 <el-form-item label="起点经度">
                   <el-input-number v-model="form.start_lng" :precision="4" :step="0.001" />
                 </el-form-item>
@@ -102,7 +101,7 @@
                 <el-form-item label="终点纬度">
                   <el-input-number v-model="form.end_lat" :precision="4" :step="0.001" />
                 </el-form-item>
-                <el-form-item label="多终点坐标">
+                <el-form-item label="调试多终点坐标">
                   <el-input
                     v-model="multiPointText"
                     type="textarea"
@@ -128,6 +127,7 @@
           <div class="stat"><span>总距离</span><strong>{{ route.distance }} m</strong></div>
           <div class="stat"><span>预计时间</span><strong>{{ Math.round(route.duration / 60) }} min</strong></div>
           <div class="stat"><span>策略</span><strong>{{ route.strategy }} / {{ route.mode }}</strong></div>
+          <div class="stat"><span>数据源</span><strong>{{ routeSourceLabel(route.route_source) }}</strong></div>
           <div v-if="route.visit_order?.length" class="visit-order">
             <el-tag v-for="item in route.visit_order" :key="item.index" class="visit-tag">
               {{ item.name }}
@@ -142,19 +142,27 @@
       </el-col>
 
       <el-col :span="17">
-        <AMapView :route-path="route?.path ?? []" />
+        <AMapView
+          :road-paths="roadPaths"
+          :buildings="campusBuildings"
+          :facilities="campusFacilities"
+          :route-path="route?.path ?? []"
+        />
       </el-col>
     </el-row>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 
 import AMapView from "../components/AMapView.vue";
 import {
   apiGet,
   apiPost,
+  type BuildingItem,
+  type FacilityItem,
+  type MapGeoJsonPayload,
   type RoutePlanPayload,
   type SearchPlaceItem,
   type SearchPlacesPayload,
@@ -163,13 +171,21 @@ import {
 const loading = ref(false);
 const placeLoading = ref(false);
 const route = ref<RoutePlanPayload | null>(null);
+const mapPayload = ref<MapGeoJsonPayload | null>(null);
+const error = ref("");
 const returnToStart = ref(false);
 const startPlaceId = ref("");
 const endPlaceId = ref("");
 const multiPlaceIds = ref<string[]>([]);
 const routeOptions = ref<SearchPlaceItem[]>([]);
 const optionCache = reactive<Record<string, SearchPlaceItem>>({});
-const multiPointText = ref("教学楼,116.2842,40.1567\n图书馆,116.2862,40.1582");
+const multiPointText = ref("教学实验综合楼,116.2862632,40.1571249\n南区食堂,116.2845755,40.1548202");
+const buptShaheBounds = {
+  minLng: 116.2770,
+  maxLng: 116.2896,
+  minLat: 40.1534,
+  maxLat: 40.1602,
+};
 const strategyOptions = [
   { label: "最短距离", value: "shortest_distance" },
   { label: "最短时间", value: "shortest_time" },
@@ -180,10 +196,6 @@ const modeOptions = [
   { label: "电瓶车", value: "electric_cart" },
   { label: "混合交通", value: "mixed" },
 ];
-const routeSourceOptions = [
-  { label: "真实路线", value: "auto" },
-  { label: "本地图", value: "local_graph" },
-];
 const form = reactive({
   start_lng: 116.28333,
   start_lat: 40.15608,
@@ -191,8 +203,19 @@ const form = reactive({
   end_lat: 40.15820,
   strategy: "shortest_distance",
   mode: "walk",
-  route_source: "auto",
+  route_source: "local_graph",
 });
+
+const roadPaths = computed(() => mapPayload.value?.roads.map((road) => road.path) ?? []);
+const campusBuildings = computed<BuildingItem[]>(() =>
+  (mapPayload.value?.buildings ?? []).filter((building) => {
+    const center = buildingCenter(building.polygon);
+    return isInBuptShaheCampus(center[0], center[1]);
+  }),
+);
+const campusFacilities = computed<FacilityItem[]>(() =>
+  (mapPayload.value?.facilities ?? []).filter((facility) => isInBuptShaheCampus(facility.lng, facility.lat)),
+);
 
 async function searchRoutePlaces(query: string) {
   const keyword = query.trim();
@@ -201,9 +224,12 @@ async function searchRoutePlaces(query: string) {
   }
   placeLoading.value = true;
   try {
-    const params = new URLSearchParams({ keyword, limit: "20" });
+    const params = new URLSearchParams({ keyword, limit: "20", scope: "campus" });
     const payload = await apiGet<SearchPlacesPayload>(`/api/v1/search/places?${params}`);
-    mergeRouteOptions(payload.items);
+    mergeRouteOptions(payload.items.filter(isCampusRoutePlace));
+    error.value = "";
+  } catch (requestError) {
+    error.value = requestError instanceof Error ? requestError.message : "校内地点搜索失败";
   } finally {
     placeLoading.value = false;
   }
@@ -221,11 +247,37 @@ function mergeRouteOptions(items: SearchPlaceItem[]) {
 function placeLabel(item: SearchPlaceItem) {
   const source =
     {
-      destination: "景点",
       building: "楼宇",
       facility: "设施",
     }[item.source] ?? item.source;
   return `${item.name} · ${source}`;
+}
+
+function isCampusRoutePlace(item: SearchPlaceItem) {
+  return item.source === "building" || item.source === "facility";
+}
+
+function routeSourceLabel(source?: string) {
+  return source === "local_graph" ? "北邮校园拓扑" : source ?? "北邮校园拓扑";
+}
+
+function buildingCenter(polygon: Array<[number, number]> | number[][]) {
+  if (!polygon.length) {
+    return [0, 0];
+  }
+  return [
+    polygon.reduce((sum, point) => sum + point[0], 0) / polygon.length,
+    polygon.reduce((sum, point) => sum + point[1], 0) / polygon.length,
+  ];
+}
+
+function isInBuptShaheCampus(lng: number, lat: number) {
+  return (
+    lng >= buptShaheBounds.minLng &&
+    lng <= buptShaheBounds.maxLng &&
+    lat >= buptShaheBounds.minLat &&
+    lat <= buptShaheBounds.maxLat
+  );
 }
 
 function handlePlaceChange(kind: "start" | "end", placeId: string) {
@@ -250,6 +302,9 @@ async function planRoute() {
       end_place_id: endPlaceId.value || null,
       ...form,
     });
+    error.value = "";
+  } catch (requestError) {
+    error.value = requestError instanceof Error ? requestError.message : "校内路线规划失败";
   } finally {
     loading.value = false;
   }
@@ -273,6 +328,9 @@ async function planMultiPointRoute() {
       mode: form.mode,
       route_source: form.route_source,
     });
+    error.value = "";
+  } catch (requestError) {
+    error.value = requestError instanceof Error ? requestError.message : "校内多点路线规划失败";
   } finally {
     loading.value = false;
   }
@@ -312,8 +370,8 @@ function parseMultiPointText() {
 }
 
 async function primeRouteOptions() {
-  await searchRoutePlaces("校门");
-  const gate = routeOptions.value.find((item) => item.category === "gate") ?? routeOptions.value[0];
+  await searchRoutePlaces("西门");
+  const gate = routeOptions.value.find((item) => item.category === "gate" || item.name.includes("西门")) ?? routeOptions.value[0];
   if (gate) {
     startPlaceId.value = gate.id;
     handlePlaceChange("start", gate.id);
@@ -328,6 +386,11 @@ async function primeRouteOptions() {
 }
 
 onMounted(async () => {
+  try {
+    mapPayload.value = await apiGet<MapGeoJsonPayload>("/api/v1/map/geojson");
+  } catch (requestError) {
+    error.value = requestError instanceof Error ? requestError.message : "校园地图数据加载失败";
+  }
   await primeRouteOptions();
   void planRoute();
 });

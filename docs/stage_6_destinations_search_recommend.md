@@ -17,6 +17,8 @@ Destination scope:
   - `GET /api/v1/destinations/{id}`
 - Added place search across destinations, buildings, and facilities:
   - `GET /api/v1/search/places`
+  - `scope=destinations` returns attraction/school destination records for tourism search.
+  - `scope=campus` returns only BUPT Shahe campus buildings/facilities for campus navigation endpoints.
 - Added destination recommendation service and API:
   - `GET /api/v1/recommendations`
 - Recommendation uses:
@@ -42,6 +44,8 @@ Place search:
 
 ```text
 GET /api/v1/search/places?keyword=厕所&limit=5
+GET /api/v1/search/places?keyword=厕所&scope=campus&limit=5
+GET /api/v1/search/places?keyword=大学&scope=destinations&limit=5
 ```
 
 Recommendations:

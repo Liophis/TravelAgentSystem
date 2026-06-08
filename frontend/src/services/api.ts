@@ -227,6 +227,7 @@ export interface SearchPlacesPayload {
   total: number;
   keyword: string;
   category: string | null;
+  scope?: string;
   algorithm_trace: Record<string, string>;
 }
 

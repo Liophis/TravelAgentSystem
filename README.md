@@ -2,12 +2,12 @@
 
 景点/学校推荐 + 校园内部导航平台 MVP。
 
-当前仓库处于 **Stage 27 real map layer cleanup** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、校园内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、高德真实步行路线兜底、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理，以及真实优先地图图层：旧 seed 方框默认隐藏并已从本地库清理，当前本地库包含 2045 条 OSM 可视道路、188 个 OSM 建筑、516 个高德 POI 和 49 个 OSM POI。
+当前仓库处于 **Stage 28 reference campus navigation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层，以及北邮沙河参考校园拓扑导入：本地导入可产生 106 个参考节点、246 条校内拓扑边和 35 个参考校园设施，旧 seed 方框默认隐藏。
 
 Scope clarification:
 
 - 推荐模块面向不同景点和学校，按热度、评分、个人兴趣和行为反馈输出 Top 10 目的地。
-- 导航模块面向已选择学校/校园的内部地图，处理道路、建筑、设施和室内外路线。
+- 导航模块当前面向北京邮电大学沙河校区内部地图，处理校门、楼宇、设施和室内外路线。
 - 校园建筑和设施用于地图、搜索、场所查询和路线输入，默认不作为旅游推荐候选。
 
 ## Target Stack
@@ -194,13 +194,14 @@ curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"end_lng":116.2862,"end_lat":40.1582,"route_source":"local_graph"}'
 curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -H 'Content-Type: application/json' \
-  -d '{"start_place_id":"facility-1","end_place_id":"facility-2","strategy":"shortest_distance","mode":"walk","route_source":"auto"}'
+  -d '{"start_place_id":"facility-1","end_place_id":"facility-2","strategy":"shortest_distance","mode":"walk","route_source":"local_graph"}'
 curl -X POST http://127.0.0.1:8000/api/v1/routes/multi-point \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"points":[{"name":"教学楼","lng":116.2842,"lat":40.1567},{"name":"图书馆","lng":116.2862,"lat":40.1582}],"return_to_start":true}'
 curl 'http://127.0.0.1:8000/api/v1/facilities/nearby?current_lng=116.28333&current_lat=40.15608&category=water&radius=5000&limit=3'
 curl 'http://127.0.0.1:8000/api/v1/destinations?category=school&q=大学&limit=5'
-curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=厕所&limit=5'
+curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=厕所&scope=campus&limit=5'
+curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=大学&scope=destinations&limit=5'
 curl 'http://127.0.0.1:8000/api/v1/recommendations?user_id=1&strategy=composite&limit=10'
 curl -X POST http://127.0.0.1:8000/api/v1/users/login \
   -H 'Content-Type: application/json' \

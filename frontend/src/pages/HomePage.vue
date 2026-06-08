@@ -70,8 +70,8 @@ const modules = [
     path: "/map",
   },
   {
-    title: "路线规划",
-    description: "调用路线规划接口，绘制路径并展示距离、时间和步骤。",
+    title: "校内导航",
+    description: "选择校门、楼宇或设施，使用参考校园拓扑绘制校内路线。",
     path: "/routes",
   },
   {

@@ -16,7 +16,7 @@ Input:
 - `mode`
 - `route_source`
 
-The user-facing frontend should prefer `start_place_id` and `end_place_id` selected from `GET /api/v1/search/places`. Raw coordinates remain as a fallback for debugging, imported data issues, and algorithm tests.
+The user-facing campus navigation page is scoped to 北京邮电大学沙河校区内部场所. It should prefer `start_place_id` and `end_place_id` selected from `GET /api/v1/search/places?scope=campus`, which returns only campus buildings and facilities inside the BUPT Shahe coordinate boundary. Raw coordinates remain as a fallback for debugging, imported data issues, and algorithm tests.
 
 Output:
 
@@ -35,7 +35,7 @@ Supported `route_source` values:
 - `amap_walking`: require AMap walking directions.
 - `local_graph`: force local Dijkstra over `map_nodes/map_edges`.
 
-This split is intentional: AMap route data gives a more credible user-facing campus route, while local Dijkstra remains available for algorithm demonstration and network-free tests.
+The BUPT campus navigation page defaults to `local_graph` because the imported campus topology is the source of truth for internal walk paths. AMap walking remains available at the API level for explicit experiments and fallback comparisons, but it is not the default UI route source for campus-internal navigation.
 
 ## Algorithm
 
@@ -45,11 +45,12 @@ For campus-grade navigation, imported topology should come from real campus refe
 
 If a place ID is provided, the service resolves it first:
 
-- `destination-{id}` uses destination coordinates
 - `building-{id}` uses the building polygon center
 - `facility-{id}` uses facility coordinates
 
 Then the resolved coordinate is snapped to the nearest graph node.
+
+`destination-{id}` is still accepted by the backend for backward compatibility and smoke tests, but the BUPT campus navigation UI and `scope=campus` search do not expose destination IDs as route endpoints.
 
 Current snapping is node-based. The next improvement is edge projection with temporary virtual nodes, so facilities/buildings that lie along long path segments can route from the nearest point on an edge instead of the nearest graph node.
 
