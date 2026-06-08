@@ -4,7 +4,8 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 
 | Module | Core Feature | API | Frontend Page | Main Tables | Test Status |
 | --- | --- | --- | --- | --- | --- |
-| Users | Register, login, profile, interests | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/users/me` | Login, Profile | `users`, `user_profiles`, `user_interests` | scaffolded: models + seed |
+| Users | Register, login, token auth | `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/users/me` | Login | `users`, `user_profiles`, `user_interests` | planned |
+| Users | Profile and editable interests | `GET /api/v1/users`, `GET /api/v1/users/{id}`, `PUT /api/v1/users/{id}/interests` | UserPreferencePage | `users`, `user_profiles`, `user_interests` | tested: preference update changes recommendation trace |
 | Users | Favorites, behavior logs, ratings | `POST /api/favorites`, `POST /api/behavior`, `POST /api/ratings` | Profile | `user_favorites`, `user_behavior_logs`, `user_ratings` | planned |
 | Destinations | List, detail, category filter | `GET /api/v1/destinations`, `GET /api/v1/destinations/{id}` | Destinations | `destinations`, `destination_tags` | tested: DB-backed API + page |
 | Destinations | Search by name/category/keyword | `GET /api/v1/search/places` | Destinations/Search | `destinations`, `buildings`, `facilities` | tested: contains search across places |

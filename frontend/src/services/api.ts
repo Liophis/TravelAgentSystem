@@ -137,6 +137,27 @@ export interface RecommendationPayload {
   algorithm_trace: Record<string, string>;
 }
 
+export interface UserProfileItem {
+  id: number;
+  username: string;
+  email: string;
+  nickname: string;
+  avatar_url: string | null;
+  interests: string[];
+}
+
+export interface UserListPayload {
+  items: UserProfileItem[];
+  total: number;
+  available_interests: string[];
+  algorithm_trace: Record<string, string>;
+}
+
+export interface UserProfilePayload extends UserProfileItem {
+  available_interests: string[];
+  algorithm_trace: Record<string, string>;
+}
+
 export interface SearchPlaceItem {
   id: string;
   source: string;
@@ -282,6 +303,20 @@ export async function apiPost<T>(path: string, body: unknown): Promise<T> {
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return await parseResponse<T>(response);
+  } catch (error) {
+    notifyApiError(error);
+    throw error;
+  }
+}
+
+export async function apiPut<T>(path: string, body: unknown): Promise<T> {
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });

@@ -14,6 +14,8 @@ Run this after `bash scripts/reset_dev_db.sh`.
 - [x] `GET /api/v1/destinations`
 - [x] `GET /api/v1/search/places`
 - [x] `GET /api/v1/recommendations`
+- [x] `GET /api/v1/users`
+- [x] `PUT /api/v1/users/{id}/interests`
 - [x] `POST /api/v1/admin/map/import`
 - [x] `GET /api/v1/diaries`
 - [x] `POST /api/v1/diaries`
@@ -26,6 +28,7 @@ Run this after `bash scripts/reset_dev_db.sh`.
 ## Frontend Pages
 
 - [x] Home
+- [x] User Preferences
 - [x] Destinations
 - [x] Map Guide
 - [x] Route Planner

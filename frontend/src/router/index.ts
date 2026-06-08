@@ -10,12 +10,14 @@ import IndoorNavigationPage from "../pages/IndoorNavigationPage.vue";
 import MapGuidePage from "../pages/MapGuidePage.vue";
 import NearbyFacilitiesPage from "../pages/NearbyFacilitiesPage.vue";
 import RoutePlannerPage from "../pages/RoutePlannerPage.vue";
+import UserPreferencePage from "../pages/UserPreferencePage.vue";
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: "/", name: "home", component: HomePage },
     { path: "/destinations", name: "destinations", component: DestinationListPage },
+    { path: "/profile", name: "profile", component: UserPreferencePage },
     { path: "/map", name: "map-guide", component: MapGuidePage },
     { path: "/routes", name: "route-planner", component: RoutePlannerPage },
     { path: "/indoor", name: "indoor-navigation", component: IndoorNavigationPage },

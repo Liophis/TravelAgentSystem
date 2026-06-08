@@ -8,7 +8,7 @@ The project has a runnable MVP for the main demo chain: destination recommendati
 
 The main weakness is not API absence; it is requirement depth. Several features are still simplified demos where the course requirement asks for richer algorithms or interaction:
 
-- dynamic user interests and behavior
+- user auth, favorites, ratings, and behavior logs
 - diary media and photo-driven AIGC
 - exact/full-text/fuzzy search algorithm evidence
 - browser-level map verification
@@ -18,7 +18,7 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
 | P1 | Route target selection | Route strategy depth is covered for demo: distance/time, congestion, walk/bike/electric-cart/mixed modes | Route planner still expects coordinates instead of selecting destination/facility names | Add target search/select controls connected to destination/facility APIs |
-| P1 | User preference dynamics | Seeded users/interests exist; frontend hard-codes `user_id=1` | Users cannot edit interests, favorite/rate destinations, or change recommendation state through UI | Add minimal auth/profile/interest editor and behavior/rating events |
+| P1 | User auth and behavior loop | Editable user interests now update recommendation output | Registration/login, favorites, destination ratings, and browsing behavior logs are still missing | Add minimal auth plus favorite/rating/behavior APIs |
 | P1 | Diary media | Text diary works; compression works | No image/video upload, no media preview, AIGC does not accept photos | Add media table/local upload and pass uploaded media metadata to mock AIGC |
 | P1 | Diary search | Title/body contains search works | No exact-title index/hash/trie; full-text is not an inverted index or DB full-text search | Add exact title lookup and lightweight inverted index or SQLite/Postgres FTS path |
 | P1 | Diary recommendation | Uses views + rating Top-K | Does not use personal interest | Add user-interest overlap to diary score and expose reason |
@@ -31,7 +31,7 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 | Requirement Module | Coverage | Notes |
 | --- | --- | --- |
-| 旅游推荐 | Partial | Top-K heap and hot/rating/interest strategies exist. Missing editable user preference and dynamic behavior feedback. |
+| 旅游推荐 | Partial | Top-K heap, hot/rating/interest strategies, editable interests, and recommendation refresh exist. Missing favorites/ratings/behavior feedback. |
 | 景点/学校查询 | Mostly covered | Destination list supports keyword/category and hot/rating sort. Cross-source search does not yet sort all result types by heat/rating. |
 | 单点路线规划 | Partial | Dijkstra route and map polyline exist. Distance/time/mode strategies work. Target input is still coordinate-oriented. |
 | 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start. Candidate legs use the selected distance/time strategy, but it is still an approximation. |
@@ -48,14 +48,14 @@ The main weakness is not API absence; it is requirement depth. Several features 
 
 ## Recommended Next Stages
 
-1. Stage 16: user preference loop.
-   Add minimal profile interest editing, destination rating/favorite/behavior logging, and recommendation refresh.
-
-2. Stage 17: diary search and media.
+1. Stage 17: diary search and media.
    Add media upload, exact title lookup, inverted/full-text search, and interest-aware diary recommendations.
 
-3. Stage 18: query polish for facilities and food.
+2. Stage 18: query polish for facilities and food.
    Add category-name lookup, destination-scoped food filtering, and visible sort controls for heat/rating/distance.
+
+3. Stage 19: auth and behavior feedback.
+   Add registration/login, favorites, destination ratings, and browsing behavior logs.
 
 ## Harness Commands
 

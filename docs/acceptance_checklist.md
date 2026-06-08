@@ -26,9 +26,10 @@
 - [ ] User can register.
 - [ ] User can log in and receive token.
 - [ ] Profile shows nickname, avatar, interests, favorites.
-- [ ] User can edit interests from the frontend.
+- [x] Profile shows nickname and interests.
+- [x] User can edit interests from the frontend.
 - [ ] User can select preferred destinations/schools before recommendation.
-- [ ] Interest changes affect recommendation output.
+- [x] Interest changes affect recommendation output.
 - [ ] Behavior logs are recorded after browsing/rating/favorite actions.
 
 ## Destinations And Recommendations

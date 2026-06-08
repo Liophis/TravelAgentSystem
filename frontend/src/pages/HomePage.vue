@@ -54,6 +54,11 @@ const strategyOptions = [
 ];
 const modules = [
   {
+    title: "个人偏好",
+    description: "选择兴趣标签，查看随用户画像变化的推荐结果。",
+    path: "/profile",
+  },
+  {
     title: "目的地",
     description: "浏览 200 个演示目的地，支持分类筛选、关键词搜索和详情查看。",
     path: "/destinations",
