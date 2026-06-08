@@ -12,4 +12,7 @@ elif [ -f backend/app/seed/reset_dev_db.py ]; then
 else
   echo "[db] no reset script yet; scaffold pending"
   echo "[db] when Docker is introduced, this script should drop/recreate dev schema and rerun seed_all"
+  exit 0
 fi
+
+bash scripts/restore_campus_map.sh

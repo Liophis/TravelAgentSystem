@@ -47,7 +47,7 @@ with Session(engine) as session:
     require("destinations", destinations["total"])
     print(f"[smoke] destinations: total={destinations['total']} returned={len(destinations['items'])}")
 
-    search = search_places_from_db(session, "厕所", None, 3)
+    search = search_places_from_db(session, "图书馆", None, 3)
     require("place search results", search["total"])
     print(f"[smoke] search: total={search['total']} returned={len(search['items'])}")
 
@@ -145,7 +145,7 @@ with Session(engine) as session:
         session=session,
         current_lng=116.28333,
         current_lat=40.15608,
-        category="厕所",
+        category="超市",
         radius=5000,
         limit=3,
     )

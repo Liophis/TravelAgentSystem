@@ -86,13 +86,14 @@ bash scripts/check_merge_markers.sh
 bash scripts/check_all.sh
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
+bash scripts/restore_campus_map.sh
 bash scripts/smoke_features.sh
 ```
 
 Optional campus reference import:
 
 ```bash
-PYTHONPATH=backend python backend/scripts/import_reference_campus.py --replace-campus-layers
+bash scripts/restore_campus_map.sh
 ```
 
 Optional conda backend check:

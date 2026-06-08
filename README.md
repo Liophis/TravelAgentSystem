@@ -121,11 +121,14 @@ docker compose up --build
 ```bash
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
+bash scripts/restore_campus_map.sh
 bash scripts/smoke_features.sh
 bash scripts/clean_demo_map_layers.sh
 ```
 
 These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 11 users, including `user01` as a normal user and `admin01` as an admin, 207 real China attraction/university destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, 20 diaries, and sample user feedback rows.
+
+`bash scripts/reset_dev_db.sh` resets the SQLite demo database and then calls `bash scripts/restore_campus_map.sh`, so the BUPT Shahe campus navigation page keeps visible roads, buildings, and facilities after reset.
 
 `bash scripts/seed_all.sh` is incremental once a dev DB already exists: it creates missing tables/columns, upgrades old `北邮沙河导览点` destination rows to real attraction/university rows, assigns existing restaurants to nearby destinations, and backfills sample favorites/ratings/behavior logs without deleting real imported AMap facilities.
 
@@ -172,10 +175,10 @@ python backend/scripts/import_osm_campus.py --source osmnx --features-only --dis
 To import the manually supplied BUPT Shahe WGS84 campus topology:
 
 ```bash
-PYTHONPATH=backend python backend/scripts/import_reference_campus.py --replace-campus-layers
+bash scripts/restore_campus_map.sh
 ```
 
-This replaces visible OSM road nodes/edges with the reference campus graph, keeps the deterministic seed graph hidden as fallback, preserves existing building polygons and POIs, and imports reference campus facilities.
+This restores the reference campus graph and offline OSM building/POI layers, keeps the deterministic seed graph hidden as fallback, and makes the campus navigation map visible after a database reset.
 
 The public map API hides seed/fallback layers by default. Use `include_demo=true` only for fallback inspection:
 
@@ -325,6 +328,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_30_diary_requirement_alignment.md`: diary management/community requirement mapping and next implementation focus.
 - `docs/stage_31_admin_user_auth.md`: role-aware user/admin login-state implementation notes and acceptance criteria.
 - `docs/stage_32_aigc_agent.md`: AIGC Agent workflow implementation, API contract, trace schema, and acceptance criteria.
+- `docs/stage_33_campus_map_restore.md`: reset-safe BUPT Shahe campus map restore notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

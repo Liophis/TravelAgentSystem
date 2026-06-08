@@ -35,6 +35,7 @@
 - [x] Reference campus source directory is documented for WGS84 JSON/GeoJSON and topology files.
 - [x] Reference campus import script validates and imports `data/reference/bupt-shahe/` files into map tables.
 - [x] Reference campus import has been run locally and produced 106 nodes, 246 road edges, and 35 BUPT Shahe reference facilities.
+- [x] `bash scripts/reset_dev_db.sh` restores visible BUPT Shahe campus navigation roads, buildings, and facilities after reset.
 - [x] Admin map import/status API reports current map table counts.
 
 ## Users
