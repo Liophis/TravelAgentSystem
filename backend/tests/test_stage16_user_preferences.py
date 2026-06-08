@@ -46,14 +46,14 @@ def test_updating_user_interests_changes_interest_recommendation_trace() -> None
     with Session(engine) as session:
         seed_demo_data(session)
         before = recommend_destinations_from_db(session, 1, "interest", 5, 116.28333, 40.15608)
-        profile = update_user_interests_from_db(session, 1, ["sports"])
+        profile = update_user_interests_from_db(session, 1, ["technology"])
         after = recommend_destinations_from_db(session, 1, "interest", 5, 116.28333, 40.15608)
 
     assert profile is not None
-    assert profile["interests"] == ["sports"]
+    assert profile["interests"] == ["technology"]
     assert before["algorithm_trace"]["interest_tags"] != after["algorithm_trace"]["interest_tags"]
-    assert after["algorithm_trace"]["interest_tags"] == "sports"
-    assert any("sports" in item["tags"] for item in after["items"])
+    assert after["algorithm_trace"]["interest_tags"] == "technology"
+    assert any("technology" in item["tags"] for item in after["items"])
 
 
 def test_update_user_interests_api_handler() -> None:
@@ -114,7 +114,7 @@ def test_favorite_rating_and_behavior_feedback_affect_recommendations() -> None:
     assert behavior is not None
     assert destination is not None
     assert destination.rating == 5.0
-    assert destination.popularity > 80 + target_id - 1
+    assert destination.popularity > 10000
     assert any(item["id"] == target_id and item["behavior_score"] > 0 for item in after["items"])
     assert int(after["algorithm_trace"]["behavior_targets"]) > int(before["algorithm_trace"]["behavior_targets"])
     assert len(profile["favorites"]) >= 1

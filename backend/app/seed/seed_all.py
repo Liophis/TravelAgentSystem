@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 if __name__ == "__main__":
@@ -35,6 +35,7 @@ from app.models import (
 from app.algorithms.route_planning import approximate_distance_meters
 from app.services.diary_service import rebuild_diary_search_index
 from app.services.user_service import hash_password
+from app.seed.real_destinations import DESTINATION_SEED_SOURCE_NOTE, build_real_destination_seed
 from app.seed.sample_data import (
     BUPT_BUILDING_NAMES,
     BUPT_FACILITY_PREFIXES,
@@ -70,24 +71,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
         for tag in INTEREST_TAGS[index % len(INTEREST_TAGS) : index % len(INTEREST_TAGS) + 2]:
             session.add(UserInterest(user_id=user.id, tag=tag))
 
-    destinations = []
-    for index in range(200):
-        lng = center_lng + ((index % 20) - 10) * 0.00018
-        lat = center_lat + ((index // 20) - 5) * 0.00016
-        destination = Destination(
-            name=f"北邮沙河导览点 {index + 1:03d}",
-            category=["campus", "building", "service", "landscape"][index % 4],
-            description="北京邮电大学沙河校区演示目的地数据。",
-            lng=lng,
-            lat=lat,
-            rating=4.2 + (index % 8) * 0.1,
-            popularity=80 + index,
-        )
-        destinations.append(destination)
-    session.add_all(destinations)
-    session.flush()
-    for index, destination in enumerate(destinations[:40]):
-        session.add(DestinationTag(destination_id=destination.id, tag=INTEREST_TAGS[index % len(INTEREST_TAGS)]))
+    destinations = _ensure_real_destinations(session)
 
     grid_cols = 15
     grid_rows = 12
@@ -287,7 +271,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
 
 def ensure_incremental_demo_data(session: Session) -> None:
     users = list(session.scalars(select(User).order_by(User.id).limit(10)).all())
-    destinations = list(session.scalars(select(Destination).order_by(Destination.id).limit(200)).all())
+    destinations = _ensure_real_destinations(session)
     restaurants = list(session.scalars(select(Restaurant).order_by(Restaurant.id)).all())
     foods = list(session.scalars(select(Food).order_by(Food.id)).all())
     diaries = list(session.scalars(select(Diary).order_by(Diary.id)).all())
@@ -367,6 +351,61 @@ def ensure_incremental_demo_data(session: Session) -> None:
                 for index in range(min(3, len(diaries)))
             ]
         )
+
+
+def _ensure_real_destinations(session: Session) -> list[Destination]:
+    seed_rows = build_real_destination_seed()
+    destinations = list(session.scalars(select(Destination).order_by(Destination.id)).all())
+    should_refresh = (
+        len(destinations) < len(seed_rows)
+        or any(destination.name.startswith("北邮沙河导览点") for destination in destinations[:20])
+    )
+    if not should_refresh:
+        return destinations
+
+    seeded: list[Destination] = []
+    for index, row in enumerate(seed_rows):
+        if index < len(destinations):
+            destination = destinations[index]
+        else:
+            destination = Destination(
+                name=row["name"],
+                category=row["category"],
+                description="",
+                lng=row["lng"],
+                lat=row["lat"],
+                rating=row["rating"],
+                popularity=row["popularity"],
+            )
+            session.add(destination)
+            destinations.append(destination)
+        _apply_real_destination_row(destination, row)
+        seeded.append(destination)
+
+    session.flush()
+    seeded_ids = [destination.id for destination in seeded]
+    if seeded_ids:
+        session.execute(delete(DestinationTag).where(DestinationTag.destination_id.in_(seeded_ids)))
+    for destination, row in zip(seeded, seed_rows):
+        for tag in row["tags"]:
+            session.add(DestinationTag(destination_id=destination.id, tag=tag))
+    session.flush()
+    return seeded
+
+
+def _apply_real_destination_row(destination: Destination, row: dict[str, object]) -> None:
+    category_label = "学校" if row["category"] == "school" else "景区"
+    destination.name = str(row["name"])
+    destination.category = str(row["category"])
+    destination.description = (
+        f"{row['province']}{row['city']}真实{category_label}目的地。"
+        f"用于旅游推荐、搜索、热度/评分排序和个性化兴趣匹配。"
+        f"{DESTINATION_SEED_SOURCE_NOTE}"
+    )
+    destination.lng = float(row["lng"])
+    destination.lat = float(row["lat"])
+    destination.rating = float(row["rating"])
+    destination.popularity = int(row["popularity"])
 
 
 def _seed_indoor_navigation(session: Session) -> None:

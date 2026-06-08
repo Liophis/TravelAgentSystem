@@ -49,6 +49,8 @@ def test_seed_demo_data_meets_stage2_scale() -> None:
         first_destination = session.scalars(select(Destination).limit(1)).one()
         assert abs(first_destination.lng - BUPT_SHAHE_CENTER[0]) < 0.003
         assert abs(first_destination.lat - BUPT_SHAHE_CENTER[1]) < 0.003
+        assert first_destination.name == "北京邮电大学沙河校区"
+        assert first_destination.category == "school"
 
         assert session.scalars(select(User).limit(1)).first() is not None
         assert session.scalars(select(Building).limit(1)).first() is not None

@@ -9,9 +9,9 @@
   - map nodes, map edges, buildings, facility categories, facilities
   - diaries
   - restaurants, foods
-- Deterministic seed data added for the current campus:
+- Deterministic seed data added for tourism recommendation and campus navigation:
   - users: 10
-  - destinations: 200
+  - destinations: 207 real China attraction/university rows
   - map nodes: 180
   - map edges: 641
   - buildings: 60
@@ -38,5 +38,6 @@ bash scripts/check_all.sh
 
 - Dev seed defaults to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db`.
 - PostgreSQL/PostGIS remains the target deployment database.
+- Destination seed data uses real attraction/university names, categories, provinces, cities, and approximate coordinates. Rating/popularity are deterministic demo signals for recommendation sorting.
 - Real OSMnx import is not implemented in this stage; seeded map data is deterministic mock data shaped like campus map data.
 - `scripts/smoke_features.sh` should not leave persistent user-interest mutations in the dev DB.

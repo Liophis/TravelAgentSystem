@@ -126,7 +126,7 @@ def test_admin_can_edit_core_content_and_moderate_diaries() -> None:
             1,
             DestinationAdminUpdate(
                 name="后台更新目的地",
-                category="campus",
+                category="school",
                 popularity=999,
                 tags=["food", "study"],
             ),

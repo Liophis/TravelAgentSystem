@@ -2,8 +2,8 @@
   <section class="page-stack">
     <div class="page-heading">
       <div>
-        <h1>目的地</h1>
-        <p>浏览、筛选和搜索沙河校区演示目的地。</p>
+        <h1>景点与学校</h1>
+        <p>浏览、筛选和搜索全国真实景区与高校目的地。</p>
       </div>
       <el-button type="primary" :loading="loading" @click="loadDestinations">查询</el-button>
     </div>
@@ -82,7 +82,7 @@ const sortOptions = [
   { label: "评分", value: "rating" },
   { label: "名称", value: "name" },
 ];
-const categoryOptions = computed(() => categories.value.length > 0 ? categories.value : ["campus", "building", "service", "landscape"]);
+const categoryOptions = computed(() => categories.value.length > 0 ? categories.value : ["school", "scenic"]);
 
 async function loadDestinations() {
   loading.value = true;

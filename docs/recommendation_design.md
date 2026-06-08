@@ -23,11 +23,11 @@ Score factors:
 
 Candidate data:
 
-- `destinations` contains scenic attractions and schools/campuses.
+- `destinations` contains 207 curated real China scenic attractions and schools/campuses.
 - destination tags describe tourism interest, school type, scenery, culture, transport convenience, and visit style.
 - user interests select preferred attraction/school categories before recommendation.
 
-The service ranks candidates with a Top-K heap helper and returns `score` plus `reason`. This matches the requirement that users usually inspect only the Top 10 results and the system should avoid full sorting when possible.
+The service ranks candidates with a Top-K heap helper and returns `score` plus `reason`. This matches the requirement that users usually inspect only the Top 10 results and the system should avoid full sorting when possible. Names, categories, provinces, cities, and coordinates are real-world seed data; rating/popularity are deterministic demo signals for repeatable sorting.
 
 ## Destination Search
 

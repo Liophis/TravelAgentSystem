@@ -71,15 +71,15 @@
                 />
               </el-checkbox-group>
             </el-form-item>
-            <el-form-item label="目的地 ID">
-              <el-input-number v-model="targetDestinationId" :min="1" :max="200" />
+            <el-form-item label="景点/学校 ID">
+              <el-input-number v-model="targetDestinationId" :min="1" :max="207" />
             </el-form-item>
             <el-form-item label="评分">
               <el-rate v-model="ratingValue" allow-half />
             </el-form-item>
           </el-form>
           <div class="button-row wrap">
-            <el-button @click="addFavorite">收藏目的地</el-button>
+            <el-button @click="addFavorite">收藏景点/学校</el-button>
             <el-button @click="rateDestination">提交评分</el-button>
             <el-button @click="recordView">记录浏览</el-button>
           </div>

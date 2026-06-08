@@ -2,7 +2,13 @@
 
 ## Scope
 
-This stage implements the remaining recommendation and search work from the project plan's fourth phase. It uses deterministic seeded data and does not implement PostgreSQL full-text search or pg_trgm yet.
+This stage implements the remaining recommendation and search work from the project plan's fourth phase. It uses deterministic real-destination seed data and does not implement PostgreSQL full-text search or pg_trgm yet.
+
+Destination scope:
+
+- Tourism recommendation candidates are real China attractions and schools/universities from `destinations`.
+- Campus buildings/facilities remain map and route entities; they are not mixed into the tourism recommendation candidate pool.
+- Rating/popularity are deterministic demo signals so Top-K, hot sort, and rating sort remain repeatable in tests.
 
 ## Delivered
 
@@ -29,7 +35,7 @@ This stage implements the remaining recommendation and search work from the proj
 Destination list:
 
 ```text
-GET /api/v1/destinations?category=campus&q=导览点&sort=popularity&limit=20&offset=0
+GET /api/v1/destinations?category=school&q=大学&sort=popularity&limit=20&offset=0
 ```
 
 Place search:

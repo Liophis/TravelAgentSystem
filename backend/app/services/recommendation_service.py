@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session, selectinload
 from app.algorithms.ranking import top_k_smallest
 from app.algorithms.route_planning import approximate_distance_meters
 from app.models import Destination, UserBehaviorLog, UserFavorite, UserInterest, UserRating
-from app.seed.sample_data import BUPT_SHAHE_CENTER
 from app.services.destination_service import serialize_destination
 
 
@@ -30,8 +29,9 @@ def recommend_destinations_from_db(
     feedback = _load_user_feedback(session, user_id)
     max_popularity = max((destination.popularity for destination in destinations), default=1)
     current = (
-        current_lng if current_lng is not None else BUPT_SHAHE_CENTER[0],
-        current_lat if current_lat is not None else BUPT_SHAHE_CENTER[1],
+        (current_lng, current_lat)
+        if current_lng is not None and current_lat is not None
+        else None
     )
 
     scored = [
@@ -48,6 +48,7 @@ def recommend_destinations_from_db(
             "stage": "stage-23-user-feedback-loop",
             "algorithm": "rule scoring plus Top-K heap",
             "formula": "rating 0.28 + popularity 0.22 + interest 0.20 + behavior 0.12 + distance 0.10 + freshness 0.08",
+            "candidate_scope": "real China attractions and schools from destinations table",
             "candidates": str(len(destinations)),
             "returned": str(len(top_items)),
             "interest_tags": ",".join(sorted(interests)) if interests else "",
@@ -71,7 +72,7 @@ def _score_destination(
     interests: set[str],
     feedback: dict[str, Any],
     max_popularity: int,
-    current: tuple[float, float],
+    current: tuple[float, float] | None,
     strategy: str,
 ) -> dict[str, Any]:
     tags = {tag.tag for tag in destination.tags}
@@ -79,8 +80,8 @@ def _score_destination(
     popularity_score = destination.popularity / max(max_popularity, 1)
     interest_score = len(tags & interests) / max(len(interests), 1) if interests else 0
     behavior_score = _behavior_score(destination, tags, feedback)
-    distance = approximate_distance_meters(current, (destination.lng, destination.lat))
-    distance_score = max(0, 1 - distance / 2500)
+    distance = approximate_distance_meters(current, (destination.lng, destination.lat)) if current else None
+    distance_score = max(0, 1 - distance / 200000) if distance is not None else 0.5
     freshness_score = min(destination.id / 200, 1)
 
     if strategy == "rating":

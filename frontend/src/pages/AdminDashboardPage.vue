@@ -149,7 +149,7 @@ const mapRows = computed(() => toRows(stats.value?.map ?? {}));
 const destinationForm = reactive({
   id: 1,
   name: "后台更新目的地",
-  category: "campus",
+  category: "school",
   popularity: 999,
   tags: "food,study",
 });

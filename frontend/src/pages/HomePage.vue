@@ -3,7 +3,7 @@
     <div class="page-heading">
       <div>
         <h1>Smart Tour Guide</h1>
-        <p>北京邮电大学沙河校区导览、路线、设施、搜索与推荐演示。</p>
+        <p>面向全国真实景区与高校的推荐，以及学校内部导航、设施和游记演示。</p>
       </div>
     </div>
 
@@ -20,7 +20,7 @@
     <el-card shadow="never">
       <template #header>
         <div class="card-header">
-          <span>推荐目的地</span>
+          <span>景点/学校推荐</span>
           <el-segmented v-model="strategy" :options="strategyOptions" @change="() => loadRecommendations()" />
         </div>
       </template>
@@ -61,7 +61,7 @@ const modules = [
   },
   {
     title: "目的地",
-    description: "浏览 200 个演示目的地，支持分类筛选、关键词搜索和详情查看。",
+    description: "浏览真实景区与高校目的地，支持分类筛选、关键词搜索和热度/评分排序。",
     path: "/destinations",
   },
   {

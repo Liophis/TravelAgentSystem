@@ -114,9 +114,9 @@ bash scripts/smoke_features.sh
 bash scripts/clean_demo_map_layers.sh
 ```
 
-These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, 20 diaries, and sample user feedback rows.
+These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 207 real China attraction/university destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, 20 diaries, and sample user feedback rows.
 
-`bash scripts/seed_all.sh` is incremental once a dev DB already exists: it creates missing tables/columns, assigns existing restaurants to nearby destinations, and backfills sample favorites/ratings/behavior logs without deleting real imported AMap facilities.
+`bash scripts/seed_all.sh` is incremental once a dev DB already exists: it creates missing tables/columns, upgrades old `北邮沙河导览点` destination rows to real attraction/university rows, assigns existing restaurants to nearby destinations, and backfills sample favorites/ratings/behavior logs without deleting real imported AMap facilities.
 
 The deterministic seed is an offline demo fallback, not a claim of real campus POI density. To enrich facilities from real AMap POI data after seeding:
 
@@ -181,7 +181,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/routes/multi-point \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"points":[{"name":"教学楼","lng":116.2842,"lat":40.1567},{"name":"图书馆","lng":116.2862,"lat":40.1582}],"return_to_start":true}'
 curl 'http://127.0.0.1:8000/api/v1/facilities/nearby?current_lng=116.28333&current_lat=40.15608&category=water&radius=5000&limit=3'
-curl 'http://127.0.0.1:8000/api/v1/destinations?category=campus&q=导览点&limit=5'
+curl 'http://127.0.0.1:8000/api/v1/destinations?category=school&q=大学&limit=5'
 curl 'http://127.0.0.1:8000/api/v1/search/places?keyword=厕所&limit=5'
 curl 'http://127.0.0.1:8000/api/v1/recommendations?user_id=1&strategy=composite&limit=10'
 curl -X POST http://127.0.0.1:8000/api/v1/users/login \

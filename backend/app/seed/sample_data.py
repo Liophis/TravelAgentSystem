@@ -1,6 +1,26 @@
 BUPT_SHAHE_CENTER = [116.28333, 40.15608]
 
-INTEREST_TAGS = ["history", "architecture", "food", "quiet", "sports", "study"]
+INTEREST_TAGS = [
+    "history",
+    "architecture",
+    "food",
+    "quiet",
+    "sports",
+    "study",
+    "culture",
+    "technology",
+    "campus",
+    "mountain",
+    "water",
+    "lake",
+    "sea",
+    "heritage",
+    "museum",
+    "city",
+    "nature",
+    "family",
+    "adventure",
+]
 
 FACILITY_CATEGORIES = [
     ("toilet", "厕所"),

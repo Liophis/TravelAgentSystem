@@ -31,7 +31,7 @@ def list_destinations_from_db(
             "stage": "stage-6-destination-search-recommend",
             "filter": "category and keyword contains matching",
             "sort": sort,
-            "source": "destinations seeded database",
+            "source": "real China attraction/university destination seed",
             "matched": str(len(destinations)),
             "returned": str(len(items)),
         },
@@ -50,7 +50,7 @@ def get_destination_detail_from_db(session: Session, destination_id: int) -> dic
         **serialize_destination(destination),
         "algorithm_trace": {
             "stage": "stage-6-destination-search-recommend",
-            "source": "destinations seeded database",
+            "source": "real China attraction/university destination seed",
         },
     }
 

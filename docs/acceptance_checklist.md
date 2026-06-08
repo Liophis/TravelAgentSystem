@@ -42,6 +42,7 @@
 ## Destinations And Recommendations
 
 - [x] Destination list supports attraction/school category filter and sorting.
+- [x] Destination seed uses real China attraction/university names and approximate coordinates.
 - [ ] Destination detail shows rating, popularity, tags, description, related diaries.
 - [x] Search supports attraction/school name/category/keyword.
 - [x] Home shows personalized Top 10 attraction/school recommendations.

@@ -19,19 +19,19 @@ def test_destination_list_and_detail_use_seeded_database() -> None:
         seed_demo_data(session)
         payload = list_destinations_from_db(
             session=session,
-            category="campus",
-            q="导览点",
+            category="school",
+            q="大学",
             sort="popularity",
             limit=5,
             offset=0,
         )
         detail = get_destination(1, session)
 
-    assert payload["total"] == 50
+    assert payload["total"] >= 80
     assert len(payload["items"]) == 5
-    assert all(item["category"] == "campus" for item in payload["items"])
+    assert all(item["category"] == "school" for item in payload["items"])
     assert detail["id"] == 1
-    assert detail["name"].startswith("北邮沙河导览点")
+    assert detail["name"] == "北京邮电大学沙河校区"
 
 
 def test_place_search_covers_destinations_buildings_and_facilities() -> None:
@@ -40,7 +40,7 @@ def test_place_search_covers_destinations_buildings_and_facilities() -> None:
 
     with Session(engine) as session:
         seed_demo_data(session)
-        destination_results = search_places_from_db(session, keyword="导览点", category=None, limit=5)
+        destination_results = search_places_from_db(session, keyword="长城", category=None, limit=5)
         building_results = search_places_from_db(session, keyword="建筑", category=None, limit=5)
         facility_results = search_places_from_db(session, keyword="饮水点", category=None, limit=5)
 

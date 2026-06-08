@@ -7,7 +7,7 @@
 | `users` | demo accounts |
 | `user_profiles` | nickname/avatar |
 | `user_interests` | recommendation interests |
-| `destinations` | searchable/recommendable places |
+| `destinations` | searchable/recommendable real attractions and schools |
 | `destination_tags` | destination interest tags |
 | `map_nodes` | route graph nodes |
 | `map_edges` | route graph edges and geometry |
@@ -47,7 +47,7 @@ duration = distance / (ideal_speed * congestion)
 
 ```text
 users: 10
-destinations: 200
+destinations: 207 real attraction/university rows
 map_nodes: 180
 map_edges: 641
 buildings: 60
