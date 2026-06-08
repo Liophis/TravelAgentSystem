@@ -47,7 +47,7 @@
 
 ## Map And Routing
 
-- [ ] Map page displays roads, buildings, and facilities.
+- [x] Map page displays roads, buildings, and facilities.
 - [x] Map page scaffold uses AMap JS API for rendering.
 - [x] Backend map data and route topology boundary is documented as OSMnx/OpenStreetMap, not AMap routing.
 - [x] AMap default center is `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
@@ -66,6 +66,7 @@
 - [x] Route planning filters by transport mode: walking, bicycle, electric cart, and mixed mode.
 - [x] Route scaffold is drawn as polyline on map.
 - [x] Route drawing calls fit-view behavior after rendering.
+- [x] Optional AMap browser smoke harness exists and skips cleanly when `VITE_AMAP_KEY` or Playwright is unavailable.
 - [x] Multi-point planning returns optimized order and closed loop.
 - [x] Nearby facilities are sorted by graph distance, not straight-line distance.
 - [x] Nearby facility query filters by category before route-distance ranking.
@@ -110,7 +111,7 @@
 
 - [x] Admin dashboard shows user/destination/map/diary/food counts.
 - [x] Admin can inspect OSM import status and data scale.
-- [ ] Admin can moderate diaries and edit destinations/facilities/foods.
+- [x] Admin can moderate diaries and edit destinations/facilities/foods.
 
 ## Docs And Tests
 

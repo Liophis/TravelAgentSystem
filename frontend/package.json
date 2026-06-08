@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "typecheck": "vue-tsc --noEmit",
-    "build": "vite build"
+    "build": "vite build",
+    "test:e2e:amap": "playwright test tests/amap-smoke.spec.ts"
   },
   "dependencies": {
     "@amap/amap-jsapi-loader": "^1.0.1",

@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 24 destination-scoped food** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗、路线地点选择输入、高德真实步行路线兜底、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环，以及按目的地范围过滤的美食推荐。
+当前仓库处于 **Stage 25 admin moderation** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗、路线地点选择输入、高德真实步行路线兜底、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐，以及后台目的地/设施/美食编辑和游记审核删除。
 
 ## Target Stack
 
@@ -72,7 +72,10 @@ bash scripts/check_backend.sh
 bash scripts/check_backend.sh
 bash scripts/check_frontend.sh
 bash scripts/check_all.sh
+bash scripts/check_map_frontend_optional.sh
 ```
+
+`check_map_frontend_optional.sh` is intentionally guarded: it skips when `VITE_AMAP_KEY`, a running backend, or local Playwright is unavailable. Use it only when browser screenshot proof of the AMap page is needed.
 
 ## Startup
 
@@ -179,6 +182,10 @@ curl -X POST http://127.0.0.1:8000/api/v1/aigc/diary-draft \
   -H 'Content-Type: application/json' \
   -d '{"topic":"沙河校区路线","keywords":["食堂","图书馆"],"tone":"自然"}'
 curl 'http://127.0.0.1:8000/api/v1/admin/stats'
+curl -X PATCH http://127.0.0.1:8000/api/v1/admin/destinations/1 \
+  -H 'Content-Type: application/json' \
+  -d '{"name":"后台更新目的地","popularity":999,"tags":["food","study"]}'
+curl 'http://127.0.0.1:8000/api/v1/admin/diaries?limit=5'
 ```
 
 OSMnx import CLI:
@@ -233,6 +240,8 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_22_diary_media_search.md`: diary media, exact title index, inverted index, and interest recommendation notes.
 - `docs/stage_23_user_feedback_loop.md`: registration/login, token auth, favorites, ratings, behavior logs, and recommendation feedback notes.
 - `docs/stage_24_destination_food_scope.md`: restaurant destination linkage and scoped food API notes.
+- `docs/stage_25_admin_moderation.md`: admin edit endpoints and diary moderation notes.
+- `docs/stage_26_optional_map_smoke.md`: optional AMap browser screenshot smoke notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

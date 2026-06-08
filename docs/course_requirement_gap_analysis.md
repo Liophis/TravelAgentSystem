@@ -8,17 +8,15 @@ The project has a runnable MVP for the main demo chain: destination recommendati
 
 The main weakness is no longer API absence; it is demo-data and visual-verification depth. Several features are still simplified demos where the course requirement asks for richer operational management or verified real map interaction:
 
-- browser-level map verification
-- admin-side moderation/editing
+- browser-level map verification requires optional AMap key and Playwright environment
 - real building/walkable-topology richness when external map data is sparse
 
 ## Highest-Risk Gaps
 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
-| P1 | Map demo verification | AMap component exists and converts WGS84 to GCJ-02 | No browser/e2e screenshot proof because AMap key is environment-dependent | Add optional Playwright smoke guarded by `VITE_AMAP_KEY` |
+| P1 | Map demo verification | AMap component exists, converts WGS84 to GCJ-02, and optional Playwright harness exists | Screenshot proof still depends on a valid `VITE_AMAP_KEY`, backend server, and local Playwright install | Run `bash scripts/check_map_frontend_optional.sh` in a prepared demo environment |
 | P2 | Real map data richness | Dense deterministic BUPT seed is documented as offline fallback; OSM import path exists; AMap POI importer exists; clean live AMap import replaced facility seed with 516 real facility rows locally | Building polygons and walkable campus topology may still be sparse if OSM data is incomplete | Keep OSM/manual graph data for routes and use AMap import for POI density |
-| P2 | Admin editing | Admin dashboard reports table counts and map import status | No moderation/edit forms for diary/destination/facility/food records | Add small CRUD/moderation actions if time remains |
 
 ## Requirement Coverage By Module
 
@@ -47,8 +45,11 @@ The main weakness is no longer API absence; it is demo-data and visual-verificat
 2. Stage 24: destination-scoped food.
    Implemented restaurant destination linkage and destination-aware food list/search/recommend/nearby endpoints.
 
-3. Next: optional browser map smoke and admin editing.
-   Keep these guarded so normal checks do not require a real AMap key or a browser install.
+3. Stage 25: admin moderation and editing.
+   Implemented destination/facility/food edit endpoints and diary moderation delete flow.
+
+4. Optional browser map smoke.
+   `bash scripts/check_map_frontend_optional.sh` skips cleanly without key/browser and runs screenshot verification when the environment is prepared.
 
 ## Harness Commands
 

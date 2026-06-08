@@ -350,6 +350,24 @@ export interface AdminStatsPayload {
   tables: Record<string, number>;
 }
 
+export interface AdminDiaryItem {
+  id: number;
+  user_id: number;
+  destination_id: number | null;
+  title: string;
+  views: number;
+  rating_count: number;
+  created_at: string;
+}
+
+export interface AdminDiaryListPayload {
+  items: AdminDiaryItem[];
+  total: number;
+  limit: number;
+  offset: number;
+  algorithm_trace: Record<string, string>;
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export async function apiGet<T>(path: string): Promise<T> {
@@ -394,6 +412,32 @@ export async function apiPut<T>(path: string, body: unknown): Promise<T> {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
+    });
+    return await parseResponse<T>(response);
+  } catch (error) {
+    notifyApiError(error);
+    throw error;
+  }
+}
+
+export async function apiPatch<T>(path: string, body: unknown): Promise<T> {
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    return await parseResponse<T>(response);
+  } catch (error) {
+    notifyApiError(error);
+    throw error;
+  }
+}
+
+export async function apiDelete<T>(path: string): Promise<T> {
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "DELETE",
     });
     return await parseResponse<T>(response);
   } catch (error) {

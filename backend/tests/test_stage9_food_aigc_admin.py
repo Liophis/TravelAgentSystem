@@ -1,7 +1,17 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
-from app.api.v1.admin import admin_stats
+from app.api.v1.admin import (
+    DestinationAdminUpdate,
+    FacilityAdminUpdate,
+    FoodAdminUpdate,
+    admin_delete_diary,
+    admin_list_diaries,
+    admin_stats,
+    admin_update_destination,
+    admin_update_facility,
+    admin_update_food,
+)
 from app.api.v1.aigc import DiaryDraftRequest, StoryboardRequest, diary_draft, storyboard
 from app.db.init_db import create_all
 from app.seed.seed_all import seed_demo_data
@@ -104,3 +114,44 @@ def test_admin_stats_reports_core_table_counts() -> None:
     assert stats["tables"]["diaries"] == 20
     assert stats["tables"]["indoor_nodes"] >= 19
     assert stats["tables"]["indoor_edges"] >= 20
+
+
+def test_admin_can_edit_core_content_and_moderate_diaries() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        destination = admin_update_destination(
+            1,
+            DestinationAdminUpdate(
+                name="后台更新目的地",
+                category="campus",
+                popularity=999,
+                tags=["food", "study"],
+            ),
+            session,
+        )
+        facility = admin_update_facility(
+            1,
+            FacilityAdminUpdate(name="后台更新设施", category_code="toilet"),
+            session,
+        )
+        food = admin_update_food(
+            1,
+            FoodAdminUpdate(name="后台更新美食", price=18.5, rating=4.9, heat=888),
+            session,
+        )
+        diaries = admin_list_diaries(limit=5, offset=0, db=session)
+        deleted = admin_delete_diary(diaries["items"][0]["id"], session)
+        stats = admin_stats(session)
+
+    assert destination["name"] == "后台更新目的地"
+    assert destination["popularity"] == 999
+    assert destination["tags"] == ["food", "study"]
+    assert facility["name"] == "后台更新设施"
+    assert facility["category"] == "toilet"
+    assert food["name"] == "后台更新美食"
+    assert food["heat"] == 888
+    assert deleted["deleted"] is True
+    assert stats["tables"]["diaries"] == 19
