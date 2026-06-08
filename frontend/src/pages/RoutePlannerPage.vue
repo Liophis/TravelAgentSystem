@@ -65,6 +65,9 @@
                 />
               </el-select>
             </el-form-item>
+            <el-form-item label="路线数据">
+              <el-segmented v-model="form.route_source" :options="routeSourceOptions" />
+            </el-form-item>
             <el-form-item label="多终点">
               <el-select
                 v-model="multiPlaceIds"
@@ -177,6 +180,10 @@ const modeOptions = [
   { label: "电瓶车", value: "electric_cart" },
   { label: "混合交通", value: "mixed" },
 ];
+const routeSourceOptions = [
+  { label: "真实路线", value: "auto" },
+  { label: "本地图", value: "local_graph" },
+];
 const form = reactive({
   start_lng: 116.28333,
   start_lat: 40.15608,
@@ -184,6 +191,7 @@ const form = reactive({
   end_lat: 40.15820,
   strategy: "shortest_distance",
   mode: "walk",
+  route_source: "auto",
 });
 
 async function searchRoutePlaces(query: string) {
@@ -263,6 +271,7 @@ async function planMultiPointRoute() {
       return_to_start: returnToStart.value,
       strategy: form.strategy,
       mode: form.mode,
+      route_source: form.route_source,
     });
   } finally {
     loading.value = false;

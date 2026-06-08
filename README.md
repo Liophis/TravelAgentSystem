@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 20 data cleaning and route inputs** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗，以及路线地点选择输入。
+当前仓库处于 **Stage 21 real route planning** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗、路线地点选择输入，以及高德真实步行路线兜底。
 
 ## Target Stack
 
@@ -141,10 +141,10 @@ Then check:
 curl http://127.0.0.1:8000/api/v1/map/stats
 curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -H 'Content-Type: application/json' \
-  -d '{"start_lng":116.28333,"start_lat":40.15608,"end_lng":116.2862,"end_lat":40.1582}'
+  -d '{"start_lng":116.28333,"start_lat":40.15608,"end_lng":116.2862,"end_lat":40.1582,"route_source":"local_graph"}'
 curl -X POST http://127.0.0.1:8000/api/v1/routes/plan \
   -H 'Content-Type: application/json' \
-  -d '{"start_place_id":"facility-1","end_place_id":"facility-2","strategy":"shortest_distance","mode":"walk"}'
+  -d '{"start_place_id":"facility-1","end_place_id":"facility-2","strategy":"shortest_distance","mode":"walk","route_source":"auto"}'
 curl -X POST http://127.0.0.1:8000/api/v1/routes/multi-point \
   -H 'Content-Type: application/json' \
   -d '{"start_lng":116.28333,"start_lat":40.15608,"points":[{"name":"教学楼","lng":116.2842,"lat":40.1567},{"name":"图书馆","lng":116.2862,"lat":40.1582}],"return_to_start":true}'
@@ -182,6 +182,12 @@ PYTHONPATH=backend python backend/scripts/import_amap_pois.py --radius 1800 --ma
 
 AMap POI import uses the official Place Around Web Service endpoint, converts returned GCJ-02 coordinates back to WGS84 for storage, classifies campus facilities, de-duplicates repeated keyword hits, binds each POI to the nearest local graph node, and backs off when AMap returns QPS limit code `10021`.
 
+AMap walking route smoke:
+
+```bash
+python backend/scripts/smoke_amap_route.py
+```
+
 ## Docs
 
 - `AGENTS.md`: rules for Codex and future agents.
@@ -208,6 +214,7 @@ AMap POI import uses the official Place Around Web Service endpoint, converts re
 - `docs/stage_18_query_polish.md`: facility category lookup and food search sorting notes.
 - `docs/stage_19_real_data_enrichment.md`: AMap POI real-data enrichment notes.
 - `docs/stage_20_data_cleaning_route_inputs.md`: data cleaning and route place-input notes.
+- `docs/stage_21_real_route_planning.md`: AMap walking route and local Dijkstra fallback notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

@@ -94,6 +94,7 @@ with Session(engine) as session:
             "end_lat": 40.1582,
             "strategy": "shortest_distance",
             "mode": "walk",
+            "route_source": "local_graph",
         },
     )
     require("route path points", len(route["path"]), 2)
@@ -114,6 +115,7 @@ with Session(engine) as session:
             "return_to_start": False,
             "strategy": "shortest_distance",
             "mode": "walk",
+            "route_source": "local_graph",
         },
     )
     require("multi-point route segments", len(multi_route["segments"]), 2)

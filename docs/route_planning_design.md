@@ -14,6 +14,7 @@ Input:
 - `end_lat`
 - `strategy`
 - `mode`
+- `route_source`
 
 The user-facing frontend should prefer `start_place_id` and `end_place_id` selected from `GET /api/v1/search/places`. Raw coordinates remain as a fallback for debugging, imported data issues, and algorithm tests.
 
@@ -26,6 +27,16 @@ Output:
 - `steps`
 - `algorithm_trace`
 
+## Route Source
+
+Supported `route_source` values:
+
+- `auto`: use AMap walking directions for walking routes when `AMAP_WEB_API_KEY` exists, otherwise fall back to local Dijkstra.
+- `amap_walking`: require AMap walking directions.
+- `local_graph`: force local Dijkstra over `map_nodes/map_edges`.
+
+This split is intentional: AMap route data gives a more credible user-facing campus route, while local Dijkstra remains available for algorithm demonstration and network-free tests.
+
 ## Algorithm
 
 The service snaps start/end coordinates to nearest graph nodes, builds a bidirectional graph from `map_edges`, and runs Dijkstra shortest path.
@@ -37,6 +48,8 @@ If a place ID is provided, the service resolves it first:
 - `facility-{id}` uses facility coordinates
 
 Then the resolved coordinate is snapped to the nearest graph node.
+
+For `amap_walking`, the service resolves the same place IDs, converts WGS84 to GCJ-02 for AMap, calls the walking route Web Service, and converts the returned polyline back to WGS84.
 
 Supported weights:
 

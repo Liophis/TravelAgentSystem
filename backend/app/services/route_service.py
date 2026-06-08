@@ -3,6 +3,7 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.algorithms.route_planning import (
     GraphEdge,
     GraphNode,
@@ -14,6 +15,7 @@ from app.algorithms.route_planning import (
     find_nearest_node,
 )
 from app.models import Building, Destination, Facility, MapEdge, MapNode
+from app.services.amap_route_service import AMapRouteError, plan_amap_walking_route
 
 TRANSPORT_MODES = {"walk", "bike", "electric_cart"}
 MODE_LABELS = {
@@ -26,14 +28,46 @@ MODE_LABELS = {
 
 def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, Any]:
     mode = _normalize_mode(payload.get("mode"))
-    nodes, edges = _load_route_graph_data(session, mode)
-    if not edges:
-        raise RouteNotFoundError(f"No map edges are available for mode {mode}.")
-
+    route_source = _normalize_route_source(payload.get("route_source"))
     start_endpoint = _resolve_route_endpoint(session, payload, "start")
     end_endpoint = _resolve_route_endpoint(session, payload, "end")
     start = (start_endpoint["lng"], start_endpoint["lat"])
     end = (end_endpoint["lng"], end_endpoint["lat"])
+
+    if _should_use_amap_walking(route_source, mode):
+        try:
+            route = plan_amap_walking_route(
+                api_key=settings.amap_web_api_key or "",
+                start_lng=start[0],
+                start_lat=start[1],
+                end_lng=end[0],
+                end_lat=end[1],
+            )
+            return {
+                "strategy": payload.get("strategy", "shortest_distance"),
+                "mode": mode,
+                "route_source": "amap_walking",
+                "distance": route["distance"],
+                "duration": route["duration"],
+                "start": start_endpoint,
+                "end": end_endpoint,
+                "path": route["path"],
+                "node_ids": [],
+                "steps": route["steps"],
+                "algorithm_trace": {
+                    **route["algorithm_trace"],
+                    "input_model": "place_id first, coordinate fallback",
+                    "fallback": "local Dijkstra graph when AMap is unavailable or route_source=local_graph",
+                },
+            }
+        except AMapRouteError:
+            if route_source == "amap_walking":
+                raise RouteNotFoundError("AMap walking route is unavailable.")
+
+    nodes, edges = _load_route_graph_data(session, mode)
+    if not edges:
+        raise RouteNotFoundError(f"No map edges are available for mode {mode}.")
+
     start_snap = find_nearest_node(start[0], start[1], nodes)
     end_snap = find_nearest_node(end[0], end[1], nodes)
     weight = _resolve_weight(payload.get("strategy"))
@@ -51,6 +85,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
     return {
         "strategy": payload.get("strategy", "shortest_distance"),
         "mode": mode,
+        "route_source": "local_graph",
         "distance": round(distance),
         "duration": round(duration),
         "start": start_endpoint,
@@ -121,6 +156,7 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
     return {
         "strategy": payload.get("strategy", "shortest_distance"),
         "mode": payload.get("mode", "walk"),
+        "route_source": payload.get("route_source", "local_graph"),
         "distance": total_distance,
         "duration": total_duration,
         "path": full_path,
@@ -135,6 +171,7 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
             "points": str(len(points)),
             "segments": str(len(segments)),
             "return_to_start": str(bool(payload.get("return_to_start"))),
+            "route_source": payload.get("route_source", "local_graph"),
         },
     }
 
@@ -143,6 +180,18 @@ def _resolve_weight(strategy: str | None) -> WeightMode:
     if strategy in {"shortest_time", "fastest", "transport_time", "mixed_time"}:
         return "duration"
     return "distance"
+
+
+def _normalize_route_source(route_source: str | None) -> str:
+    if route_source in {"auto", "amap_walking", "local_graph"}:
+        return route_source
+    return "auto"
+
+
+def _should_use_amap_walking(route_source: str, mode: str) -> bool:
+    if mode != "walk":
+        return False
+    return route_source in {"auto", "amap_walking"} and bool(settings.amap_web_api_key)
 
 
 def _nearest_route(
@@ -176,6 +225,7 @@ def _plan_between(
             "end_lat": end["lat"],
             "strategy": payload.get("strategy", "shortest_distance"),
             "mode": payload.get("mode", "walk"),
+            "route_source": payload.get("route_source", "local_graph"),
         },
     )
 

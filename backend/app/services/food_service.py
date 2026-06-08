@@ -302,6 +302,7 @@ def _route_to_restaurant(
                 "end_lat": restaurant.lat,
                 "strategy": "shortest_distance",
                 "mode": "walk",
+                "route_source": "local_graph",
             },
         )
         route_path = route["path"]

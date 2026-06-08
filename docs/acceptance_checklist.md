@@ -60,6 +60,8 @@
 - [x] Single-route planning returns path steps, distance, time, and mode.
 - [x] Single-route planning uses local `map_nodes` / `map_edges` and Dijkstra instead of mock route data.
 - [x] Route target can be selected by destination/place/facility name, not only typed coordinates.
+- [x] User-facing walking route planning can use AMap walking directions for real route geometry.
+- [x] Route API keeps `local_graph` mode for Dijkstra demonstration and network-free tests.
 - [x] Shortest-time routing uses per-edge congestion where real speed = congestion * ideal speed.
 - [x] Route planning filters by transport mode: walking, bicycle, electric cart, and mixed mode.
 - [x] Route scaffold is drawn as polyline on map.

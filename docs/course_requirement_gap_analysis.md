@@ -31,8 +31,8 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | --- | --- | --- |
 | 旅游推荐 | Partial | Top-K heap, hot/rating/interest strategies, editable interests, and recommendation refresh exist. Missing favorites/ratings/behavior feedback. |
 | 景点/学校查询 | Mostly covered | Destination list supports keyword/category and hot/rating sort. Cross-source search does not yet sort all result types by heat/rating. |
-| 单点路线规划 | Mostly covered | Dijkstra route, map polyline, distance/time/mode strategies, and place-name start/end selection work. |
-| 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start and place IDs. Candidate legs use the selected distance/time strategy, but it is still an approximation. |
+| 单点路线规划 | Mostly covered | Place-name start/end selection works. Walking routes can use AMap real route geometry; local Dijkstra remains available for algorithm demo. |
+| 多点路线规划 | Partial | Greedy multi-point route exists and supports return-to-start, place IDs, and per-leg route source selection. Candidate ordering is still greedy approximation. |
 | 最短时间/拥挤度 | Covered for demo | `shortest_time` uses duration computed from per-edge congestion and ideal speed. |
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
 | 室内导航 | Covered for demo | Indoor nodes/edges, cross-floor Dijkstra, elevator/stair steps, and frontend page are implemented. |

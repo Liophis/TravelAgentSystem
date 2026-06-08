@@ -45,6 +45,7 @@ The route planner now uses:
 - `start_place_id` and `end_place_id` in `POST /api/v1/routes/plan`
 - `place_id` for multi-point destinations
 - coordinate fallback inside an advanced panel for debugging and edge cases
+- `route_source` selection added in Stage 21: real AMap walking route by default, local graph for Dijkstra demonstration
 
 Supported route place IDs are the same IDs returned by `GET /api/v1/search/places`, for example:
 

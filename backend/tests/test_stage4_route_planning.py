@@ -43,6 +43,7 @@ def test_route_service_returns_seeded_graph_path() -> None:
                 "end_lat": BUPT_SHAHE_CENTER[1] + 0.0012,
                 "strategy": "shortest_distance",
                 "mode": "walk",
+                "route_source": "local_graph",
             },
         )
 
@@ -62,7 +63,7 @@ def test_route_api_handler_uses_seeded_database() -> None:
 
     with Session(engine) as session:
         seed_demo_data(session)
-        route = plan_route(RoutePlanRequest(), session)
+        route = plan_route(RoutePlanRequest(route_source="local_graph"), session)
 
     assert route["strategy"] == "shortest_distance"
     assert route["mode"] == "walk"
@@ -85,6 +86,7 @@ def test_route_service_accepts_place_ids_for_user_facing_inputs() -> None:
                 "end_place_id": f"facility-{facilities[1].id}",
                 "strategy": "shortest_distance",
                 "mode": "walk",
+                "route_source": "local_graph",
             },
         )
 
@@ -109,6 +111,7 @@ def test_shortest_time_and_bike_mode_use_transport_duration() -> None:
                 "end_lat": BUPT_SHAHE_CENTER[1] + 0.0012,
                 "strategy": "shortest_time",
                 "mode": "walk",
+                "route_source": "local_graph",
             },
         )
         bike_route = plan_route_from_db(
@@ -120,6 +123,7 @@ def test_shortest_time_and_bike_mode_use_transport_duration() -> None:
                 "end_lat": BUPT_SHAHE_CENTER[1] + 0.0012,
                 "strategy": "shortest_time",
                 "mode": "bike",
+                "route_source": "local_graph",
             },
         )
 
@@ -144,6 +148,7 @@ def test_electric_cart_mode_filters_to_fixed_route_edges() -> None:
                 "end_lat": BUPT_SHAHE_CENTER[1],
                 "strategy": "shortest_time",
                 "mode": "electric_cart",
+                "route_source": "local_graph",
             },
         )
 
@@ -170,6 +175,7 @@ def test_multi_point_route_returns_visit_order_and_segments() -> None:
                 "return_to_start": True,
                 "strategy": "shortest_distance",
                 "mode": "walk",
+                "route_source": "local_graph",
             },
         )
 

@@ -55,6 +55,7 @@ export interface MapGeoJsonPayload {
 export interface RoutePlanPayload {
   strategy: string;
   mode: string;
+  route_source?: string;
   distance: number;
   duration: number;
   start?: RouteEndpointItem;
