@@ -57,6 +57,7 @@ bash scripts/check_frontend.sh
 bash scripts/check_all.sh
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
+bash scripts/smoke_features.sh
 ```
 
 Optional conda backend check:
@@ -76,3 +77,4 @@ For every feature:
 3. Add or update page-level acceptance notes.
 4. Run `bash scripts/check_all.sh`.
 5. Update `docs/acceptance_checklist.md` if acceptance criteria changed.
+6. Run `bash scripts/reset_dev_db.sh && bash scripts/smoke_features.sh` before claiming local demo usability.

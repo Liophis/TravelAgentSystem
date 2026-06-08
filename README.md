@@ -72,8 +72,7 @@ bash scripts/check_all.sh
 Backend:
 
 ```bash
-cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+PYTHONPATH=backend uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Frontend:
@@ -95,16 +94,17 @@ docker compose up --build
 ```bash
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
+bash scripts/smoke_features.sh
 ```
 
 These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 10 users, 200 destinations, 80 map nodes, 220 map edges, 20 buildings, 50 facilities, and 10 facility categories.
 
-The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run:
+The local backend reads API data from `API_DATABASE_URL`. For the SQLite demo path, run the backend from the repository root so the SQLite relative path matches `scripts/reset_dev_db.sh`:
 
 ```bash
 bash scripts/reset_dev_db.sh
-cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+bash scripts/smoke_features.sh
+PYTHONPATH=backend uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 Then check:
