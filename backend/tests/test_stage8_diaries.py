@@ -4,12 +4,16 @@ from sqlalchemy.orm import Session
 from app.api.v1.diaries import (
     DiaryCommentRequest,
     DiaryCreateRequest,
+    DiaryMediaRequest,
     DiaryRatingRequest,
     add_diary_comment,
+    add_diary_media,
     create_diary,
     diary_compression,
     get_diary,
+    list_diary_media,
     rate_diary,
+    recommend_diaries,
     search_diaries,
     view_diary,
 )
@@ -81,3 +85,37 @@ def test_diary_api_handlers_create_and_search() -> None:
 
     assert created["title"] == "API 游记"
     assert results["items"][0]["title"] == "API 游记"
+
+
+def test_diary_media_exact_title_inverted_index_and_interest_recommendation() -> None:
+    engine = create_engine("sqlite+pysqlite:///:memory:", future=True)
+    create_all(engine)
+
+    with Session(engine) as session:
+        seed_demo_data(session)
+        created = create_diary(
+            DiaryCreateRequest(
+                user_id=1,
+                destination_id=1,
+                title="图书馆精确标题",
+                body="图书馆 自习 空间 安静 study study",
+            ),
+            session,
+        )
+        media = add_diary_media(
+            created["id"],
+            DiaryMediaRequest(media_type="image", url="/media/demo/library.jpg", caption="图书馆照片"),
+            session,
+        )
+        media_payload = list_diary_media(created["id"], session)
+        detail = get_diary(created["id"], session)
+        exact = search_diaries(keyword="图书馆精确标题", mode="exact_title", limit=5, db=session)
+        fulltext = search_diaries(keyword="自习 空间", mode="fulltext", limit=5, db=session)
+        recommended = recommend_diaries(user_id=1, limit=5, db=session)
+
+    assert media["url"] == "/media/demo/library.jpg"
+    assert media_payload["total"] == 1
+    assert detail["media"][0]["caption"] == "图书馆照片"
+    assert exact["items"][0]["id"] == created["id"]
+    assert fulltext["items"][0]["id"] == created["id"]
+    assert recommended["algorithm_trace"]["interest_tags"]

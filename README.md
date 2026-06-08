@@ -2,7 +2,7 @@
 
 大型校园 / 景区智能导览平台 MVP。
 
-当前仓库处于 **Stage 21 real route planning** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗、路线地点选择输入，以及高德真实步行路线兜底。
+当前仓库处于 **Stage 22 diary media and search** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把地图浏览、路线规划、室内导航、附近设施、目的地搜索、推荐、OSM 导入、游记社区、美食推荐、AIGC 占位和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、校园地图演示 seed、拥挤度/交通方式路线策略、室内跨楼层导航、用户兴趣编辑、设施/美食查询打磨、高德 Web Service 真实 POI 导入链路、设施数据清洗、路线地点选择输入、高德真实步行路线兜底，以及游记媒体/索引检索/兴趣推荐。
 
 ## Target Stack
 
@@ -215,6 +215,7 @@ python backend/scripts/smoke_amap_route.py
 - `docs/stage_19_real_data_enrichment.md`: AMap POI real-data enrichment notes.
 - `docs/stage_20_data_cleaning_route_inputs.md`: data cleaning and route place-input notes.
 - `docs/stage_21_real_route_planning.md`: AMap walking route and local Dijkstra fallback notes.
+- `docs/stage_22_diary_media_search.md`: diary media, exact title index, inverted index, and interest recommendation notes.
 - `README_DEPLOY.md`: local and Docker deployment commands.
 - `tests/fixtures/README.md`: shared test fixture notes.
 

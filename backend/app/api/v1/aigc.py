@@ -15,6 +15,7 @@ class DiaryDraftRequest(BaseModel):
 class StoryboardRequest(BaseModel):
     text: str = Field(min_length=1)
     scene_count: int = Field(default=4, ge=1, le=8)
+    media_urls: list[str] = Field(default_factory=list)
 
 
 @router.post("/diary-draft")

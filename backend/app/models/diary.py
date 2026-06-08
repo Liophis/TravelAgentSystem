@@ -24,6 +24,7 @@ class Diary(Base):
 
     comments: Mapped[list["DiaryComment"]] = relationship(back_populates="diary")
     ratings: Mapped[list["DiaryRating"]] = relationship(back_populates="diary")
+    media: Mapped[list["DiaryMedia"]] = relationship(back_populates="diary")
 
 
 class DiaryComment(Base):
@@ -48,3 +49,34 @@ class DiaryRating(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
 
     diary: Mapped[Diary] = relationship(back_populates="ratings")
+
+
+class DiaryMedia(Base):
+    __tablename__ = "diary_media"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    diary_id: Mapped[int] = mapped_column(ForeignKey("diaries.id"), index=True)
+    media_type: Mapped[str] = mapped_column(String(32), index=True)
+    url: Mapped[str] = mapped_column(String(512))
+    caption: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+
+    diary: Mapped[Diary] = relationship(back_populates="media")
+
+
+class DiaryTitleIndex(Base):
+    __tablename__ = "diary_title_indexes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    diary_id: Mapped[int] = mapped_column(ForeignKey("diaries.id"), unique=True, index=True)
+    normalized_title: Mapped[str] = mapped_column(String(200), index=True)
+
+
+class DiarySearchToken(Base):
+    __tablename__ = "diary_search_tokens"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    diary_id: Mapped[int] = mapped_column(ForeignKey("diaries.id"), index=True)
+    token: Mapped[str] = mapped_column(String(80), index=True)
+    field: Mapped[str] = mapped_column(String(24), default="body")
+    frequency: Mapped[int] = mapped_column(Integer, default=1)

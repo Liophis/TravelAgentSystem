@@ -23,13 +23,13 @@ Status values: `planned`, `scaffolded`, `implemented`, `tested`.
 | Facilities | Category-name text lookup and fuzzy category input | `GET /api/v1/facilities/nearby` | NearbyFacilitiesPage | `facility_categories`, `facilities` | tested: required by `要求.md` |
 | Indoor | Building, floor, cross-floor route | `GET /api/v1/indoor/buildings`, `GET /api/v1/indoor/nodes`, `POST /api/v1/indoor/routes` | IndoorNavigationPage | `indoor_nodes`, `indoor_edges` | tested: Dijkstra indoor graph + page |
 | Diaries | Publish, browse, rating, comments | `POST /api/v1/diaries`, `GET /api/v1/diaries`, `POST /api/v1/diaries/{id}/rating`, `POST /api/v1/diaries/{id}/comments` | Diary Community | `diaries`, `diary_comments`, `diary_ratings` | tested: DB-backed API + page |
-| Diaries | Title/body search and recommendation | `GET /api/v1/diaries/search`, `GET /api/v1/diaries/recommend` | Diary Community | `diaries` | tested: contains search + Top-K recommendation |
+| Diaries | Title/body search and recommendation | `GET /api/v1/diaries/search`, `GET /api/v1/diaries/recommend` | Diary Community | `diaries`, `diary_title_indexes`, `diary_search_tokens` | tested: exact title index + inverted index + interest-aware Top-K |
 | Diaries | Compression stats | `GET /api/v1/diaries/{id}/compression` | Diary Community | `diaries` | tested: zlib compression/decompression |
-| Diaries | Media upload, exact-title index, inverted/full-text search, interest-aware recommendation | future media/search APIs | Diary Community, AIGC Assistant | `diary_media`, search index | planned: required by `要求.md` |
+| Diaries | Media metadata and AIGC media input | `POST /api/v1/diaries/{id}/media`, `GET /api/v1/diaries/{id}/media`, `POST /api/v1/aigc/storyboard` | Diary Community, AIGC Assistant | `diary_media` | tested: media attach/list/detail + storyboard media input |
 | Food | Restaurant/item list, cuisine filter, fuzzy search | `GET /api/v1/foods/restaurants`, `GET /api/v1/foods/items`, `GET /api/v1/foods/search` | FoodRecommendPage | `foods`, `restaurants` | tested: DB-backed API + page |
 | Food | Hot/rating/distance recommendation and nearby route preview | `GET /api/v1/foods/recommend`, `GET /api/v1/foods/nearby` | FoodRecommendPage | `foods`, `restaurants`, `user_interests`, `map_edges` | tested: scoring + Top-K + route path |
 | Food | Explicit heat/rating/distance sort for fuzzy results | `GET /api/v1/foods/search` | FoodRecommendPage | `foods`, `restaurants` | tested: required by `要求.md` |
 | Food | Destination-scoped filtering | `GET /api/v1/foods/recommend` future destination parameter | FoodRecommendPage | future destination linkage | planned |
 | AIGC | Diary draft and storyboard prompt | `POST /api/v1/aigc/diary-draft`, `POST /api/v1/aigc/storyboard` | AigcAssistantPage | mock service | tested: deterministic placeholder |
-| AIGC | Photo-driven tourism animation generation | future media AIGC API | AigcAssistantPage | `diary_media` | planned: mock accepted, photo input missing |
+| AIGC | Photo-driven tourism animation generation | `POST /api/v1/aigc/storyboard` with `media_urls` | AigcAssistantPage | `diary_media` | tested: mock storyboard accepts media inputs |
 | Admin | Data dashboard and OSM import status | `GET /api/v1/admin/stats`, `GET /api/v1/admin/map/import/status` | AdminDashboardPage | all core tables | tested: stats API + page |

@@ -81,12 +81,12 @@
 ## Diary Community
 
 - [x] User can publish diary with title, body, and destination.
-- [ ] User can attach image/video media to diary.
+- [x] User can attach image/video media metadata to diary.
 - [x] Diary detail increments views.
 - [x] User can rate/comment on diary.
-- [ ] Title exact search uses an indexed exact lookup instead of generic contains matching.
-- [ ] Body keyword diary search uses an inverted index or database full-text search.
-- [ ] Diary recommendation uses views, rating, and personal interest.
+- [x] Title exact search uses an indexed exact lookup instead of generic contains matching.
+- [x] Body keyword diary search uses an inverted index or database full-text search.
+- [x] Diary recommendation uses views, rating, and personal interest.
 - [x] Compression ratio can be displayed for a diary.
 
 ## Food
@@ -103,8 +103,8 @@
 - [x] Diary draft endpoint returns title, draft, and reusable prompt.
 - [x] Storyboard endpoint returns scene list, prompt, and simulated video link.
 - [x] Frontend page can call both placeholder endpoints.
-- [ ] AIGC flow accepts uploaded scenic/campus photos as input.
-- [ ] AIGC flow returns a simulated tourism animation/video artifact from photo or diary content.
+- [x] AIGC flow accepts scenic/campus media URLs as input.
+- [x] AIGC flow returns a simulated tourism animation/video artifact from photo or diary content.
 
 ## Admin
 

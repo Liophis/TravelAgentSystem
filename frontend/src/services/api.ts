@@ -196,6 +196,15 @@ export interface DiaryCommentItem {
   created_at: string;
 }
 
+export interface DiaryMediaItem {
+  id: number;
+  diary_id: number;
+  media_type: string;
+  url: string;
+  caption?: string | null;
+  created_at: string;
+}
+
 export interface DiaryItem {
   id: number;
   user_id: number;
@@ -208,6 +217,7 @@ export interface DiaryItem {
   rating_count: number;
   created_at: string;
   comments?: DiaryCommentItem[];
+  media?: DiaryMediaItem[];
   score?: number;
   reason?: string;
 }

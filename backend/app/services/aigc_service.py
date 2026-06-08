@@ -32,11 +32,12 @@ def generate_diary_draft(payload: dict[str, Any]) -> dict[str, Any]:
 def generate_storyboard(payload: dict[str, Any]) -> dict[str, Any]:
     text = payload.get("text") or "沙河校区一日游"
     scene_count = min(max(int(payload.get("scene_count") or 4), 1), 8)
+    media_urls = _normalize_keywords(payload.get("media_urls"))
     scenes = [
         {
             "index": index,
             "title": f"镜头 {index}",
-            "description": _scene_description(text, index),
+            "description": _scene_description(text, index, media_urls),
             "duration_seconds": 5 + index,
         }
         for index in range(1, scene_count + 1)
@@ -46,6 +47,8 @@ def generate_storyboard(payload: dict[str, Any]) -> dict[str, Any]:
         "每个分镜包含画面、字幕和转场建议："
         f"{text}"
     )
+    if media_urls:
+        prompt += "；参考图片/视频素材：" + "、".join(media_urls[:5])
     return {
         "scenes": scenes,
         "prompt": prompt,
@@ -54,6 +57,7 @@ def generate_storyboard(payload: dict[str, Any]) -> dict[str, Any]:
             "stage": "stage-9-food-aigc-admin",
             "mode": "mock AIGC storyboard generator",
             "scene_count": str(scene_count),
+            "media_inputs": str(len(media_urls)),
         },
     }
 
@@ -66,7 +70,8 @@ def _normalize_keywords(value: Any) -> list[str]:
     return []
 
 
-def _scene_description(text: str, index: int) -> str:
+def _scene_description(text: str, index: int, media_urls: list[str] | None = None) -> str:
     themes = ["校门出发", "沿路导览", "设施特写", "美食停留", "总结回望", "地图路线", "互动评论", "发布游记"]
     theme = themes[(index - 1) % len(themes)]
-    return f"{theme}：结合“{text[:32]}”展示校园游览亮点。"
+    media_hint = "，参考上传素材" if media_urls else ""
+    return f"{theme}：结合“{text[:32]}”展示校园游览亮点{media_hint}。"

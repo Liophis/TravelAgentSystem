@@ -36,6 +36,9 @@
             <el-form-item label="镜头数">
               <el-input-number v-model="sceneCount" :min="1" :max="8" />
             </el-form-item>
+            <el-form-item label="媒体素材">
+              <el-input v-model="mediaText" type="textarea" :rows="3" placeholder="/media/demo/photo.jpg" />
+            </el-form-item>
           </el-form>
           <el-button :loading="storyLoading" @click="generateStory">生成分镜</el-button>
         </el-card>
@@ -78,6 +81,7 @@ const draftLoading = ref(false);
 const storyLoading = ref(false);
 const keywordText = ref("图书馆, 食堂, 路线");
 const storyText = ref("从沙河校区校门出发，经过食堂，最后到图书馆完成一次导览。");
+const mediaText = ref("/media/demo/campus-photo.jpg");
 const sceneCount = ref(4);
 const draft = ref<AigcDraftPayload | null>(null);
 const storyboard = ref<AigcStoryboardPayload | null>(null);
@@ -104,6 +108,7 @@ async function generateStory() {
     storyboard.value = await apiPost<AigcStoryboardPayload>("/api/v1/aigc/storyboard", {
       text: storyText.value,
       scene_count: sceneCount.value,
+      media_urls: mediaText.value.split("\n").map((item) => item.trim()).filter(Boolean),
     });
   } finally {
     storyLoading.value = false;

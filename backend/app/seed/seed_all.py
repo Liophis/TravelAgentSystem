@@ -16,6 +16,7 @@ from app.models import (
     Destination,
     DestinationTag,
     Diary,
+    DiaryMedia,
     Facility,
     FacilityCategory,
     Food,
@@ -29,6 +30,7 @@ from app.models import (
     UserProfile,
 )
 from app.algorithms.route_planning import approximate_distance_meters
+from app.services.diary_service import rebuild_diary_search_index
 from app.seed.sample_data import (
     BUPT_BUILDING_NAMES,
     BUPT_FACILITY_PREFIXES,
@@ -217,6 +219,20 @@ def seed_demo_data(session: Session) -> dict[str, int]:
         for index in range(20)
     ]
     session.add_all(diaries)
+    session.flush()
+    for diary in diaries:
+        rebuild_diary_search_index(session, diary)
+    session.add_all(
+        [
+            DiaryMedia(
+                diary_id=diaries[index].id,
+                media_type="image",
+                url=f"/media/seed/diary-{index + 1}.jpg",
+                caption="沙河校区游记示例图片",
+            )
+            for index in range(3)
+        ]
+    )
 
     _seed_indoor_navigation(session)
 
@@ -299,6 +315,7 @@ def count_seeded_data(session: Session) -> dict[str, int]:
         "restaurants": Restaurant,
         "foods": Food,
         "diaries": Diary,
+        "diary_media": DiaryMedia,
     }
     return {name: len(session.scalars(select(model)).all()) for name, model in models.items()}
 

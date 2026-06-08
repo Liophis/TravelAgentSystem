@@ -9,8 +9,6 @@ The project has a runnable MVP for the main demo chain: destination recommendati
 The main weakness is not API absence; it is requirement depth. Several features are still simplified demos where the course requirement asks for richer algorithms or interaction:
 
 - user auth, favorites, ratings, and behavior logs
-- diary media and photo-driven AIGC
-- exact/full-text/fuzzy search algorithm evidence
 - browser-level map verification
 
 ## Highest-Risk Gaps
@@ -18,9 +16,6 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | Priority | Area | Current State | Gap Against `要求.md` | Next Action |
 | --- | --- | --- | --- | --- |
 | P1 | User auth and behavior loop | Editable user interests now update recommendation output | Registration/login, favorites, destination ratings, and browsing behavior logs are still missing | Add minimal auth plus favorite/rating/behavior APIs |
-| P1 | Diary media | Text diary works; compression works | No image/video upload, no media preview, AIGC does not accept photos | Add media table/local upload and pass uploaded media metadata to mock AIGC |
-| P1 | Diary search | Title/body contains search works | No exact-title index/hash/trie; full-text is not an inverted index or DB full-text search | Add exact title lookup and lightweight inverted index or SQLite/Postgres FTS path |
-| P1 | Diary recommendation | Uses views + rating Top-K | Does not use personal interest | Add user-interest overlap to diary score and expose reason |
 | P1 | Food destination scope | Cuisine filter, fuzzy search, heat/rating/distance sort, and Top-K scoring work | Food is not explicitly scoped to selected destination/school | Add destination/current-place context and destination linkage |
 | P1 | Map demo verification | AMap component exists and converts WGS84 to GCJ-02 | No browser/e2e screenshot proof because AMap key is environment-dependent | Add optional Playwright smoke guarded by `VITE_AMAP_KEY` |
 | P2 | Real map data richness | Dense deterministic BUPT seed is documented as offline fallback; OSM import path exists; AMap POI importer exists; clean live AMap import replaced facility seed with 516 real facility rows locally | Building polygons and walkable campus topology may still be sparse if OSM data is incomplete | Keep OSM/manual graph data for routes and use AMap import for POI density |
@@ -37,11 +32,11 @@ The main weakness is not API absence; it is requirement depth. Several features 
 | 交通工具策略 | Covered for demo | Route planning filters walking, bicycle, electric-cart, and mixed-mode edges. |
 | 室内导航 | Covered for demo | Indoor nodes/edges, cross-floor Dijkstra, elevator/stair steps, and frontend page are implemented. |
 | 场所查询 | Covered for demo | Category-name lookup, category filtering, graph distance, and Top-K heap are implemented. |
-| 旅游日记管理/交流 | Partial | Publish/list/detail/view/rating/comment/delete work. Media upload and admin moderation are missing. |
-| 日记推荐 | Partial | Views + rating Top-K exists. Personal interest is not included. |
-| 日记精确查询/全文检索 | Partial | Contains search works, but exact-title index and inverted/full-text search are not yet implemented. |
+| 旅游日记管理/交流 | Mostly covered | Publish/list/detail/view/rating/comment/delete and media metadata work. Admin moderation remains. |
+| 日记推荐 | Covered for demo | Views + rating + personal interest Top-K exists. |
+| 日记精确查询/全文检索 | Covered for demo | Exact title index and lightweight inverted index full-text search are implemented. |
 | 日记压缩 | Covered for demo | Uses zlib+base64 lossless compression on publish and decompression on read. If hand-written compression is required, this needs a Huffman replacement. |
-| AIGC 动画 | Partial | Deterministic mock draft/storyboard exists. Photo upload and photo-to-animation input flow are missing. |
+| AIGC 动画 | Covered for demo | Deterministic mock draft/storyboard accepts media URLs and returns a simulated video link. |
 | 美食推荐 | Partial | Cuisine filter, hot/rating/distance scoring, Top-K heap, route preview, fuzzy query, and explicit search sort controls exist. Destination-scoped filtering remains. |
 
 ## Recommended Next Stages

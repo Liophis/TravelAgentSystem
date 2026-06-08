@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.services.diary_service import (
     add_diary_comment_from_db,
+    add_diary_media_from_db,
     create_diary_from_db,
     delete_diary_from_db,
     get_diary_compression_stats,
     get_diary_from_db,
     increment_diary_view,
+    list_diary_media_from_db,
     list_diaries_from_db,
     rate_diary_from_db,
     recommend_diaries_from_db,
@@ -42,18 +44,29 @@ class DiaryCommentRequest(BaseModel):
     content: str = Field(min_length=1)
 
 
+class DiaryMediaRequest(BaseModel):
+    media_type: str = Field(default="image", pattern="^(image|video)$")
+    url: str = Field(min_length=1, max_length=512)
+    caption: str | None = Field(default=None, max_length=160)
+
+
 @router.get("/search")
 def search_diaries(
     keyword: str = Query(min_length=1),
+    mode: str = Query(default="fulltext", pattern="^(fulltext|exact_title|contains)$"),
     limit: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> dict:
-    return search_diaries_from_db(db, keyword=keyword, limit=limit)
+    return search_diaries_from_db(db, keyword=keyword, mode=mode, limit=limit)
 
 
 @router.get("/recommend")
-def recommend_diaries(limit: int = Query(default=10, ge=1, le=50), db: Session = Depends(get_db)) -> dict:
-    return recommend_diaries_from_db(db, limit=limit)
+def recommend_diaries(
+    user_id: int | None = Query(default=None),
+    limit: int = Query(default=10, ge=1, le=50),
+    db: Session = Depends(get_db),
+) -> dict:
+    return recommend_diaries_from_db(db, limit=limit, user_id=user_id)
 
 
 @router.get("")
@@ -125,6 +138,22 @@ def add_diary_comment(diary_id: int, payload: DiaryCommentRequest, db: Session =
     if comment is None:
         raise HTTPException(status_code=404, detail="Diary not found.")
     return comment
+
+
+@router.post("/{diary_id}/media")
+def add_diary_media(diary_id: int, payload: DiaryMediaRequest, db: Session = Depends(get_db)) -> dict:
+    media = add_diary_media_from_db(db, diary_id=diary_id, payload=payload.model_dump())
+    if media is None:
+        raise HTTPException(status_code=404, detail="Diary not found.")
+    return media
+
+
+@router.get("/{diary_id}/media")
+def list_diary_media(diary_id: int, db: Session = Depends(get_db)) -> dict:
+    media = list_diary_media_from_db(db, diary_id=diary_id)
+    if media is None:
+        raise HTTPException(status_code=404, detail="Diary not found.")
+    return media
 
 
 @router.get("/{diary_id}/compression")

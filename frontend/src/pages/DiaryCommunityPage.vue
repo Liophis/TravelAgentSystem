@@ -15,11 +15,17 @@
             <el-form-item label="搜索">
               <el-input v-model="keyword" clearable placeholder="标题或正文" @keyup.enter="loadDiaries" />
             </el-form-item>
+            <el-form-item label="搜索模式">
+              <el-segmented v-model="searchMode" :options="searchModeOptions" />
+            </el-form-item>
             <el-form-item label="标题">
               <el-input v-model="form.title" maxlength="160" />
             </el-form-item>
             <el-form-item label="正文">
               <el-input v-model="form.body" type="textarea" :rows="5" />
+            </el-form-item>
+            <el-form-item label="媒体 URL">
+              <el-input v-model="form.media_url" clearable placeholder="/media/demo/photo.jpg" />
             </el-form-item>
           </el-form>
           <el-button type="primary" :loading="creating" @click="createDiary">发布</el-button>
@@ -52,6 +58,18 @@
             </div>
           </template>
           <p class="diary-body">{{ selected.body }}</p>
+          <div v-if="selected.media?.length" class="media-list">
+            <div v-for="media in selected.media" :key="media.id" class="media-item">
+              <el-image
+                v-if="media.media_type === 'image'"
+                :src="media.url"
+                fit="cover"
+                class="media-image"
+              />
+              <div v-else class="media-video">{{ media.url }}</div>
+              <span>{{ media.caption || media.media_type }}</span>
+            </div>
+          </div>
           <div class="diary-actions">
             <el-rate v-model="rating" />
             <el-button type="primary" @click="rateSelected">评分</el-button>
@@ -83,14 +101,21 @@ import {
 const loading = ref(false);
 const creating = ref(false);
 const keyword = ref("");
+const searchMode = ref("fulltext");
 const diaries = ref<DiaryItem[]>([]);
 const selected = ref<DiaryItem | null>(null);
 const compression = ref<DiaryCompressionPayload | null>(null);
 const rating = ref(5);
 const comment = ref("");
+const searchModeOptions = [
+  { label: "全文", value: "fulltext" },
+  { label: "精确标题", value: "exact_title" },
+  { label: "包含", value: "contains" },
+];
 const form = reactive({
   title: "沙河校区新游记",
   body: "今天在沙河校区完成了一次路线和设施查询体验，地图路径很清晰。",
+  media_url: "/media/demo/campus-photo.jpg",
 });
 
 async function loadDiaries() {
@@ -98,7 +123,14 @@ async function loadDiaries() {
   try {
     const params = new URLSearchParams({ limit: "30", offset: "0" });
     if (keyword.value.trim()) {
-      params.set("q", keyword.value.trim());
+      params.set("keyword", keyword.value.trim());
+      params.set("mode", searchMode.value);
+      const payload = await apiGet<DiaryListPayload>(`/api/v1/diaries/search?${params}`);
+      diaries.value = payload.items;
+      if (!selected.value && payload.items[0]) {
+        await selectDiary(payload.items[0]);
+      }
+      return;
     }
     const payload = await apiGet<DiaryListPayload>(`/api/v1/diaries?${params}`);
     diaries.value = payload.items;
@@ -120,6 +152,13 @@ async function createDiary() {
       body: form.body,
     });
     diaries.value = [diary, ...diaries.value];
+    if (form.media_url.trim()) {
+      await apiPost(`/api/v1/diaries/${diary.id}/media`, {
+        media_type: "image",
+        url: form.media_url.trim(),
+        caption: "游记媒体",
+      });
+    }
     await selectDiary(diary);
   } finally {
     creating.value = false;
@@ -206,5 +245,36 @@ onMounted(() => {
   border: 1px solid #edf1f5;
   border-radius: 8px;
   color: #475467;
+}
+
+.media-list {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.media-item {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  font-size: 13px;
+  color: #475467;
+}
+
+.media-image,
+.media-video {
+  width: 80px;
+  height: 54px;
+  border-radius: 6px;
+  background: #f2f4f7;
+}
+
+.media-video {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 6px;
+  font-size: 11px;
 }
 </style>
