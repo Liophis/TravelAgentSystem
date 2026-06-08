@@ -21,6 +21,7 @@ bash scripts/check_all.sh
 - Stage 7 OSM import fixture and fallback.
 - Stage 8 diary compression/search/rating/comment.
 - Stage 9 food recommendation, AIGC placeholders, admin stats.
+- Stage 32 planned: AIGC Agent endpoint/result/trace tests.
 
 ## Frontend Coverage
 

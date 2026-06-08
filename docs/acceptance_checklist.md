@@ -139,6 +139,12 @@
 - [x] Frontend page can call both placeholder endpoints.
 - [x] AIGC flow accepts scenic/campus media URLs as input.
 - [x] AIGC flow returns a simulated tourism animation/video artifact from photo or diary content.
+- [ ] `POST /api/v1/aigc/agent/run` exposes an Agent-style workflow.
+- [ ] Agent response includes `result`, `agent_trace.steps[]`, and `algorithm_trace`.
+- [ ] Agent trace shows at least 4 deterministic tool steps with timing and status.
+- [ ] Media URLs affect the Agent media-analysis and storyboard output.
+- [ ] AIGC Assistant page displays both generated artifact and Agent execution trace.
+- [ ] Legacy `diary-draft` and `storyboard` endpoints remain backward-compatible.
 
 ## Admin
 

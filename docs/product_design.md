@@ -19,10 +19,10 @@ Smart Tour Guide is an attraction/school recommendation system plus a campus-int
 5. Query nearby facilities by category and graph distance.
 6. Browse all-user diaries, open details to increase heat, rate/comment after reading, and search by destination/title/body.
 7. Recommend foods by cuisine, rating, heat, and distance.
-8. Generate mock AIGC diary/storyboard output from text and scenic/school media URLs.
+8. Generate AIGC diary/storyboard output from text and scenic/school media URLs; Stage 32 target adds an Agent-style tool execution trace.
 9. Check admin data scale and map import status.
 10. Log in as admin to access management tools; normal users should not see or call admin features.
 
 ## Demo Boundary
 
-The system is optimized for course demonstration. Authentication, moderation editing, production RBAC, and real external AIGC calls remain future work.
+The system is optimized for course demonstration. Real external AIGC calls remain future work; before the Stage 32 endpoint is implemented, current AIGC should be presented as deterministic local draft/storyboard simulation.

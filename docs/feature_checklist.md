@@ -33,6 +33,7 @@ Run this after `bash scripts/reset_dev_db.sh`.
 - [x] `GET /api/v1/foods/nearby`
 - [x] `POST /api/v1/aigc/diary-draft`
 - [x] `POST /api/v1/aigc/storyboard`
+- [ ] `POST /api/v1/aigc/agent/run`
 - [x] `GET /api/v1/admin/stats`
 
 ## Frontend Pages

@@ -66,6 +66,15 @@ data/external/      downloaded third-party OSM/AMap source payloads before clean
 - AMap overlays must receive `[lng, lat]`.
 - Default map center: `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
 
+## AIGC Contract
+
+- AIGC animation remains a deterministic local simulation unless a real external model provider is explicitly configured.
+- Do not present mock video links as real generated videos.
+- The next AIGC enhancement target is a lightweight workflow Agent exposed as `POST /api/v1/aigc/agent/run`.
+- Agent responses must include `agent_trace.steps[]` with tool name, status, timing, input summary, and output summary.
+- Keep `POST /api/v1/aigc/diary-draft` and `POST /api/v1/aigc/storyboard` backward-compatible.
+- Agent tools should be small deterministic functions first: media analyzer, diary writer, storyboard planner, prompt builder, mock video generator, and compression summary.
+
 ## Required Harness Commands
 
 Run from repository root:

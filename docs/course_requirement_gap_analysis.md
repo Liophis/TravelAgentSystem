@@ -4,11 +4,12 @@ Source: `要求.md`. The current source file contains a complete functional-requ
 
 ## Overall Judgment
 
-The project has a runnable MVP for the main demo chain: attraction/school destination recommendation, destination search, campus map display, campus-internal single-route planning, multi-point route planning, nearby facilities, diary community, diary compression, food recommendation, AIGC placeholder, and admin stats.
+The project has a runnable MVP for the main demo chain: attraction/school destination recommendation, destination search, campus map display, campus-internal single-route planning, multi-point route planning, nearby facilities, diary community, diary compression, food recommendation, AIGC placeholder, and role-aware admin management.
 
 The main weakness is no longer API absence; it is browser-level verification depth. Several features are still simplified demos where the course requirement asks for verified real map interaction:
 
 - browser-level map verification requires optional AMap key and Playwright environment
+- AIGC currently demonstrates deterministic draft/storyboard generation, but the next high-score target is an Agent-style workflow with tool orchestration and visible trace output
 
 ## Highest-Risk Gaps
 
@@ -16,6 +17,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | --- | --- | --- | --- | --- |
 | P1 | Map demo verification | AMap component exists, converts WGS84 to GCJ-02, and optional Playwright harness exists | Screenshot proof still depends on a valid `VITE_AMAP_KEY`, backend server, and local Playwright install | Run `bash scripts/check_map_frontend_optional.sh` in a prepared demo environment |
 | P2 | Real map data repeatability | Local dev DB now can use offline BUPT reference topology plus AMap/OSM POIs; seed layers are hidden by default | OSM/AMap live imports still depend on network/quota, but reference campus import is offline | Use `backend/scripts/import_reference_campus.py --replace-campus-layers` for repeatable campus routing |
+| P2 | AIGC Agent | Current AIGC is deterministic endpoint-level mock logic | Requirement says AIGC animation from photos; an Agent-style flow would better show reasoning, tool calls, and replaceable model boundary | Stage 32: add `POST /api/v1/aigc/agent/run` with local tools and `agent_trace` |
 
 ## Requirement Coverage By Module
 
@@ -34,7 +36,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | 目的地相关日记查询排序 | Covered for demo | `GET /api/v1/diaries?destination_id=...&sort=hot|rating` filters destination-related diaries and sorts by heat/rating. Frontend destination selector can be made more explicit in a polish stage. |
 | 日记精确查询/全文检索 | Covered for demo | Exact title uses `diary_title_indexes`; full-text uses lightweight `diary_search_tokens` inverted index. Chinese segmentation quality can be improved later. |
 | 日记压缩 | Covered for demo | Uses zlib+base64 lossless compression on publish and decompression on read, with compression ratio and `decompress_ok`. If hand-written compression is required, add a Huffman implementation. |
-| AIGC 动画 | Covered for demo | Deterministic mock draft/storyboard accepts scenic/school media URLs and returns storyboard scenes plus a simulated video link. Real external AIGC generation remains future work. |
+| AIGC 动画 | Partial | Deterministic mock draft/storyboard accepts scenic/school media URLs and returns storyboard scenes plus a simulated video link. Next stage should upgrade this to a lightweight Agent workflow with `agent_trace`; real external AIGC generation remains future work. |
 | 美食推荐 | Mostly covered | Cuisine filter, destination scope, hot/rating/distance scoring, Top-K heap, route preview, fuzzy query, and explicit search sort controls exist. |
 | 管理员/普通用户登录状态 | Covered for demo | One login endpoint returns `role=user|admin`; `admin01` is seeded; admin APIs require admin token and return `401/403` for missing or normal-user tokens. |
 
@@ -54,6 +56,9 @@ The main weakness is no longer API absence; it is browser-level verification dep
 
 5. Optional browser map smoke.
    `bash scripts/check_map_frontend_optional.sh` skips cleanly without key/browser and runs screenshot verification when the environment is prepared.
+
+6. Stage 32: AIGC Agent workflow.
+   Planned next stage: implement `POST /api/v1/aigc/agent/run`, keep legacy AIGC endpoints, show deterministic tool orchestration and trace on the frontend.
 
 ## Harness Commands
 
