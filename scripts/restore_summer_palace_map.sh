@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -e
+
+cd "$(dirname "$0")/.."
+
+PYTHON_CMD=${BACKEND_PYTHON_CMD:-python}
+OSM_PAYLOAD="data/external/summer-palace/osm/osmnx_summer_palace_payload.json"
+
+if [ ! -f "$OSM_PAYLOAD" ]; then
+  echo "[summer-palace-map] missing offline OSM payload: $OSM_PAYLOAD"
+  exit 1
+fi
+
+echo "[summer-palace-map] restoring Summer Palace OSM graph, buildings, and facilities"
+PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_osm_campus.py \
+  --source osmnx \
+  --scene-key summer_palace \
+  --load-payload "$OSM_PAYLOAD"
+
+PYTHONPATH=backend ${PYTHON_CMD} - <<'PY'
+from sqlalchemy.orm import Session
+
+from app.core.config import settings
+from app.db.session import create_app_engine
+from app.services.map_data_service import get_map_stats_from_db
+
+engine = create_app_engine(settings.api_database_url)
+with Session(engine) as session:
+    stats = get_map_stats_from_db(session, scene_key="summer_palace")
+
+print(f"[summer-palace-map] visible map stats: {stats}")
+
+if stats["roads"] < 200:
+    raise SystemExit("[summer-palace-map] restore failed: roads are below requirement")
+if stats["buildings"] < 20:
+    raise SystemExit("[summer-palace-map] restore failed: buildings are below requirement")
+if stats["facilities"] < 50:
+    raise SystemExit("[summer-palace-map] restore failed: facilities are below requirement")
+PY

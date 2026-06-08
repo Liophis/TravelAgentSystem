@@ -6,6 +6,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.core.campus_scope import is_in_bupt_shahe_bounds
+from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key
 from app.algorithms.coordinates import gcj02_to_wgs84, wgs84_to_gcj02
 from app.algorithms.route_planning import approximate_distance_meters
 from app.models import Facility, FacilityCategory, MapNode
@@ -111,6 +112,7 @@ def import_amap_pois_to_db(
     reset_dataset: bool = False,
     dataset: str = "nearby_facilities",
     campus_only: bool = False,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
     request_interval: float = 0.3,
 ) -> dict[str, Any]:
     pois, fetch_trace = fetch_amap_pois(
@@ -132,6 +134,7 @@ def import_amap_pois_to_db(
         reset_dataset=reset_dataset,
         dataset=dataset,
         campus_only=campus_only,
+        scene_key=scene_key,
         fetch_trace=fetch_trace,
     )
 
@@ -146,21 +149,29 @@ def import_amap_poi_items_to_db(
     reset_dataset: bool = False,
     dataset: str = "nearby_facilities",
     campus_only: bool = False,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
     fetch_trace: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     if reset_facilities:
-        session.execute(delete(Facility))
-        session.execute(delete(FacilityCategory))
+        session.execute(delete(Facility).where(Facility.scene_key == resolved_scene_key))
         session.flush()
     elif reset_dataset and dataset != "campus_navigation":
-        session.execute(delete(Facility).where(Facility.description.like(f"%dataset={dataset}%")))
+        session.execute(
+            delete(Facility).where(
+                Facility.scene_key == resolved_scene_key,
+                Facility.description.like(f"%dataset={dataset}%"),
+            )
+        )
         session.flush()
 
     categories = _load_or_create_standard_categories(session)
-    nodes = list(session.scalars(select(MapNode).order_by(MapNode.id)).all())
+    nodes = list(
+        session.scalars(select(MapNode).where(MapNode.scene_key == resolved_scene_key).order_by(MapNode.id)).all()
+    )
     existing_by_signature = {
         _facility_signature(facility.name, facility.lng, facility.lat): facility
-        for facility in session.scalars(select(Facility)).all()
+        for facility in session.scalars(select(Facility).where(Facility.scene_key == resolved_scene_key)).all()
     }
     seen_amap_ids: set[str] = set()
     imported = 0
@@ -184,7 +195,10 @@ def import_amap_poi_items_to_db(
         if distance > radius + 100:
             skipped += 1
             continue
-        if campus_only and not is_in_bupt_shahe_bounds(normalized["lng"], normalized["lat"]):
+        if campus_only and resolved_scene_key == DEFAULT_SCENE_KEY and not is_in_bupt_shahe_bounds(
+            normalized["lng"],
+            normalized["lat"],
+        ):
             skipped += 1
             continue
 
@@ -200,6 +214,7 @@ def import_amap_poi_items_to_db(
         category = categories[category_code]
         nearest_node = _nearest_node(normalized["lng"], normalized["lat"], nodes)
         facility = Facility(
+            scene_key=resolved_scene_key,
             name=normalized["name"],
             category_id=category.id,
             nearest_node_id=nearest_node.id if nearest_node else None,
@@ -214,6 +229,7 @@ def import_amap_poi_items_to_db(
     session.commit()
     return {
         "source": "amap-place-around",
+        "scene_key": resolved_scene_key,
         "dataset": dataset,
         "center": [center_lng, center_lat],
         "radius": radius,

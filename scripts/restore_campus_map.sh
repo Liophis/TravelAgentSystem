@@ -18,11 +18,14 @@ if [ ! -f "$OSM_PAYLOAD" ]; then
 fi
 
 echo "[campus-map] restoring BUPT Shahe reference topology"
-PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_reference_campus.py --replace-campus-layers
+PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_reference_campus.py \
+  --scene-key bupt_shahe \
+  --replace-campus-layers
 
 echo "[campus-map] restoring offline OSM building/facility layers"
 PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_osm_campus.py \
   --source osmnx \
+  --scene-key bupt_shahe \
   --features-only \
   --load-payload "$OSM_PAYLOAD"
 

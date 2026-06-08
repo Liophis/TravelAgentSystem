@@ -10,6 +10,7 @@ router = APIRouter()
 
 
 class RoutePlanRequest(BaseModel):
+    scene_key: str = Field(default="bupt_shahe")
     start_place_id: str | None = Field(default=None)
     end_place_id: str | None = Field(default=None)
     start_lng: float = Field(default=116.28333)
@@ -29,6 +30,7 @@ class RoutePointRequest(BaseModel):
 
 
 class MultiPointRouteRequest(BaseModel):
+    scene_key: str = Field(default="bupt_shahe")
     start_place_id: str | None = Field(default=None)
     start_lng: float = Field(default=116.28333)
     start_lat: float = Field(default=40.15608)

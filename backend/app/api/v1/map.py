@@ -18,40 +18,44 @@ router = APIRouter()
 @router.get("/stats")
 def get_map_stats(
     include_demo: bool = Query(default=False),
+    scene_key: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> dict[str, int]:
-    return get_map_stats_from_db(db, include_demo=include_demo)
+    return get_map_stats_from_db(db, include_demo=include_demo, scene_key=scene_key)
 
 
 @router.get("/geojson")
 def get_map_geojson(
     include_demo: bool = Query(default=False),
+    scene_key: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> dict:
-    return get_map_payload_from_db(db, include_demo=include_demo)
+    return get_map_payload_from_db(db, include_demo=include_demo, scene_key=scene_key)
 
 
 @router.get("/nodes")
-def get_map_nodes(db: Session = Depends(get_db)) -> list[dict]:
-    return get_map_nodes_from_db(db)
+def get_map_nodes(db: Session = Depends(get_db), scene_key: str | None = Query(default=None)) -> list[dict]:
+    return get_map_nodes_from_db(db, scene_key=scene_key)
 
 
 @router.get("/edges")
-def get_map_edges(db: Session = Depends(get_db)) -> list[dict]:
-    return get_map_edges_from_db(db)
+def get_map_edges(db: Session = Depends(get_db), scene_key: str | None = Query(default=None)) -> list[dict]:
+    return get_map_edges_from_db(db, scene_key=scene_key)
 
 
 @router.get("/buildings")
 def get_map_buildings(
     include_demo: bool = Query(default=False),
+    scene_key: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[dict]:
-    return get_buildings_from_db(db, include_demo=include_demo)
+    return get_buildings_from_db(db, include_demo=include_demo, scene_key=scene_key)
 
 
 @router.get("/facilities")
 def get_map_facilities(
     include_demo: bool = Query(default=False),
+    scene_key: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> list[dict]:
-    return get_facilities_from_db(db, include_demo=include_demo)
+    return get_facilities_from_db(db, include_demo=include_demo, scene_key=scene_key)

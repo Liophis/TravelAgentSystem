@@ -11,7 +11,8 @@ router = APIRouter()
 def search_places(
     keyword: str = Query(default="", min_length=0),
     category: str | None = Query(default=None),
-    scope: str = Query(default="all", pattern="^(all|destinations|campus)$"),
+    scope: str = Query(default="all", pattern="^(all|destinations|campus|scenic)$"),
+    scene_key: str | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
     db: Session = Depends(get_db),
 ) -> dict:
@@ -21,4 +22,5 @@ def search_places(
         category=category,
         limit=limit,
         scope=scope,
+        scene_key=scene_key,
     )

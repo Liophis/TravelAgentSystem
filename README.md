@@ -122,13 +122,14 @@ docker compose up --build
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
 bash scripts/restore_campus_map.sh
+bash scripts/restore_summer_palace_map.sh
 bash scripts/smoke_features.sh
 bash scripts/clean_demo_map_layers.sh
 ```
 
 These scripts default to `DEV_DATABASE_URL=sqlite:///./smart_tour_dev.db` and currently seed 11 users, including `user01` as a normal user and `admin01` as an admin, 207 real China attraction/university destinations, 180 map nodes, 641 map edges, 60 buildings, 120 facilities, 10 facility categories, 19 indoor nodes, 20 indoor edges, 12 restaurants, 72 foods, 20 diaries, and sample user feedback rows.
 
-`bash scripts/reset_dev_db.sh` resets the SQLite demo database and then calls `bash scripts/restore_campus_map.sh`, so the BUPT Shahe campus navigation page keeps visible roads, buildings, and facilities after reset.
+`bash scripts/reset_dev_db.sh` resets the SQLite demo database and then calls `bash scripts/restore_campus_map.sh` plus `bash scripts/restore_summer_palace_map.sh` when the saved payload exists, so BUPT Shahe and Summer Palace navigation keep visible roads, buildings, and facilities after reset.
 
 `bash scripts/seed_all.sh` is incremental once a dev DB already exists: it creates missing tables/columns, upgrades old `北邮沙河导览点` destination rows to real attraction/university rows, assigns existing restaurants to nearby destinations, and backfills sample favorites/ratings/behavior logs without deleting real imported AMap facilities.
 
@@ -157,6 +158,7 @@ To capture external source payloads without changing the database:
 ```bash
 PYTHONPATH=backend python backend/scripts/import_osm_campus.py --source osmnx --dist 900 --download-only --save-payload data/external/bupt-shahe/osm/osmnx_campus_payload.json
 PYTHONPATH=backend python backend/scripts/import_amap_pois.py --dataset campus_navigation --campus-only --download-only --save-raw data/external/bupt-shahe/amap_gcj02/campus_navigation_raw.json
+conda run -n travel-agent python backend/scripts/import_osm_campus.py --source osmnx --scene-key summer_palace --place-name "Summer Palace, Beijing, China" --center-lng 116.2755 --center-lat 39.9996 --dist 1800 --download-only --save-payload data/external/summer-palace/osm/osmnx_summer_palace_payload.json
 ```
 
 To remove old offline square building/facility layers:
@@ -176,9 +178,10 @@ To import the manually supplied BUPT Shahe WGS84 campus topology:
 
 ```bash
 bash scripts/restore_campus_map.sh
+bash scripts/restore_summer_palace_map.sh
 ```
 
-This restores the reference campus graph and offline OSM building/POI layers, keeps the deterministic seed graph hidden as fallback, and makes the campus navigation map visible after a database reset.
+This restores the reference campus graph, offline BUPT OSM building/POI layers, and the saved real Summer Palace OSM graph/features. The deterministic seed graph stays hidden as fallback for BUPT, and both internal-navigation scenes remain visible after a database reset.
 
 The public map API hides seed/fallback layers by default. Use `include_demo=true` only for fallback inspection:
 

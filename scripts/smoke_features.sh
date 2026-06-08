@@ -109,6 +109,65 @@ with Session(engine) as session:
         f"distance={route['distance']}m duration={route['duration']}s steps={len(route['steps'])}"
     )
 
+    summer_stats = get_map_stats_from_db(session, scene_key="summer_palace")
+    require("summer palace roads", summer_stats["roads"], 200)
+    require("summer palace buildings", summer_stats["buildings"], 20)
+    require("summer palace facilities", summer_stats["facilities"], 50)
+    print(f"[smoke] summer palace map: {summer_stats}")
+    summer_start_search = search_places_from_db(
+        session,
+        "仁寿殿",
+        None,
+        5,
+        scope="scenic",
+        scene_key="summer_palace",
+    )
+    summer_end_search = search_places_from_db(
+        session,
+        "佛香阁",
+        None,
+        5,
+        scope="scenic",
+        scene_key="summer_palace",
+    )
+    require("summer palace start search", summer_start_search["total"])
+    require("summer palace end search", summer_end_search["total"])
+    summer_route = plan_route_from_db(
+        session,
+        {
+            "scene_key": "summer_palace",
+            "start_place_id": summer_start_search["items"][0]["id"],
+            "end_place_id": summer_end_search["items"][0]["id"],
+            "strategy": "shortest_distance",
+            "mode": "walk",
+            "route_source": "local_graph",
+        },
+    )
+    require("summer palace route path points", len(summer_route["path"]), 2)
+    print(
+        "[smoke] summer palace route: "
+        f"distance={summer_route['distance']}m steps={len(summer_route['steps'])}"
+    )
+    summer_multi_route = plan_multi_point_route_from_db(
+        session,
+        {
+            "scene_key": "summer_palace",
+            "start_place_id": summer_start_search["items"][0]["id"],
+            "points": [
+                {"place_id": summer_end_search["items"][0]["id"]},
+            ],
+            "return_to_start": False,
+            "strategy": "shortest_distance",
+            "mode": "walk",
+            "route_source": "local_graph",
+        },
+    )
+    require("summer palace multi-point segments", len(summer_multi_route["segments"]))
+    print(
+        "[smoke] summer palace multi-point: "
+        f"distance={summer_multi_route['distance']}m segments={len(summer_multi_route['segments'])}"
+    )
+
     multi_route = plan_multi_point_route_from_db(
         session,
         {
@@ -158,6 +217,22 @@ with Session(engine) as session:
         "[smoke] facilities: "
         f"origin={facilities['origin']['name']} category={facilities['category']} "
         f"total={facilities['total']} returned={len(facilities['items'])}"
+    )
+
+    summer_facilities = get_nearby_facilities_from_db(
+        session=session,
+        origin_place_id=summer_start_search["items"][0]["id"],
+        current_lng=0,
+        current_lat=0,
+        category=None,
+        radius=5000,
+        limit=3,
+        scene_key="summer_palace",
+    )
+    require("summer palace nearby facilities", len(summer_facilities["items"]))
+    print(
+        "[smoke] summer palace facilities: "
+        f"origin={summer_facilities['origin']['name']} returned={len(summer_facilities['items'])}"
     )
 
     diaries = list_diaries_from_db(session, destination_id=None, q=None, sort="hot", limit=2, offset=0)

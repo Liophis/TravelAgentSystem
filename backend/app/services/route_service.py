@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key
 from app.algorithms.route_planning import (
     GraphEdge,
     GraphNode,
@@ -27,10 +28,11 @@ MODE_LABELS = {
 
 
 def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, Any]:
+    scene_key = normalize_scene_key(payload.get("scene_key"))
     mode = _normalize_mode(payload.get("mode"))
     route_source = _normalize_route_source(payload.get("route_source"))
-    start_endpoint = _resolve_route_endpoint(session, payload, "start")
-    end_endpoint = _resolve_route_endpoint(session, payload, "end")
+    start_endpoint = _resolve_route_endpoint(session, payload, "start", scene_key)
+    end_endpoint = _resolve_route_endpoint(session, payload, "end", scene_key)
     start = (start_endpoint["lng"], start_endpoint["lat"])
     end = (end_endpoint["lng"], end_endpoint["lat"])
 
@@ -45,6 +47,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
             )
             return {
                 "strategy": payload.get("strategy", "shortest_distance"),
+                "scene_key": scene_key,
                 "mode": mode,
                 "route_source": "amap_walking",
                 "distance": route["distance"],
@@ -56,6 +59,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
                 "steps": route["steps"],
                 "algorithm_trace": {
                     **route["algorithm_trace"],
+                    "scene_key": scene_key,
                     "input_model": "place_id first, coordinate fallback",
                     "fallback": "local Dijkstra graph when AMap is unavailable or route_source=local_graph",
                 },
@@ -64,9 +68,9 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
             if route_source == "amap_walking":
                 raise RouteNotFoundError("AMap walking route is unavailable.")
 
-    nodes, edges = _load_route_graph_data(session, mode)
+    nodes, edges = _load_route_graph_data(session, mode, scene_key)
     if not edges:
-        raise RouteNotFoundError(f"No map edges are available for mode {mode}.")
+        raise RouteNotFoundError(f"No map edges are available for scene {scene_key} and mode {mode}.")
 
     start_snap, end_snap, component_count = _find_connected_snaps(start, end, nodes, edges)
     weight = _resolve_weight(payload.get("strategy"))
@@ -83,6 +87,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
     duration = route.graph_duration + _snap_duration(start_snap.distance, mode) + _snap_duration(end_snap.distance, mode)
     return {
         "strategy": payload.get("strategy", "shortest_distance"),
+        "scene_key": scene_key,
         "mode": mode,
         "route_source": "local_graph",
         "distance": round(distance),
@@ -96,6 +101,7 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
             "stage": "stage-4-db-graph",
             "algorithm": "Dijkstra shortest path",
             "topology_source": "local map_nodes/map_edges graph",
+            "scene_key": scene_key,
             "input_model": "place_id first, coordinate fallback",
             "weight": weight,
             "mode": mode,
@@ -112,18 +118,20 @@ def plan_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, A
 
 
 def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) -> dict[str, Any]:
+    scene_key = normalize_scene_key(payload.get("scene_key"))
+    payload = {**payload, "scene_key": scene_key}
     points = list(payload.get("points") or [])
     if not points:
         raise RouteNotFoundError("At least one destination point is required.")
 
-    start_endpoint = _resolve_route_endpoint(session, payload, "start")
+    start_endpoint = _resolve_route_endpoint(session, payload, "start", scene_key)
     current = {
         **start_endpoint,
         "name": start_endpoint.get("name") or "起点",
     }
     start = dict(current)
     remaining = [
-        _resolve_multi_point_endpoint(session, point, index)
+        _resolve_multi_point_endpoint(session, point, index, scene_key)
         for index, point in enumerate(points)
     ]
     segments = []
@@ -155,6 +163,7 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
 
     return {
         "strategy": payload.get("strategy", "shortest_distance"),
+        "scene_key": scene_key,
         "mode": payload.get("mode", "walk"),
         "route_source": payload.get("route_source", "local_graph"),
         "distance": total_distance,
@@ -167,6 +176,7 @@ def plan_multi_point_route_from_db(session: Session, payload: dict[str, Any]) ->
         "algorithm_trace": {
             "stage": "stage-12-multi-point-route",
             "algorithm": "Greedy TSP approximation, each candidate leg scored by Dijkstra graph distance",
+            "scene_key": scene_key,
             "input_model": "place_id first, coordinate fallback",
             "points": str(len(points)),
             "segments": str(len(segments)),
@@ -273,6 +283,7 @@ def _plan_between(
     return plan_route_from_db(
         session,
         {
+            "scene_key": payload.get("scene_key", DEFAULT_SCENE_KEY),
             "start_lng": start["lng"],
             "start_lat": start["lat"],
             "end_lng": end["lng"],
@@ -284,10 +295,10 @@ def _plan_between(
     )
 
 
-def _resolve_route_endpoint(session: Session, payload: dict[str, Any], prefix: str) -> dict[str, Any]:
+def _resolve_route_endpoint(session: Session, payload: dict[str, Any], prefix: str, scene_key: str) -> dict[str, Any]:
     place_id = payload.get(f"{prefix}_place_id")
     if place_id:
-        return _lookup_place_coordinate(session, str(place_id))
+        return _lookup_place_coordinate(session, str(place_id), scene_key)
 
     lng = payload.get(f"{prefix}_lng")
     lat = payload.get(f"{prefix}_lat")
@@ -302,10 +313,15 @@ def _resolve_route_endpoint(session: Session, payload: dict[str, Any], prefix: s
     }
 
 
-def _resolve_multi_point_endpoint(session: Session, point: dict[str, Any], index: int) -> dict[str, Any]:
+def _resolve_multi_point_endpoint(
+    session: Session,
+    point: dict[str, Any],
+    index: int,
+    scene_key: str,
+) -> dict[str, Any]:
     place_id = point.get("place_id")
     if place_id:
-        endpoint = _lookup_place_coordinate(session, str(place_id))
+        endpoint = _lookup_place_coordinate(session, str(place_id), scene_key)
         endpoint["index"] = index
         endpoint["name"] = point.get("name") or endpoint.get("name") or f"终点 {index + 1}"
         return endpoint
@@ -322,7 +338,7 @@ def _resolve_multi_point_endpoint(session: Session, point: dict[str, Any], index
     }
 
 
-def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
+def _lookup_place_coordinate(session: Session, place_id: str, scene_key: str) -> dict[str, Any]:
     source, raw_id = _split_place_id(place_id)
     model_id = int(raw_id)
     if source == "destination":
@@ -340,6 +356,7 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
         facility = session.get(Facility, model_id)
         if facility is None:
             raise RouteNotFoundError(f"Facility {place_id} was not found.")
+        _ensure_place_in_scene(place_id, facility.scene_key, scene_key)
         return {
             "id": place_id,
             "source": "facility",
@@ -351,6 +368,7 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
         building = session.get(Building, model_id)
         if building is None:
             raise RouteNotFoundError(f"Building {place_id} was not found.")
+        _ensure_place_in_scene(place_id, building.scene_key, scene_key)
         lng, lat = _building_center(building.polygon)
         return {
             "id": place_id,
@@ -363,6 +381,7 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
         node = session.get(MapNode, model_id)
         if node is None:
             raise RouteNotFoundError(f"Map node {place_id} was not found.")
+        _ensure_place_in_scene(place_id, node.scene_key, scene_key)
         return {
             "id": place_id,
             "source": "node",
@@ -371,6 +390,13 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
             "lat": node.lat,
         }
     raise RouteNotFoundError(f"Unsupported route place id: {place_id}.")
+
+
+def _ensure_place_in_scene(place_id: str, item_scene_key: str, requested_scene_key: str) -> None:
+    if item_scene_key != requested_scene_key:
+        raise RouteNotFoundError(
+            f"Route place {place_id} belongs to scene {item_scene_key}, not {requested_scene_key}."
+        )
 
 
 def _split_place_id(place_id: str) -> tuple[str, str]:
@@ -483,7 +509,7 @@ def _build_steps(start_snap, end_snap, edges: list[GraphEdge]) -> list[dict[str,
     return steps
 
 
-def _load_route_graph_data(session: Session, mode: str) -> tuple[list[GraphNode], list[GraphEdge]]:
+def _load_route_graph_data(session: Session, mode: str, scene_key: str) -> tuple[list[GraphNode], list[GraphEdge]]:
     nodes = [
         GraphNode(
             id=node.id,
@@ -491,10 +517,10 @@ def _load_route_graph_data(session: Session, mode: str) -> tuple[list[GraphNode]
             lat=node.lat,
             name=node.name,
         )
-        for node in session.scalars(select(MapNode).order_by(MapNode.id)).all()
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key).order_by(MapNode.id)).all()
     ]
     edges = []
-    for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all():
+    for edge in session.scalars(select(MapEdge).where(MapEdge.scene_key == scene_key).order_by(MapEdge.id)).all():
         resolved = _resolve_edge_for_mode(edge, mode)
         if resolved is not None:
             edges.append(resolved)

@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Import WGS84 BUPT Shahe reference campus topology.")
     parser.add_argument("--database-url", default=settings.dev_database_url)
     parser.add_argument("--source", default=str(DEFAULT_SOURCE_DIR))
+    parser.add_argument("--scene-key", default="bupt_shahe")
     parser.add_argument("--replace-campus-layers", action="store_true")
     return parser.parse_args()
 
@@ -33,6 +34,7 @@ def main() -> None:
             session=session,
             source_dir=args.source,
             replace_campus_layers=args.replace_campus_layers,
+            scene_key=args.scene_key,
         )
     print("[reference-campus-import] database:", args.database_url)
     for key, value in summary.items():

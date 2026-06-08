@@ -5,6 +5,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.algorithms.route_planning import approximate_distance_meters
+from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key
 from app.models import Building, Facility, FacilityCategory, MapEdge, MapNode
 from app.seed.osm_sample_data import BUPT_SHAHE_OSM_SAMPLE
 from app.services.map_data_service import cleanup_demo_map_layers
@@ -14,21 +15,33 @@ class OsmImportError(RuntimeError):
     pass
 
 
-def import_fixture_osm_payload(session: Session, reset_existing: bool = True) -> dict[str, Any]:
-    return import_osm_payload_to_db(session, BUPT_SHAHE_OSM_SAMPLE, reset_existing=reset_existing)
+def import_fixture_osm_payload(
+    session: Session,
+    reset_existing: bool = True,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
+) -> dict[str, Any]:
+    return import_osm_payload_to_db(
+        session,
+        BUPT_SHAHE_OSM_SAMPLE,
+        reset_existing=reset_existing,
+        scene_key=scene_key,
+    )
 
 
 def import_osm_payload_to_db(
     session: Session,
     payload: dict[str, Any],
     reset_existing: bool = True,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
 ) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     if reset_existing:
-        _clear_map_tables(session)
+        _clear_map_tables(session, resolved_scene_key)
 
     external_to_node: dict[str, MapNode] = {}
     for node_payload in payload.get("nodes", []):
         node = MapNode(
+            scene_key=resolved_scene_key,
             external_id=str(node_payload["external_id"]),
             name=node_payload.get("name"),
             lng=float(node_payload["lng"]),
@@ -50,6 +63,7 @@ def import_osm_payload_to_db(
         )
         session.add(
             MapEdge(
+                scene_key=resolved_scene_key,
                 from_node_id=from_node.id,
                 to_node_id=to_node.id,
                 distance=distance,
@@ -67,6 +81,7 @@ def import_osm_payload_to_db(
     for building_payload in payload.get("buildings", []):
         session.add(
             Building(
+                scene_key=resolved_scene_key,
                 name=building_payload["name"],
                 category=building_payload.get("category") or "building",
                 polygon=building_payload["polygon"],
@@ -86,6 +101,7 @@ def import_osm_payload_to_db(
         category = categories[facility_payload["category"]]
         session.add(
             Facility(
+                scene_key=resolved_scene_key,
                 name=facility_payload["name"],
                 category_id=category.id,
                 nearest_node_id=nearest_node.id if nearest_node else None,
@@ -98,6 +114,7 @@ def import_osm_payload_to_db(
     session.commit()
     return {
         "source": payload.get("source", "osm-payload"),
+        "scene_key": resolved_scene_key,
         "place_name": payload.get("place_name"),
         "nodes": len(payload.get("nodes", [])),
         "edges": edges_imported,
@@ -118,11 +135,13 @@ def import_osm_feature_layers_to_db(
     remove_demo_layers: bool = True,
     replace_osm_layers: bool = True,
     import_facilities: bool = True,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
 ) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     if remove_demo_layers:
-        cleanup_demo_map_layers(session, remove_buildings=True, remove_facilities=True)
+        cleanup_demo_map_layers(session, remove_buildings=True, remove_facilities=True, scene_key=resolved_scene_key)
     if replace_osm_layers:
-        _clear_imported_feature_layers(session, include_facilities=import_facilities)
+        _clear_imported_feature_layers(session, include_facilities=import_facilities, scene_key=resolved_scene_key)
 
     buildings_imported = 0
     for building_payload in payload.get("buildings", []):
@@ -131,6 +150,7 @@ def import_osm_feature_layers_to_db(
             continue
         session.add(
             Building(
+                scene_key=resolved_scene_key,
                 name=building_payload.get("name") or "OSM building",
                 category=building_payload.get("category") or "building",
                 polygon=polygon,
@@ -143,10 +163,12 @@ def import_osm_feature_layers_to_db(
     facilities_skipped = 0
     if import_facilities:
         categories = _load_or_create_categories(session, payload.get("facilities", []))
-        nodes = list(session.scalars(select(MapNode).order_by(MapNode.id)).all())
+        nodes = list(
+            session.scalars(select(MapNode).where(MapNode.scene_key == resolved_scene_key).order_by(MapNode.id)).all()
+        )
         existing_signatures = {
             _facility_signature(facility.name, facility.lng, facility.lat)
-            for facility in session.scalars(select(Facility)).all()
+            for facility in session.scalars(select(Facility).where(Facility.scene_key == resolved_scene_key)).all()
         }
         for facility_payload in payload.get("facilities", []):
             signature = _facility_signature(
@@ -165,6 +187,7 @@ def import_osm_feature_layers_to_db(
             ) if nodes else None
             session.add(
                 Facility(
+                    scene_key=resolved_scene_key,
                     name=facility_payload["name"],
                     category_id=category.id,
                     nearest_node_id=nearest_node.id if nearest_node else None,
@@ -179,6 +202,7 @@ def import_osm_feature_layers_to_db(
     session.commit()
     return {
         "source": payload.get("source", "osmnx-overpass"),
+        "scene_key": resolved_scene_key,
         "place_name": payload.get("place_name"),
         "buildings_imported": buildings_imported,
         "facilities_imported": facilities_imported,
@@ -198,20 +222,25 @@ def import_osm_road_graph_to_db(
     payload: dict[str, Any],
     replace_osm_roads: bool = True,
     rebind_facilities: bool = True,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
 ) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     if replace_osm_roads:
-        _clear_imported_road_layers(session)
+        _clear_imported_road_layers(session, resolved_scene_key)
 
     external_to_node: dict[str, MapNode] = {}
     skipped_nodes = 0
     for node_payload in payload.get("nodes", []):
         external_id = str(node_payload["external_id"])
-        existing = session.scalar(select(MapNode).where(MapNode.external_id == external_id))
+        existing = session.scalar(
+            select(MapNode).where(MapNode.external_id == external_id, MapNode.scene_key == resolved_scene_key)
+        )
         if existing is not None:
             external_to_node[external_id] = existing
             skipped_nodes += 1
             continue
         node = MapNode(
+            scene_key=resolved_scene_key,
             external_id=external_id,
             name=node_payload.get("name"),
             lng=float(node_payload["lng"]),
@@ -225,7 +254,7 @@ def import_osm_road_graph_to_db(
     edges_skipped = 0
     existing_edge_signatures = {
         (edge.from_node_id, edge.to_node_id, round(edge.distance, 1))
-        for edge in session.scalars(select(MapEdge)).all()
+        for edge in session.scalars(select(MapEdge).where(MapEdge.scene_key == resolved_scene_key)).all()
     }
     for edge_payload in payload.get("edges", []):
         from_node = external_to_node.get(str(edge_payload["from_external_id"]))
@@ -243,6 +272,7 @@ def import_osm_road_graph_to_db(
             continue
         session.add(
             MapEdge(
+                scene_key=resolved_scene_key,
                 from_node_id=from_node.id,
                 to_node_id=to_node.id,
                 distance=distance,
@@ -258,10 +288,11 @@ def import_osm_road_graph_to_db(
         existing_edge_signatures.add(signature)
         edges_imported += 1
 
-    rebound_facilities = _rebind_facilities_to_nearest_node(session) if rebind_facilities else 0
+    rebound_facilities = _rebind_facilities_to_nearest_node(session, resolved_scene_key) if rebind_facilities else 0
     session.commit()
     return {
         "source": payload.get("source", "osmnx-overpass"),
+        "scene_key": resolved_scene_key,
         "place_name": payload.get("place_name"),
         "nodes_imported": len(external_to_node) - skipped_nodes,
         "nodes_skipped": skipped_nodes,
@@ -399,18 +430,31 @@ def get_map_import_status(session: Session) -> dict[str, Any]:
     }
 
 
-def _clear_map_tables(session: Session) -> None:
-    session.execute(delete(Facility))
-    session.execute(delete(FacilityCategory))
-    session.execute(delete(MapEdge))
-    session.execute(delete(Building))
-    session.execute(delete(MapNode))
+def _clear_map_tables(session: Session, scene_key: str) -> None:
+    node_ids = [
+        node.id
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all()
+    ]
+    if node_ids:
+        session.execute(
+            delete(MapEdge).where(
+                (MapEdge.scene_key == scene_key)
+                | (MapEdge.from_node_id.in_(node_ids))
+                | (MapEdge.to_node_id.in_(node_ids))
+            )
+        )
+    else:
+        session.execute(delete(MapEdge).where(MapEdge.scene_key == scene_key))
+    session.execute(delete(Facility).where(Facility.scene_key == scene_key))
+    session.execute(delete(Building).where(Building.scene_key == scene_key))
+    session.execute(delete(MapNode).where(MapNode.scene_key == scene_key))
     session.flush()
 
 
-def _clear_imported_feature_layers(session: Session, include_facilities: bool) -> None:
+def _clear_imported_feature_layers(session: Session, include_facilities: bool, scene_key: str) -> None:
     session.execute(
         delete(Building).where(
+            Building.scene_key == scene_key,
             (Building.description.like("Imported from OpenStreetMap%"))
             | (Building.description.like("Fixture %OSM%"))
         )
@@ -418,6 +462,7 @@ def _clear_imported_feature_layers(session: Session, include_facilities: bool) -
     if include_facilities:
         session.execute(
             delete(Facility).where(
+                Facility.scene_key == scene_key,
                 (Facility.description.like("Imported from OpenStreetMap%"))
                 | (Facility.description.like("Fixture %OSM%"))
             )
@@ -425,10 +470,10 @@ def _clear_imported_feature_layers(session: Session, include_facilities: bool) -
     session.flush()
 
 
-def _clear_imported_road_layers(session: Session) -> None:
+def _clear_imported_road_layers(session: Session, scene_key: str) -> None:
     osm_node_ids = [
         node.id
-        for node in session.scalars(select(MapNode)).all()
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all()
         if node.external_id.startswith("osm-")
     ]
     if not osm_node_ids:
@@ -439,7 +484,9 @@ def _clear_imported_road_layers(session: Session) -> None:
             | (MapEdge.to_node_id.in_(osm_node_ids))
         )
     )
-    for facility in session.scalars(select(Facility).where(Facility.nearest_node_id.in_(osm_node_ids))).all():
+    for facility in session.scalars(
+        select(Facility).where(Facility.scene_key == scene_key, Facility.nearest_node_id.in_(osm_node_ids))
+    ).all():
         facility.nearest_node_id = None
     session.execute(delete(MapNode).where(MapNode.id.in_(osm_node_ids)))
     session.flush()
@@ -492,12 +539,12 @@ def _source_description(payload: dict[str, Any], fallback: str) -> str:
     return str(description)
 
 
-def _rebind_facilities_to_nearest_node(session: Session) -> int:
-    nodes = list(session.scalars(select(MapNode)).all())
+def _rebind_facilities_to_nearest_node(session: Session, scene_key: str) -> int:
+    nodes = list(session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all())
     if not nodes:
         return 0
     rebound = 0
-    for facility in session.scalars(select(Facility)).all():
+    for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key)).all():
         nearest_node = _nearest_imported_node(facility.lng, facility.lat, nodes)
         if facility.nearest_node_id != nearest_node.id:
             facility.nearest_node_id = nearest_node.id

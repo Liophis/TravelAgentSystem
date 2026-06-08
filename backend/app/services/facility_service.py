@@ -13,6 +13,7 @@ from app.algorithms.route_planning import (
     build_bidirectional_graph,
     dijkstra_shortest_path,
 )
+from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key
 from app.models import Building, Facility, FacilityCategory, MapEdge, MapNode
 from app.services.route_service import build_path_coordinates
 
@@ -25,18 +26,20 @@ def get_nearby_facilities_from_db(
     radius: int,
     limit: int,
     origin_place_id: str | None = None,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
 ) -> dict[str, Any]:
-    nodes, edges = _load_graph_data(session)
+    resolved_scene_key = normalize_scene_key(scene_key)
+    nodes, edges = _load_graph_data(session, resolved_scene_key)
     if not edges:
-        raise RouteNotFoundError("No map edges are available.")
+        raise RouteNotFoundError(f"No map edges are available for scene {resolved_scene_key}.")
 
-    origin = _resolve_origin(session, origin_place_id, current_lng, current_lat)
+    origin = _resolve_origin(session, origin_place_id, current_lng, current_lat, resolved_scene_key)
     start = (origin["lng"], origin["lat"])
     graph = build_bidirectional_graph(edges)
     components = _connected_components(nodes, edges)
 
     resolved_category = _resolve_category_code(session, category)
-    candidates = _load_facilities(session, resolved_category)
+    candidates = _load_facilities(session, resolved_category, resolved_scene_key)
     enriched = []
     for facility in candidates:
         facility_point = (facility.lng, facility.lat)
@@ -75,12 +78,14 @@ def get_nearby_facilities_from_db(
     return {
         "items": ranked,
         "total": len(enriched),
+        "scene_key": resolved_scene_key,
         "origin": origin,
         "category": resolved_category,
         "category_query": category,
         "radius": radius,
         "algorithm_trace": {
             "stage": "stage-5-facility-graph-distance",
+            "scene_key": resolved_scene_key,
             "origin_resolution": "origin_place_id" if origin_place_id else "coordinate fallback",
             "origin_id": origin.get("id") or "",
             "origin_source": origin.get("source") or "",
@@ -98,7 +103,7 @@ def get_nearby_facilities_from_db(
     }
 
 
-def _load_graph_data(session: Session) -> tuple[list[GraphNode], list[GraphEdge]]:
+def _load_graph_data(session: Session, scene_key: str) -> tuple[list[GraphNode], list[GraphEdge]]:
     nodes = [
         GraphNode(
             id=node.id,
@@ -106,7 +111,7 @@ def _load_graph_data(session: Session) -> tuple[list[GraphNode], list[GraphEdge]
             lat=node.lat,
             name=node.name,
         )
-        for node in session.scalars(select(MapNode).order_by(MapNode.id)).all()
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key).order_by(MapNode.id)).all()
     ]
     edges = [
         GraphEdge(
@@ -117,13 +122,18 @@ def _load_graph_data(session: Session) -> tuple[list[GraphNode], list[GraphEdge]
             duration=edge.walk_time,
             geometry=edge.geometry,
         )
-        for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all()
+        for edge in session.scalars(select(MapEdge).where(MapEdge.scene_key == scene_key).order_by(MapEdge.id)).all()
     ]
     return nodes, edges
 
 
-def _load_facilities(session: Session, category: str | None) -> list[Facility]:
-    query = select(Facility).options(selectinload(Facility.category)).order_by(Facility.id)
+def _load_facilities(session: Session, category: str | None, scene_key: str) -> list[Facility]:
+    query = (
+        select(Facility)
+        .where(Facility.scene_key == scene_key)
+        .options(selectinload(Facility.category))
+        .order_by(Facility.id)
+    )
     if category:
         query = query.join(FacilityCategory).where(FacilityCategory.code == category)
     return list(session.scalars(query).all())
@@ -134,9 +144,10 @@ def _resolve_origin(
     origin_place_id: str | None,
     current_lng: float,
     current_lat: float,
+    scene_key: str,
 ) -> dict[str, Any]:
     if origin_place_id:
-        return _lookup_place_coordinate(session, origin_place_id)
+        return _lookup_place_coordinate(session, origin_place_id, scene_key)
     return {
         "id": "",
         "source": "coordinate",
@@ -146,13 +157,14 @@ def _resolve_origin(
     }
 
 
-def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
+def _lookup_place_coordinate(session: Session, place_id: str, scene_key: str) -> dict[str, Any]:
     source, raw_id = _split_place_id(place_id)
     model_id = int(raw_id)
     if source == "facility":
         facility = session.get(Facility, model_id)
         if facility is None:
             raise RouteNotFoundError(f"Facility {place_id} was not found.")
+        _ensure_place_in_scene(place_id, facility.scene_key, scene_key)
         return {
             "id": place_id,
             "source": "facility",
@@ -164,6 +176,7 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
         building = session.get(Building, model_id)
         if building is None:
             raise RouteNotFoundError(f"Building {place_id} was not found.")
+        _ensure_place_in_scene(place_id, building.scene_key, scene_key)
         lng, lat = _building_center(building.polygon)
         return {
             "id": place_id,
@@ -176,6 +189,7 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
         node = session.get(MapNode, model_id)
         if node is None:
             raise RouteNotFoundError(f"Map node {place_id} was not found.")
+        _ensure_place_in_scene(place_id, node.scene_key, scene_key)
         return {
             "id": place_id,
             "source": "node",
@@ -184,6 +198,13 @@ def _lookup_place_coordinate(session: Session, place_id: str) -> dict[str, Any]:
             "lat": node.lat,
         }
     raise RouteNotFoundError(f"Unsupported nearby origin place id: {place_id}.")
+
+
+def _ensure_place_in_scene(place_id: str, item_scene_key: str, requested_scene_key: str) -> None:
+    if item_scene_key != requested_scene_key:
+        raise RouteNotFoundError(
+            f"Nearby origin {place_id} belongs to scene {item_scene_key}, not {requested_scene_key}."
+        )
 
 
 def _split_place_id(place_id: str) -> tuple[str, str]:

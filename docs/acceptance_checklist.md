@@ -99,9 +99,11 @@
 - [x] Nearby facility API accepts `origin_place_id` and resolves it before Dijkstra ranking.
 - [x] Coordinate inputs remain available only as fallback/debug controls.
 - [x] Nearby facility result displays origin, resolved category, route distance, duration, and route path.
-- [ ] System supports a second internal-navigation scene for 北京颐和园.
-- [ ] Scene-specific map APIs filter by `scene_key` and do not mix BUPT/Summer Palace data.
-- [ ] Summer Palace has at least 200 route edges, 20 buildings/scenic structures, and 50 facilities/POIs if source data allows.
+- [x] System supports a second internal-navigation scene for 北京颐和园.
+- [x] Scene-specific map APIs filter by `scene_key` and do not mix BUPT/Summer Palace data.
+- [x] Summer Palace has at least 200 route edges, 20 buildings/scenic structures, and 50 facilities/POIs if source data allows.
+- [x] Summer Palace scene restores from saved real OSMnx payload after `bash scripts/reset_dev_db.sh`.
+- [x] Summer Palace supports route planning, multi-point planning, and nearby facility lookup by graph distance.
 
 ## Indoor Navigation
 

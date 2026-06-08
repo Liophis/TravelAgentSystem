@@ -16,3 +16,9 @@ else
 fi
 
 bash scripts/restore_campus_map.sh
+
+if [ -f data/external/summer-palace/osm/osmnx_summer_palace_payload.json ]; then
+  bash scripts/restore_summer_palace_map.sh
+else
+  echo "[db] skipping Summer Palace restore; offline payload not found"
+fi

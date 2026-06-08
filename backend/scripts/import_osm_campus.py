@@ -28,6 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--center-lng", type=float, default=settings.osm_fallback_lng)
     parser.add_argument("--center-lat", type=float, default=settings.osm_fallback_lat)
     parser.add_argument("--dist", type=int, default=settings.osm_fallback_dist)
+    parser.add_argument("--scene-key", default="bupt_shahe")
     parser.add_argument("--keep-existing", action="store_true")
     parser.add_argument(
         "--features-only",
@@ -51,7 +52,11 @@ def main() -> None:
         engine = create_app_engine(args.database_url)
         create_all(engine)
         with Session(engine) as session:
-            summary = import_fixture_osm_payload(session, reset_existing=not args.keep_existing)
+            summary = import_fixture_osm_payload(
+                session,
+                reset_existing=not args.keep_existing,
+                scene_key=args.scene_key,
+            )
     else:
         if args.load_payload:
             payload = json.loads(args.load_payload.read_text(encoding="utf-8"))
@@ -71,6 +76,7 @@ def main() -> None:
         if args.download_only:
             summary = {
                 "source": payload.get("source", "osmnx-overpass"),
+                "scene_key": args.scene_key,
                 "place_name": payload.get("place_name"),
                 "lookup_mode": payload.get("lookup_mode"),
                 "nodes": len(payload.get("nodes", [])),
@@ -90,6 +96,7 @@ def main() -> None:
                         remove_demo_layers=True,
                         replace_osm_layers=not args.keep_existing,
                         import_facilities=True,
+                        scene_key=args.scene_key,
                     )
                 elif args.graph_only:
                     summary = import_osm_road_graph_to_db(
@@ -97,9 +104,15 @@ def main() -> None:
                         payload,
                         replace_osm_roads=not args.keep_existing,
                         rebind_facilities=True,
+                        scene_key=args.scene_key,
                     )
                 else:
-                    summary = import_osm_payload_to_db(session, payload, reset_existing=not args.keep_existing)
+                    summary = import_osm_payload_to_db(
+                        session,
+                        payload,
+                        reset_existing=not args.keep_existing,
+                        scene_key=args.scene_key,
+                    )
 
     print("[osm-import] database:", args.database_url)
     for key, value in summary.items():

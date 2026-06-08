@@ -2,10 +2,13 @@
   <section class="page-stack">
     <div class="page-heading">
       <div>
-        <h1>北邮校内导航</h1>
-        <p>选择北京邮电大学沙河校区内部场所，使用校园拓扑生成校内路线。</p>
+        <h1>{{ currentScene.title }}</h1>
+        <p>{{ currentScene.description }}</p>
       </div>
-      <el-button type="primary" :loading="loading" @click="planRoute">规划路线</el-button>
+      <div class="heading-actions">
+        <el-segmented v-model="selectedSceneKey" :options="sceneSegmentOptions" />
+        <el-button type="primary" :loading="loading" @click="planRoute">规划路线</el-button>
+      </div>
     </div>
 
     <el-alert v-if="error" :title="error" type="error" show-icon />
@@ -23,7 +26,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索北邮沙河校区内场所或校内点"
+                :placeholder="`搜索${currentScene.shortName}内场所或节点`"
                 @change="handlePlaceChange('start', startPlaceId)"
               >
                 <el-option
@@ -43,7 +46,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索北邮沙河校区内场所或校内点"
+                :placeholder="`搜索${currentScene.shortName}内场所或节点`"
                 @change="handlePlaceChange('end', endPlaceId)"
               >
                 <el-option
@@ -77,7 +80,7 @@
                 reserve-keyword
                 :remote-method="searchRoutePlaces"
                 :loading="placeLoading"
-                placeholder="搜索并选择多个校内场所或校内点"
+                :placeholder="`搜索并选择多个${currentScene.shortName}内场所或节点`"
               >
                 <el-option
                   v-for="option in routeOptions"
@@ -144,9 +147,10 @@
       <el-col :span="17">
         <AMapView
           :road-paths="roadPaths"
-          :buildings="campusBuildings"
-          :facilities="campusFacilities"
+          :buildings="sceneBuildings"
+          :facilities="sceneFacilities"
           :route-path="route?.path ?? []"
+          :center="mapCenter"
         />
       </el-col>
     </el-row>
@@ -154,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 
 import AMapView from "../components/AMapView.vue";
 import {
@@ -180,12 +184,31 @@ const multiPlaceIds = ref<string[]>([]);
 const routeOptions = ref<SearchPlaceItem[]>([]);
 const optionCache = reactive<Record<string, SearchPlaceItem>>({});
 const multiPointText = ref("教学实验综合楼,116.2862632,40.1571249\n南区食堂,116.2845755,40.1548202");
-const buptShaheBounds = {
-  minLng: 116.2770,
-  maxLng: 116.2896,
-  minLat: 40.1534,
-  maxLat: 40.1602,
-};
+const selectedSceneKey = ref("bupt_shahe");
+const scenes = [
+  {
+    key: "bupt_shahe",
+    shortName: "北邮沙河",
+    title: "北邮校内导航",
+    description: "选择北京邮电大学沙河校区内部场所，使用校园拓扑生成校内路线。",
+    scope: "campus",
+    center: [116.28333, 40.15608] as [number, number],
+    defaultStartKeyword: "西门",
+    defaultEndKeyword: "图书馆",
+    defaultMultiPointText: "教学实验综合楼,116.2862632,40.1571249\n南区食堂,116.2845755,40.1548202",
+  },
+  {
+    key: "summer_palace",
+    shortName: "颐和园",
+    title: "颐和园内部导航",
+    description: "选择北京颐和园内部景点、建筑或服务设施，使用独立景区路网生成游览路线。",
+    scope: "scenic",
+    center: [116.2755, 39.9996] as [number, number],
+    defaultStartKeyword: "仁寿殿",
+    defaultEndKeyword: "佛香阁",
+    defaultMultiPointText: "仁寿殿,116.2755,39.9996\n佛香阁,116.2732,39.9997",
+  },
+];
 const strategyOptions = [
   { label: "最短距离", value: "shortest_distance" },
   { label: "最短时间", value: "shortest_time" },
@@ -206,22 +229,23 @@ const form = reactive({
   route_source: "local_graph",
 });
 
+const currentScene = computed(() => scenes.find((scene) => scene.key === selectedSceneKey.value) ?? scenes[0]);
+const sceneSegmentOptions = scenes.map((scene) => ({ label: scene.shortName, value: scene.key }));
+const mapCenter = computed(() => mapPayload.value?.center ?? currentScene.value.center);
 const roadPaths = computed(() => mapPayload.value?.roads.map((road) => road.path) ?? []);
-const campusBuildings = computed<BuildingItem[]>(() =>
-  (mapPayload.value?.buildings ?? []).filter((building) => {
-    const center = buildingCenter(building.polygon);
-    return isInBuptShaheCampus(center[0], center[1]);
-  }),
-);
-const campusFacilities = computed<FacilityItem[]>(() =>
-  (mapPayload.value?.facilities ?? []).filter((facility) => isInBuptShaheCampus(facility.lng, facility.lat)),
-);
+const sceneBuildings = computed<BuildingItem[]>(() => mapPayload.value?.buildings ?? []);
+const sceneFacilities = computed<FacilityItem[]>(() => mapPayload.value?.facilities ?? []);
 
 async function searchRoutePlaces(query: string) {
   const keyword = query.trim();
   placeLoading.value = true;
   try {
-    const params = new URLSearchParams({ keyword, limit: keyword ? "30" : "100", scope: "campus" });
+    const params = new URLSearchParams({
+      keyword,
+      limit: keyword ? "30" : "100",
+      scope: currentScene.value.scope,
+      scene_key: selectedSceneKey.value,
+    });
     const payload = await apiGet<SearchPlacesPayload>(`/api/v1/search/places?${params}`);
     mergeRouteOptions(payload.items.filter(isCampusRoutePlace));
     error.value = "";
@@ -256,26 +280,7 @@ function isCampusRoutePlace(item: SearchPlaceItem) {
 }
 
 function routeSourceLabel(source?: string) {
-  return source === "local_graph" ? "北邮校园拓扑" : source ?? "北邮校园拓扑";
-}
-
-function buildingCenter(polygon: Array<[number, number]> | number[][]) {
-  if (!polygon.length) {
-    return [0, 0];
-  }
-  return [
-    polygon.reduce((sum, point) => sum + point[0], 0) / polygon.length,
-    polygon.reduce((sum, point) => sum + point[1], 0) / polygon.length,
-  ];
-}
-
-function isInBuptShaheCampus(lng: number, lat: number) {
-  return (
-    lng >= buptShaheBounds.minLng &&
-    lng <= buptShaheBounds.maxLng &&
-    lat >= buptShaheBounds.minLat &&
-    lat <= buptShaheBounds.maxLat
-  );
+  return source === "local_graph" ? `${currentScene.value.shortName}拓扑` : source ?? `${currentScene.value.shortName}拓扑`;
 }
 
 function handlePlaceChange(kind: "start" | "end", placeId: string) {
@@ -296,6 +301,7 @@ async function planRoute() {
   loading.value = true;
   try {
     route.value = await apiPost<RoutePlanPayload>("/api/v1/routes/plan", {
+      scene_key: selectedSceneKey.value,
       start_place_id: startPlaceId.value || null,
       end_place_id: endPlaceId.value || null,
       ...form,
@@ -317,6 +323,7 @@ async function planMultiPointRoute() {
   loading.value = true;
   try {
     route.value = await apiPost<RoutePlanPayload>("/api/v1/routes/multi-point", {
+      scene_key: selectedSceneKey.value,
       start_place_id: startPlaceId.value || null,
       start_lng: form.start_lng,
       start_lat: form.start_lat,
@@ -368,34 +375,73 @@ function parseMultiPointText() {
 }
 
 async function primeRouteOptions() {
-  await searchRoutePlaces("西门");
-  const gate = routeOptions.value.find((item) => item.category === "gate" || item.name.includes("西门")) ?? routeOptions.value[0];
-  if (gate) {
-    startPlaceId.value = gate.id;
-    handlePlaceChange("start", gate.id);
+  await searchRoutePlaces(currentScene.value.defaultStartKeyword);
+  const start = routeOptions.value.find((item) => item.name.includes(currentScene.value.defaultStartKeyword)) ?? routeOptions.value[0];
+  if (start) {
+    startPlaceId.value = start.id;
+    handlePlaceChange("start", start.id);
   }
 
-  await searchRoutePlaces("图书馆");
-  const library = routeOptions.value.find((item) => item.category === "library" || item.name.includes("图书馆"));
-  if (library) {
-    endPlaceId.value = library.id;
-    handlePlaceChange("end", library.id);
+  await searchRoutePlaces(currentScene.value.defaultEndKeyword);
+  const end = routeOptions.value.find((item) => item.name.includes(currentScene.value.defaultEndKeyword));
+  if (end) {
+    endPlaceId.value = end.id;
+    handlePlaceChange("end", end.id);
   }
 }
 
-onMounted(async () => {
+function resetSceneState() {
+  route.value = null;
+  startPlaceId.value = "";
+  endPlaceId.value = "";
+  multiPlaceIds.value = [];
+  routeOptions.value = [];
+  Object.keys(optionCache).forEach((key) => delete optionCache[key]);
+  const [lng, lat] = currentScene.value.center;
+  form.start_lng = lng;
+  form.start_lat = lat;
+  form.end_lng = lng;
+  form.end_lat = lat;
+  multiPointText.value = currentScene.value.defaultMultiPointText;
+}
+
+async function loadMap() {
+  const params = new URLSearchParams({ scene_key: selectedSceneKey.value });
+  mapPayload.value = await apiGet<MapGeoJsonPayload>(`/api/v1/map/geojson?${params}`);
+}
+
+async function loadScene() {
+  resetSceneState();
   try {
-    mapPayload.value = await apiGet<MapGeoJsonPayload>("/api/v1/map/geojson");
+    await loadMap();
+    await searchRoutePlaces("");
+    await primeRouteOptions();
+    if (startPlaceId.value || endPlaceId.value) {
+      await planRoute();
+    }
   } catch (requestError) {
-    error.value = requestError instanceof Error ? requestError.message : "校园地图数据加载失败";
+    error.value = requestError instanceof Error ? requestError.message : "内部导航数据加载失败";
   }
-  await searchRoutePlaces("");
-  await primeRouteOptions();
-  void planRoute();
+}
+
+watch(selectedSceneKey, () => {
+  void loadScene();
+});
+
+onMounted(async () => {
+  await loadScene();
 });
 </script>
 
 <style scoped>
+.heading-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .advanced-panel {
   margin: 4px 0 14px;
 }

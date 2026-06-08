@@ -6,6 +6,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.algorithms.route_planning import approximate_distance_meters
+from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key
 from app.models import Facility, FacilityCategory, MapEdge, MapNode
 
 
@@ -22,14 +23,16 @@ def import_reference_campus_to_db(
     session: Session,
     source_dir: str | Path = DEFAULT_SOURCE_DIR,
     replace_campus_layers: bool = True,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
 ) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     source_path = Path(source_dir)
     scene_payload = _load_json(source_path / "raw_wgs84" / "scenes.json")
     geojson_payload = _load_json(source_path / "topology" / "scene_bupt_campus.geojson")
     scene = _resolve_single_scene(scene_payload)
 
     if replace_campus_layers:
-        removed = _clear_previous_reference_layers(session, remove_osm_roads=True)
+        removed = _clear_previous_reference_layers(session, remove_osm_roads=True, scene_key=resolved_scene_key)
     else:
         removed = {"nodes": 0, "edges": 0, "facilities": 0, "osm_nodes": 0, "osm_edges": 0}
 
@@ -41,6 +44,7 @@ def import_reference_campus_to_db(
         try:
             external_id = _node_external_id(str(node_payload["id"]))
             node = MapNode(
+                scene_key=resolved_scene_key,
                 external_id=external_id,
                 name=_node_name(node_payload),
                 lng=float(node_payload["x"]),
@@ -49,7 +53,9 @@ def import_reference_campus_to_db(
         except (KeyError, TypeError, ValueError):
             invalid_nodes += 1
             continue
-        existing = session.scalar(select(MapNode).where(MapNode.external_id == external_id))
+        existing = session.scalar(
+            select(MapNode).where(MapNode.external_id == external_id, MapNode.scene_key == resolved_scene_key)
+        )
         if existing is not None:
             external_to_node[external_id] = existing
             nodes_skipped += 1
@@ -83,6 +89,7 @@ def import_reference_campus_to_db(
             continue
         session.add(
             MapEdge(
+                scene_key=resolved_scene_key,
                 from_node_id=from_node.id,
                 to_node_id=to_node.id,
                 distance=distance,
@@ -101,12 +108,22 @@ def import_reference_campus_to_db(
     categories = _load_or_create_categories(session)
     facility_items = _facility_items_from_scene(scene, external_to_node)
     facility_items.extend(_facility_items_from_geojson(geojson_payload, external_to_node))
-    facilities_imported, facilities_skipped = _import_facilities(session, categories, facility_items)
-    rebound_facilities = _rebind_facilities_to_reference_nodes(session, list(external_to_node.values()))
+    facilities_imported, facilities_skipped = _import_facilities(
+        session,
+        categories,
+        facility_items,
+        scene_key=resolved_scene_key,
+    )
+    rebound_facilities = _rebind_facilities_to_reference_nodes(
+        session,
+        list(external_to_node.values()),
+        scene_key=resolved_scene_key,
+    )
 
     session.commit()
     return {
         "source": "reference-bupt-shahe",
+        "scene_key": resolved_scene_key,
         "source_dir": str(source_path),
         "scene_id": scene.get("id"),
         "scene_name": scene.get("name"),
@@ -148,15 +165,15 @@ def _resolve_single_scene(payload: dict[str, Any]) -> dict[str, Any]:
     return scene
 
 
-def _clear_previous_reference_layers(session: Session, remove_osm_roads: bool) -> dict[str, int]:
+def _clear_previous_reference_layers(session: Session, remove_osm_roads: bool, scene_key: str) -> dict[str, int]:
     reference_node_ids = [
         node.id
-        for node in session.scalars(select(MapNode)).all()
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all()
         if node.external_id.startswith(REFERENCE_NODE_PREFIX)
     ]
     osm_node_ids = [
         node.id
-        for node in session.scalars(select(MapNode)).all()
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all()
         if remove_osm_roads and node.external_id.startswith("osm-")
     ]
     node_ids = [*reference_node_ids, *osm_node_ids]
@@ -168,12 +185,14 @@ def _clear_previous_reference_layers(session: Session, remove_osm_roads: bool) -
     if edge_ids:
         session.execute(delete(MapEdge).where(MapEdge.id.in_(edge_ids)))
     if node_ids:
-        for facility in session.scalars(select(Facility).where(Facility.nearest_node_id.in_(node_ids))).all():
+        for facility in session.scalars(
+            select(Facility).where(Facility.scene_key == scene_key, Facility.nearest_node_id.in_(node_ids))
+        ).all():
             facility.nearest_node_id = None
         session.execute(delete(MapNode).where(MapNode.id.in_(node_ids)))
     reference_facility_ids = [
         facility.id
-        for facility in session.scalars(select(Facility)).all()
+        for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key)).all()
         if facility.description and facility.description.startswith(REFERENCE_FACILITY_PREFIX)
     ]
     if reference_facility_ids:
@@ -346,10 +365,11 @@ def _import_facilities(
     session: Session,
     categories: dict[str, FacilityCategory],
     items: list[dict[str, Any]],
+    scene_key: str,
 ) -> tuple[int, int]:
     existing_signatures = {
         _facility_signature(facility.name, facility.lng, facility.lat)
-        for facility in session.scalars(select(Facility)).all()
+        for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key)).all()
     }
     imported = 0
     skipped = 0
@@ -361,6 +381,7 @@ def _import_facilities(
         category = categories[item["category"]]
         session.add(
             Facility(
+                scene_key=scene_key,
                 name=item["name"],
                 category_id=category.id,
                 nearest_node_id=item["nearest_node"].id if item.get("nearest_node") else None,
@@ -414,11 +435,11 @@ def _nearest_node(lng: float, lat: float, nodes: list[MapNode]) -> MapNode | Non
     return min(nodes, key=lambda node: approximate_distance_meters((lng, lat), (node.lng, node.lat)))
 
 
-def _rebind_facilities_to_reference_nodes(session: Session, reference_nodes: list[MapNode]) -> int:
+def _rebind_facilities_to_reference_nodes(session: Session, reference_nodes: list[MapNode], scene_key: str) -> int:
     if not reference_nodes:
         return 0
     rebound = 0
-    for facility in session.scalars(select(Facility)).all():
+    for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key)).all():
         nearest = _nearest_node(facility.lng, facility.lat, reference_nodes)
         if nearest is not None and facility.nearest_node_id != nearest.id:
             facility.nearest_node_id = nearest.id

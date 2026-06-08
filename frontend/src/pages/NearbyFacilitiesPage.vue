@@ -3,9 +3,12 @@
     <div class="page-heading">
       <div>
         <h1>附近设施</h1>
-        <p>以选中的校内场所为中心，按真实道路距离查询服务设施。</p>
+        <p>以选中的内部场所为中心，按真实道路距离查询服务设施。</p>
       </div>
-      <el-button type="primary" :loading="loading" @click="loadFacilities">查询</el-button>
+      <div class="heading-actions">
+        <el-segmented v-model="selectedSceneKey" :options="sceneSegmentOptions" />
+        <el-button type="primary" :loading="loading" @click="loadFacilities">查询</el-button>
+      </div>
     </div>
 
     <el-alert v-if="error" :title="error" type="error" show-icon />
@@ -23,7 +26,7 @@
                 reserve-keyword
                 :remote-method="searchOrigins"
                 :loading="originLoading"
-                placeholder="搜索校内场所"
+                :placeholder="`搜索${currentScene.shortName}内场所`"
                 @change="handleOriginChange"
               >
                 <el-option
@@ -93,6 +96,7 @@
           :road-paths="roadPaths"
           :buildings="mapPayload?.buildings ?? []"
           :route-path="routePath"
+          :center="mapPayload?.center ?? currentScene.center"
           :origin="selectedOrigin"
           @map-click="handleMapClick"
         />
@@ -102,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 
 import AMapView from "../components/AMapView.vue";
 import {
@@ -127,6 +131,25 @@ const mapPayload = ref<MapGeoJsonPayload | null>(null);
 const originPlaceId = ref("");
 const originOptions = ref<SearchPlaceItem[]>([]);
 const originCache = reactive<Record<string, SearchPlaceItem>>({});
+const selectedSceneKey = ref("bupt_shahe");
+const scenes = [
+  {
+    key: "bupt_shahe",
+    shortName: "北邮沙河",
+    scope: "campus",
+    center: [116.28333, 40.15608] as [number, number],
+    defaultOriginKeyword: "图书馆",
+    defaultOriginName: "北京邮电大学沙河校区",
+  },
+  {
+    key: "summer_palace",
+    shortName: "颐和园",
+    scope: "scenic",
+    center: [116.2755, 39.9996] as [number, number],
+    defaultOriginKeyword: "仁寿殿",
+    defaultOriginName: "北京颐和园",
+  },
+];
 const coordinateOrigin = reactive({
   lng: 116.28333,
   lat: 40.15608,
@@ -139,6 +162,8 @@ const selectedOrigin = ref<RouteEndpointItem>({
   lat: coordinateOrigin.lat,
 });
 
+const currentScene = computed(() => scenes.find((scene) => scene.key === selectedSceneKey.value) ?? scenes[0]);
+const sceneSegmentOptions = scenes.map((scene) => ({ label: scene.shortName, value: scene.key }));
 const roadPaths = computed(() => mapPayload.value?.roads.map((road) => road.path) ?? []);
 const resolvedCategory = computed(() => facilities.value[0]?.category_name ?? (category.value || "全部"));
 
@@ -146,7 +171,12 @@ async function searchOrigins(query: string) {
   originLoading.value = true;
   try {
     const keyword = query.trim();
-    const params = new URLSearchParams({ keyword, limit: keyword ? "30" : "100", scope: "campus" });
+    const params = new URLSearchParams({
+      keyword,
+      limit: keyword ? "30" : "100",
+      scope: currentScene.value.scope,
+      scene_key: selectedSceneKey.value,
+    });
     const payload = await apiGet<SearchPlacesPayload>(`/api/v1/search/places?${params}`);
     mergeOriginOptions(payload.items.filter(isCampusOrigin));
     error.value = "";
@@ -233,6 +263,7 @@ async function loadFacilities() {
     const params = new URLSearchParams({
       radius: String(radius.value),
       limit: "10",
+      scene_key: selectedSceneKey.value,
     });
     if (originPlaceId.value) {
       params.set("origin_place_id", originPlaceId.value);
@@ -260,19 +291,39 @@ async function loadFacilities() {
 }
 
 async function loadMap() {
-  mapPayload.value = await apiGet<MapGeoJsonPayload>("/api/v1/map/geojson");
+  const params = new URLSearchParams({ scene_key: selectedSceneKey.value });
+  mapPayload.value = await apiGet<MapGeoJsonPayload>(`/api/v1/map/geojson?${params}`);
 }
 
 async function primeOrigin() {
-  await searchOrigins("图书馆");
-  const library = originOptions.value.find((item) => item.name.includes("图书馆")) ?? originOptions.value[0];
-  if (library) {
-    originPlaceId.value = library.id;
-    setOriginFromPlace(library);
+  await searchOrigins(currentScene.value.defaultOriginKeyword);
+  const origin = originOptions.value.find((item) => item.name.includes(currentScene.value.defaultOriginKeyword)) ?? originOptions.value[0];
+  if (origin) {
+    originPlaceId.value = origin.id;
+    setOriginFromPlace(origin);
   }
 }
 
-onMounted(async () => {
+function resetSceneState() {
+  facilities.value = [];
+  routePath.value = [];
+  originPlaceId.value = "";
+  originOptions.value = [];
+  Object.keys(originCache).forEach((key) => delete originCache[key]);
+  const [lng, lat] = currentScene.value.center;
+  coordinateOrigin.lng = lng;
+  coordinateOrigin.lat = lat;
+  selectedOrigin.value = {
+    id: "",
+    source: "coordinate",
+    name: currentScene.value.defaultOriginName,
+    lng,
+    lat,
+  };
+}
+
+async function loadScene() {
+  resetSceneState();
   try {
     await loadMap();
     await searchOrigins("");
@@ -281,10 +332,26 @@ onMounted(async () => {
   } catch (requestError) {
     error.value = requestError instanceof Error ? requestError.message : "附近设施初始化失败";
   }
+}
+
+watch(selectedSceneKey, () => {
+  void loadScene();
+});
+
+onMounted(async () => {
+  await loadScene();
 });
 </script>
 
 <style scoped>
+.heading-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .advanced-panel {
   margin: 4px 0 14px;
 }

@@ -4,6 +4,7 @@ export type Coordinate = [number, number];
 
 export interface FacilityItem {
   id: string;
+  scene_key?: string;
   name: string;
   category: string;
   category_name?: string;
@@ -18,12 +19,14 @@ export interface FacilityItem {
 
 export interface BuildingItem {
   id: string;
+  scene_key?: string;
   name: string;
   polygon: Coordinate[];
 }
 
 export interface RoadItem {
   id: string;
+  scene_key?: string;
   path: Coordinate[];
   congestion?: number;
   allowed_modes?: string[];
@@ -38,6 +41,7 @@ export interface RouteEndpointItem {
 }
 
 export interface MapGeoJsonPayload {
+  scene_key: string;
   center: Coordinate;
   statistics: {
     roads: number;
@@ -58,6 +62,7 @@ export interface MapGeoJsonPayload {
 
 export interface RoutePlanPayload {
   strategy: string;
+  scene_key?: string;
   mode: string;
   route_source?: string;
   distance: number;
@@ -116,6 +121,7 @@ export interface IndoorRoutePayload {
 export interface NearbyFacilitiesPayload {
   items: FacilityItem[];
   total: number;
+  scene_key?: string;
   origin?: RouteEndpointItem;
   category: string | null;
   category_query?: string | null;
@@ -232,6 +238,7 @@ export interface SearchPlacesPayload {
   keyword: string;
   category: string | null;
   scope?: string;
+  scene_key?: string;
   algorithm_trace: Record<string, string>;
 }
 

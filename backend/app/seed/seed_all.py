@@ -9,6 +9,7 @@ if __name__ == "__main__":
     sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from app.core.config import settings
+from app.core.scenes import DEFAULT_SCENE_KEY
 from app.db.init_db import create_all
 from app.db.session import create_app_engine
 from app.models import (
@@ -94,6 +95,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
             index = row * grid_cols + col
             nodes.append(
                 MapNode(
+                    scene_key=DEFAULT_SCENE_KEY,
                     external_id=f"bupt-node-{index + 1}",
                     name=f"校园路口 R{row + 1:02d}-C{col + 1:02d}",
                     lng=center_lng + (col - grid_cols // 2) * 0.00018,
@@ -115,6 +117,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
         electric_cart_speed = 5.2 if "electric_cart" in allowed_modes else 0.0
         edges.append(
             MapEdge(
+                scene_key=DEFAULT_SCENE_KEY,
                 from_node_id=from_node.id,
                 to_node_id=to_node.id,
                 distance=distance,
@@ -153,6 +156,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
         name = BUPT_BUILDING_NAMES[index % len(BUPT_BUILDING_NAMES)]
         buildings.append(
             Building(
+                scene_key=DEFAULT_SCENE_KEY,
                 name=f"{name} {index // len(BUPT_BUILDING_NAMES) + 1}" if index >= len(BUPT_BUILDING_NAMES) else name,
                 category=["teaching", "service", "dormitory", "sports"][index % 4],
                 polygon=[
@@ -176,6 +180,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
         prefixes = BUPT_FACILITY_PREFIXES.get(category.code, [category.name])
         facilities.append(
             Facility(
+                scene_key=DEFAULT_SCENE_KEY,
                 name=f"{prefixes[index % len(prefixes)]} {index // len(prefixes) + 1}",
                 category_id=category.id,
                 nearest_node_id=nearest_node.id,

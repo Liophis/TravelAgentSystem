@@ -44,7 +44,10 @@ The service snaps start/end coordinates to nearest graph nodes, builds a bidirec
 
 For campus/scenic-grade navigation, imported topology should come from real reference files or OSMnx payloads when available. BUPT reference files live under `data/reference/bupt-shahe/`; Summer Palace raw payloads live under `data/external/summer-palace/`.
 
-All graph loading should filter by `scene_key`, with `bupt_shahe` as default.
+All graph loading filters by `scene_key`, with `bupt_shahe` as default. Current reset-safe scenes:
+
+- `bupt_shahe`: 106 reference topology nodes, 246 reference edges, plus visible OSM buildings/facilities.
+- `summer_palace`: 236 OSM nodes, 630 OSM edges, 228 OSM building/scenic polygons, and 79 OSM POIs.
 
 If a place ID is provided, the service resolves it first:
 

@@ -100,6 +100,7 @@ bash scripts/check_all.sh
 bash scripts/seed_all.sh
 bash scripts/reset_dev_db.sh
 bash scripts/restore_campus_map.sh
+bash scripts/restore_summer_palace_map.sh
 bash scripts/smoke_features.sh
 ```
 
@@ -107,6 +108,7 @@ Optional campus reference import:
 
 ```bash
 bash scripts/restore_campus_map.sh
+bash scripts/restore_summer_palace_map.sh
 ```
 
 Optional conda backend check:

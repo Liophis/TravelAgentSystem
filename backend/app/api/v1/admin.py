@@ -52,6 +52,7 @@ class MapImportRequest(BaseModel):
         default="fixture",
         description="fixture, osmnx, osmnx_graph, osmnx_features, amap_poi, or reference_campus",
     )
+    scene_key: str = Field(default="bupt_shahe")
     place_name: str | None = Field(default=None)
     center_lng: float | None = Field(default=None)
     center_lat: float | None = Field(default=None)
@@ -116,7 +117,11 @@ def map_import_status(db: Session = Depends(get_db)) -> dict:
 def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict:
     try:
         if payload.source == "fixture":
-            return import_fixture_osm_payload(db, reset_existing=payload.reset_existing)
+            return import_fixture_osm_payload(
+                db,
+                reset_existing=payload.reset_existing,
+                scene_key=payload.scene_key,
+            )
         if payload.source == "osmnx":
             osm_payload = build_osmnx_payload(
                 place_name=payload.place_name or settings.osm_default_place,
@@ -124,7 +129,12 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 center_lat=payload.center_lat or settings.osm_fallback_lat,
                 dist=payload.dist or settings.osm_fallback_dist,
             )
-            return import_osm_payload_to_db(db, osm_payload, reset_existing=payload.reset_existing)
+            return import_osm_payload_to_db(
+                db,
+                osm_payload,
+                reset_existing=payload.reset_existing,
+                scene_key=payload.scene_key,
+            )
         if payload.source == "osmnx_features":
             osm_payload = build_osmnx_payload(
                 place_name=payload.place_name or settings.osm_default_place,
@@ -138,6 +148,7 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 remove_demo_layers=True,
                 replace_osm_layers=payload.reset_existing,
                 import_facilities=True,
+                scene_key=payload.scene_key,
             )
         if payload.source == "osmnx_graph":
             osm_payload = build_osmnx_payload(
@@ -151,6 +162,7 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 osm_payload,
                 replace_osm_roads=payload.reset_existing,
                 rebind_facilities=True,
+                scene_key=payload.scene_key,
             )
         if payload.source == "amap_poi":
             return import_amap_pois_to_db(
@@ -162,12 +174,14 @@ def import_map(payload: MapImportRequest, db: Session = Depends(get_db)) -> dict
                 keywords=payload.keywords,
                 max_pages=payload.max_pages,
                 reset_facilities=payload.reset_existing,
+                scene_key=payload.scene_key,
                 request_interval=payload.request_interval,
             )
         if payload.source == "reference_campus":
             return import_reference_campus_to_db(
                 session=db,
                 replace_campus_layers=payload.reset_existing,
+                scene_key=payload.scene_key,
             )
     except AMapPoiImportError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc

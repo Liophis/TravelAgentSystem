@@ -1,6 +1,7 @@
 from sqlalchemy import Float, ForeignKey, Integer, JSON, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.core.scenes import DEFAULT_SCENE_KEY
 from app.db.base import Base
 
 
@@ -8,6 +9,7 @@ class MapNode(Base):
     __tablename__ = "map_nodes"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    scene_key: Mapped[str] = mapped_column(String(64), default=DEFAULT_SCENE_KEY, index=True)
     external_id: Mapped[str] = mapped_column(String(128), unique=True, index=True)
     name: Mapped[str | None] = mapped_column(String(128), nullable=True)
     lng: Mapped[float] = mapped_column(Float)
@@ -18,6 +20,7 @@ class MapEdge(Base):
     __tablename__ = "map_edges"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    scene_key: Mapped[str] = mapped_column(String(64), default=DEFAULT_SCENE_KEY, index=True)
     from_node_id: Mapped[int] = mapped_column(ForeignKey("map_nodes.id"), index=True)
     to_node_id: Mapped[int] = mapped_column(ForeignKey("map_nodes.id"), index=True)
     distance: Mapped[float] = mapped_column(Float)
@@ -34,6 +37,7 @@ class Building(Base):
     __tablename__ = "buildings"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    scene_key: Mapped[str] = mapped_column(String(64), default=DEFAULT_SCENE_KEY, index=True)
     name: Mapped[str] = mapped_column(String(128), index=True)
     category: Mapped[str] = mapped_column(String(64), default="building")
     polygon: Mapped[list[list[float]]] = mapped_column(JSON)
@@ -54,6 +58,7 @@ class Facility(Base):
     __tablename__ = "facilities"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    scene_key: Mapped[str] = mapped_column(String(64), default=DEFAULT_SCENE_KEY, index=True)
     name: Mapped[str] = mapped_column(String(128), index=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("facility_categories.id"), index=True)
     nearest_node_id: Mapped[int | None] = mapped_column(ForeignKey("map_nodes.id"), nullable=True)

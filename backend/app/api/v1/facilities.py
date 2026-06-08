@@ -16,6 +16,7 @@ def nearby_facilities(
     category: str | None = Query(default=None),
     radius: int = Query(default=800, ge=1),
     limit: int = Query(default=10, ge=1, le=50),
+    scene_key: str | None = Query(default=None),
     db: Session = Depends(get_db),
 ) -> dict:
     try:
@@ -27,6 +28,7 @@ def nearby_facilities(
             category=category,
             radius=radius,
             limit=limit,
+            scene_key=scene_key,
         )
     except RouteNotFoundError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc

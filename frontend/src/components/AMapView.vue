@@ -21,6 +21,7 @@ const props = withDefaults(
     buildings?: BuildingItem[];
     roadPaths?: Coordinate[][];
     routePath?: Coordinate[];
+    center?: Coordinate;
     origin?: { lng: number; lat: number; name?: string } | null;
   }>(),
   {
@@ -28,6 +29,7 @@ const props = withDefaults(
     buildings: () => [],
     roadPaths: () => [],
     routePath: () => [],
+    center: () => [116.28333, 40.15608],
     origin: null,
   },
 );
@@ -130,6 +132,8 @@ function drawOverlays() {
     map.setFitView([routePolyline], false, [48, 48, 48, 48]);
   } else if (overlays.length > 0) {
     map.setFitView(overlays, false, [56, 56, 56, 56]);
+  } else {
+    map.setCenter(wgs84ToGcj02(props.center));
   }
 }
 
@@ -138,7 +142,7 @@ onMounted(async () => {
   try {
     AMap = await loadAMap();
     map = new AMap.Map(mapElement.value, {
-      center: wgs84ToGcj02([116.28333, 40.15608]),
+      center: wgs84ToGcj02(props.center),
       zoom: 16,
       viewMode: "2D",
     });
@@ -162,7 +166,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => [props.facilities, props.buildings, props.roadPaths, props.routePath, props.origin],
+  () => [props.facilities, props.buildings, props.roadPaths, props.routePath, props.center, props.origin],
   () => drawOverlays(),
   { deep: true },
 );

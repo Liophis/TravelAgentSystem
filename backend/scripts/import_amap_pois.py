@@ -20,6 +20,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--center-lng", type=float, default=settings.osm_fallback_lng)
     parser.add_argument("--center-lat", type=float, default=settings.osm_fallback_lat)
     parser.add_argument("--radius", type=int, default=settings.osm_fallback_dist)
+    parser.add_argument("--scene-key", default="bupt_shahe")
     parser.add_argument("--keyword", action="append", dest="keywords")
     parser.add_argument("--max-pages", type=int, default=3)
     parser.add_argument("--request-interval", type=float, default=0.3)
@@ -64,6 +65,7 @@ def main() -> None:
             json.dumps(
                 {
                     "source": "amap-place-around",
+                    "scene_key": args.scene_key,
                     "dataset": args.dataset,
                     "center": [args.center_lng, args.center_lat],
                     "radius": args.radius,
@@ -80,6 +82,7 @@ def main() -> None:
     if args.download_only:
         summary = {
             "source": "amap-place-around",
+            "scene_key": args.scene_key,
             "dataset": args.dataset,
             "center": [args.center_lng, args.center_lat],
             "radius": args.radius,
@@ -101,6 +104,7 @@ def main() -> None:
                 reset_dataset=args.reset_dataset,
                 dataset=args.dataset,
                 campus_only=args.campus_only,
+                scene_key=args.scene_key,
                 fetch_trace=fetch_trace,
             )
 

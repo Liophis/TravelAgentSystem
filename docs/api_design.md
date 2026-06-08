@@ -20,16 +20,17 @@ Base path: `/api/v1`.
   - Stage 35 target: `scene_key=summer_palace`
 - `POST /routes/plan`
   - default `scene_key=bupt_shahe`
-  - accepts `start_place_id` / `end_place_id` from `GET /search/places?scope=campus`
+  - accepts `start_place_id` / `end_place_id` from `GET /search/places?scope=campus|scenic&scene_key=...`
   - keeps `start_lng/start_lat/end_lng/end_lat` as coordinate fallback
   - supports `route_source=auto|amap_walking|local_graph`
   - RoutePlannerPage defaults to `local_graph` for BUPT Shahe campus-internal navigation, not cross-city attraction travel
 - `POST /routes/multi-point`
+  - default `scene_key=bupt_shahe`
   - each point accepts `place_id` or coordinate fallback
   - passes `route_source` to each route leg
 - `GET /facilities/nearby`
-  - current stable parameters: `current_lng`, `current_lat`, `category`, `radius`, `limit`
-  - accepts `origin_place_id` from `GET /search/places?scope=campus`
+  - current stable parameters: `scene_key`, `current_lng`, `current_lat`, `category`, `radius`, `limit`
+  - accepts `origin_place_id` from `GET /search/places?scope=campus|scenic&scene_key=...`
   - `origin_place_id` is preferred for normal users; coordinate input remains a map-click/debug fallback
   - response should include origin, resolved category, Dijkstra route distance, route path, and Top-K trace
 

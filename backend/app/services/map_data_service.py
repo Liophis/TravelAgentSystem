@@ -3,8 +3,8 @@ from typing import Any
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key, scene_center
 from app.models import Building, Facility, FacilityCategory, MapEdge, MapNode
-from app.seed.sample_data import BUPT_SHAHE_CENTER
 
 
 DEMO_BUILDING_PREFIX = "Campus-density seed building polygon"
@@ -12,13 +12,18 @@ DEMO_FACILITY_PREFIX = "Campus-density seed facility"
 DEMO_NODE_PREFIX = "bupt-node-"
 
 
-def get_map_stats_from_db(session: Session, include_demo: bool = False) -> dict[str, int]:
-    roads = _load_roads(session, include_demo=include_demo)
-    buildings = _load_buildings(session, include_demo=include_demo)
-    facilities = _load_facilities(session, include_demo=include_demo)
-    hidden_demo = _demo_layer_counts(session)
+def get_map_stats_from_db(
+    session: Session,
+    include_demo: bool = False,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
+) -> dict[str, int]:
+    resolved_scene_key = normalize_scene_key(scene_key)
+    roads = _load_roads(session, include_demo=include_demo, scene_key=resolved_scene_key)
+    buildings = _load_buildings(session, include_demo=include_demo, scene_key=resolved_scene_key)
+    facilities = _load_facilities(session, include_demo=include_demo, scene_key=resolved_scene_key)
+    hidden_demo = _demo_layer_counts(session, scene_key=resolved_scene_key)
     return {
-        "nodes": _count(session, MapNode),
+        "nodes": _count(session, MapNode, scene_key=resolved_scene_key),
         "roads": len(roads),
         "buildings": len(buildings),
         "facilities": len(facilities),
@@ -29,16 +34,22 @@ def get_map_stats_from_db(session: Session, include_demo: bool = False) -> dict[
     }
 
 
-def get_map_payload_from_db(session: Session, include_demo: bool = False) -> dict[str, Any]:
-    roads = _load_roads(session, include_demo=include_demo)
-    buildings = _load_buildings(session, include_demo=include_demo)
-    facilities = _load_facilities(session, include_demo=include_demo)
+def get_map_payload_from_db(
+    session: Session,
+    include_demo: bool = False,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
+) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
+    roads = _load_roads(session, include_demo=include_demo, scene_key=resolved_scene_key)
+    buildings = _load_buildings(session, include_demo=include_demo, scene_key=resolved_scene_key)
+    facilities = _load_facilities(session, include_demo=include_demo, scene_key=resolved_scene_key)
     categories = [
         category.code for category in session.scalars(select(FacilityCategory).order_by(FacilityCategory.code)).all()
     ]
     return {
-        "center": BUPT_SHAHE_CENTER,
-        "statistics": get_map_stats_from_db(session, include_demo=include_demo),
+        "scene_key": resolved_scene_key,
+        "center": scene_center(resolved_scene_key),
+        "statistics": get_map_stats_from_db(session, include_demo=include_demo, scene_key=resolved_scene_key),
         "roads": roads,
         "buildings": buildings,
         "facilities": facilities,
@@ -47,6 +58,7 @@ def get_map_payload_from_db(session: Session, include_demo: bool = False) -> dic
         "source": "database-real-priority-map-layers" if not include_demo else "database-all-map-layers",
         "layer_policy": {
             "include_demo": include_demo,
+            "scene_key": resolved_scene_key,
             "buildings": "OSM/imported building polygons only by default",
             "facilities": "AMap/OSM imported POIs only by default",
             "roads": "Reference campus or OSM/imported roads by default; local seed graph remains hidden for fallback",
@@ -54,23 +66,29 @@ def get_map_payload_from_db(session: Session, include_demo: bool = False) -> dic
     }
 
 
-def get_map_nodes_from_db(session: Session) -> list[dict[str, Any]]:
+def get_map_nodes_from_db(session: Session, scene_key: str | None = DEFAULT_SCENE_KEY) -> list[dict[str, Any]]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     return [
         {
             "id": node.id,
+            "scene_key": node.scene_key,
             "external_id": node.external_id,
             "name": node.name,
             "lng": node.lng,
             "lat": node.lat,
         }
-        for node in session.scalars(select(MapNode).order_by(MapNode.id)).all()
+        for node in session.scalars(
+            select(MapNode).where(MapNode.scene_key == resolved_scene_key).order_by(MapNode.id)
+        ).all()
     ]
 
 
-def get_map_edges_from_db(session: Session) -> list[dict[str, Any]]:
+def get_map_edges_from_db(session: Session, scene_key: str | None = DEFAULT_SCENE_KEY) -> list[dict[str, Any]]:
+    resolved_scene_key = normalize_scene_key(scene_key)
     return [
         {
             "id": edge.id,
+            "scene_key": edge.scene_key,
             "from_node_id": edge.from_node_id,
             "to_node_id": edge.to_node_id,
             "distance": edge.distance,
@@ -82,27 +100,54 @@ def get_map_edges_from_db(session: Session) -> list[dict[str, Any]]:
             "allowed_modes": edge.allowed_modes,
             "geometry": edge.geometry,
         }
-        for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all()
+        for edge in session.scalars(
+            select(MapEdge).where(MapEdge.scene_key == resolved_scene_key).order_by(MapEdge.id)
+        ).all()
     ]
 
 
-def get_buildings_from_db(session: Session, include_demo: bool = False) -> list[dict[str, Any]]:
-    return get_map_payload_from_db(session, include_demo=include_demo)["buildings"]
+def get_buildings_from_db(
+    session: Session,
+    include_demo: bool = False,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
+) -> list[dict[str, Any]]:
+    return get_map_payload_from_db(session, include_demo=include_demo, scene_key=scene_key)["buildings"]
 
 
-def get_facilities_from_db(session: Session, include_demo: bool = False) -> list[dict[str, Any]]:
-    return get_map_payload_from_db(session, include_demo=include_demo)["facilities"]
+def get_facilities_from_db(
+    session: Session,
+    include_demo: bool = False,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
+) -> list[dict[str, Any]]:
+    return get_map_payload_from_db(session, include_demo=include_demo, scene_key=scene_key)["facilities"]
 
 
-def cleanup_demo_map_layers(session: Session, remove_buildings: bool = True, remove_facilities: bool = True) -> dict[str, Any]:
-    counts = _demo_layer_counts(session)
+def cleanup_demo_map_layers(
+    session: Session,
+    remove_buildings: bool = True,
+    remove_facilities: bool = True,
+    scene_key: str | None = DEFAULT_SCENE_KEY,
+) -> dict[str, Any]:
+    resolved_scene_key = normalize_scene_key(scene_key)
+    counts = _demo_layer_counts(session, scene_key=resolved_scene_key)
     if remove_buildings:
-        session.execute(delete(Building).where(Building.description.like(f"{DEMO_BUILDING_PREFIX}%")))
+        session.execute(
+            delete(Building).where(
+                Building.scene_key == resolved_scene_key,
+                Building.description.like(f"{DEMO_BUILDING_PREFIX}%"),
+            )
+        )
     if remove_facilities:
-        session.execute(delete(Facility).where(Facility.description.like(f"{DEMO_FACILITY_PREFIX}%")))
+        session.execute(
+            delete(Facility).where(
+                Facility.scene_key == resolved_scene_key,
+                Facility.description.like(f"{DEMO_FACILITY_PREFIX}%"),
+            )
+        )
     session.commit()
-    after = _demo_layer_counts(session)
+    after = _demo_layer_counts(session, scene_key=resolved_scene_key)
     return {
+        "scene_key": resolved_scene_key,
         "removed_buildings": counts["buildings"] - after["buildings"] if remove_buildings else 0,
         "removed_facilities": counts["facilities"] - after["facilities"] if remove_facilities else 0,
         "remaining_demo_roads": after["roads"],
@@ -115,19 +160,26 @@ def cleanup_demo_map_layers(session: Session, remove_buildings: bool = True, rem
     }
 
 
-def _count(session: Session, model: type[Any]) -> int:
-    return len(session.scalars(select(model)).all())
+def _count(session: Session, model: type[Any], scene_key: str | None = None) -> int:
+    query = select(model)
+    if scene_key is not None and hasattr(model, "scene_key"):
+        query = query.where(model.scene_key == scene_key)
+    return len(session.scalars(query).all())
 
 
-def _load_roads(session: Session, include_demo: bool) -> list[dict[str, Any]]:
-    nodes = {node.id: node.external_id for node in session.scalars(select(MapNode)).all()}
+def _load_roads(session: Session, include_demo: bool, scene_key: str) -> list[dict[str, Any]]:
+    nodes = {
+        node.id: node.external_id
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all()
+    }
     roads = []
-    for edge in session.scalars(select(MapEdge).order_by(MapEdge.id)).all():
+    for edge in session.scalars(select(MapEdge).where(MapEdge.scene_key == scene_key).order_by(MapEdge.id)).all():
         if not include_demo and _is_demo_edge(edge, nodes):
             continue
         roads.append(
             {
                 "id": f"edge-{edge.id}",
+                "scene_key": edge.scene_key,
                 "from_node_id": edge.from_node_id,
                 "to_node_id": edge.to_node_id,
                 "distance": edge.distance,
@@ -139,14 +191,15 @@ def _load_roads(session: Session, include_demo: bool) -> list[dict[str, Any]]:
     return roads
 
 
-def _load_buildings(session: Session, include_demo: bool) -> list[dict[str, Any]]:
+def _load_buildings(session: Session, include_demo: bool, scene_key: str) -> list[dict[str, Any]]:
     buildings = []
-    for building in session.scalars(select(Building).order_by(Building.id)).all():
+    for building in session.scalars(select(Building).where(Building.scene_key == scene_key).order_by(Building.id)).all():
         if not include_demo and _is_demo_building(building):
             continue
         buildings.append(
             {
                 "id": f"building-{building.id}",
+                "scene_key": building.scene_key,
                 "name": building.name,
                 "category": building.category,
                 "polygon": building.polygon,
@@ -156,14 +209,15 @@ def _load_buildings(session: Session, include_demo: bool) -> list[dict[str, Any]
     return buildings
 
 
-def _load_facilities(session: Session, include_demo: bool) -> list[dict[str, Any]]:
+def _load_facilities(session: Session, include_demo: bool, scene_key: str) -> list[dict[str, Any]]:
     facilities = []
-    for facility in session.scalars(select(Facility).order_by(Facility.id)).all():
+    for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key).order_by(Facility.id)).all():
         if not include_demo and _is_demo_facility(facility):
             continue
         facilities.append(
             {
                 "id": f"facility-{facility.id}",
+                "scene_key": facility.scene_key,
                 "name": facility.name,
                 "category": facility.category.code,
                 "category_name": facility.category.name,
@@ -176,20 +230,23 @@ def _load_facilities(session: Session, include_demo: bool) -> list[dict[str, Any
     return facilities
 
 
-def _demo_layer_counts(session: Session) -> dict[str, int]:
-    nodes = {node.id: node.external_id for node in session.scalars(select(MapNode)).all()}
+def _demo_layer_counts(session: Session, scene_key: str) -> dict[str, int]:
+    nodes = {
+        node.id: node.external_id
+        for node in session.scalars(select(MapNode).where(MapNode.scene_key == scene_key)).all()
+    }
     return {
         "roads": sum(
             1 for edge in session.scalars(select(MapEdge)).all()
-            if _is_demo_edge(edge, nodes)
+            if edge.scene_key == scene_key and _is_demo_edge(edge, nodes)
         ),
         "buildings": sum(
             1 for building in session.scalars(select(Building)).all()
-            if _is_demo_building(building)
+            if building.scene_key == scene_key and _is_demo_building(building)
         ),
         "facilities": sum(
             1 for facility in session.scalars(select(Facility)).all()
-            if _is_demo_facility(facility)
+            if facility.scene_key == scene_key and _is_demo_facility(facility)
         ),
     }
 
@@ -221,6 +278,7 @@ def _to_feature_collection(
                 "geometry": {"type": "LineString", "coordinates": road["path"]},
                 "properties": {
                     "id": road["id"],
+                    "scene_key": road["scene_key"],
                     "kind": "road",
                     "distance": road["distance"],
                     "congestion": road["congestion"],
@@ -238,6 +296,7 @@ def _to_feature_collection(
                 "geometry": {"type": "Polygon", "coordinates": [ring]},
                 "properties": {
                     "id": building["id"],
+                    "scene_key": building["scene_key"],
                     "name": building["name"],
                     "kind": "building",
                     "category": building["category"],
@@ -251,6 +310,7 @@ def _to_feature_collection(
                 "geometry": {"type": "Point", "coordinates": [facility["lng"], facility["lat"]]},
                 "properties": {
                     "id": facility["id"],
+                    "scene_key": facility["scene_key"],
                     "name": facility["name"],
                     "category": facility["category"],
                     "category_name": facility["category_name"],
