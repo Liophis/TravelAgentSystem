@@ -16,6 +16,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | --- | --- | --- | --- | --- |
 | P1 | Map demo verification | AMap component exists, converts WGS84 to GCJ-02, and optional Playwright harness exists | Screenshot proof still depends on a valid `VITE_AMAP_KEY`, backend server, and local Playwright install | Run `bash scripts/check_map_frontend_optional.sh` in a prepared demo environment |
 | P2 | Real map data repeatability | Local dev DB now can use offline BUPT reference topology plus AMap/OSM POIs; seed layers are hidden by default | OSM/AMap live imports still depend on network/quota, but reference campus import is offline | Use `backend/scripts/import_reference_campus.py --replace-campus-layers` for repeatable campus routing |
+| P2 | Admin/user auth boundary | User login token exists and admin APIs exist | Admin APIs are not yet role-protected, so normal users and admins do not have separate login states | Implement Stage 31 role-aware auth with `role=user|admin` and `require_admin` |
 
 ## Requirement Coverage By Module
 
@@ -36,6 +37,7 @@ The main weakness is no longer API absence; it is browser-level verification dep
 | 日记压缩 | Covered for demo | Uses zlib+base64 lossless compression on publish and decompression on read, with compression ratio and `decompress_ok`. If hand-written compression is required, add a Huffman implementation. |
 | AIGC 动画 | Covered for demo | Deterministic mock draft/storyboard accepts scenic/school media URLs and returns storyboard scenes plus a simulated video link. Real external AIGC generation remains future work. |
 | 美食推荐 | Mostly covered | Cuisine filter, destination scope, hot/rating/distance scoring, Top-K heap, route preview, fuzzy query, and explicit search sort controls exist. |
+| 管理员/普通用户登录状态 | Planned | One login endpoint should return `role=user|admin`; admin APIs should require admin token. This is not a core algorithm requirement but improves demo completeness and data-management credibility. |
 
 ## Recommended Next Stages
 

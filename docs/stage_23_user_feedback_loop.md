@@ -5,6 +5,7 @@
 This stage closes the user-account and recommendation-feedback gaps:
 
 - registration, login, and token verification
+- normal user login state for recommendation and feedback flows
 - profile activity summary
 - destination/food favorites
 - destination/food ratings
@@ -48,3 +49,4 @@ Expected:
 
 - Token auth is a deterministic course-demo HMAC token, not a full production OAuth/JWT stack.
 - Frontend uses demo user `user01` by default so the system remains easy to demonstrate offline.
+- Admin/user role separation is planned in `docs/stage_31_admin_user_auth_plan.md`.

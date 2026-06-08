@@ -36,6 +36,7 @@ frontend pages/components
 
 ## Boundaries
 
+- One account system handles both normal users and admins through `role=user|admin`; admin APIs should be guarded server-side.
 - AMap renders map overlays only.
 - OSMnx/OpenStreetMap provides backend map topology and import data.
 - Required tests do not depend on remote network services.

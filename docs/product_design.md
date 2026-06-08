@@ -8,7 +8,7 @@ Smart Tour Guide is an attraction/school recommendation system plus a campus-int
 
 - Visitor: searches attractions/schools, selects a destination, finds diaries and food information.
 - Student/staff: uses campus-internal map, food recommendation, and route planning repeatedly.
-- Admin/demo operator: checks data scale, OSM import status, and feature readiness.
+- Admin/demo operator: logs in with `role=admin`, checks data scale, imports map data, edits content, and moderates diaries.
 
 ## Core User Flows
 
@@ -21,6 +21,7 @@ Smart Tour Guide is an attraction/school recommendation system plus a campus-int
 7. Recommend foods by cuisine, rating, heat, and distance.
 8. Generate mock AIGC diary/storyboard output from text and scenic/school media URLs.
 9. Check admin data scale and map import status.
+10. Log in as admin to access management tools; normal users should not see or call admin features.
 
 ## Demo Boundary
 

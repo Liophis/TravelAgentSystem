@@ -2,6 +2,16 @@
 
 Base path: `/api/v1`.
 
+## Users And Auth
+
+- `POST /users/register`
+- `POST /users/login`
+  - planned response includes `role=user|admin`
+  - one login endpoint serves both normal users and admins
+- `GET /users/me`
+  - requires bearer token
+  - planned response includes current user role
+
 ## Map And Routing
 
 - `GET /map/stats`
@@ -76,8 +86,12 @@ Destination recommendation/search is for tourist attractions and schools/campuse
 - `POST /admin/map/import`
   - `source=fixture`: offline fallback payload
   - `source=osmnx`: OSMnx road/building/POI import
+  - `source=osmnx_graph`: OSMnx road graph import
+  - `source=osmnx_features`: OSMnx building/POI feature import
   - `source=reference_campus`: offline WGS84 campus scene/topology import from `data/reference/bupt-shahe/`
   - `source=amap_poi`: AMap Place Around facility enrichment, requires `AMAP_WEB_API_KEY`
+
+Planned auth rule: all `/admin/*` endpoints require bearer token with `role=admin`. Missing/invalid token returns `401`; valid non-admin token returns `403`.
 
 ## Response Rule
 

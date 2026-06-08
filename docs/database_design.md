@@ -4,7 +4,7 @@
 
 | Table | Purpose |
 | --- | --- |
-| `users` | demo accounts |
+| `users` | demo accounts; planned `role=user|admin` |
 | `user_profiles` | nickname/avatar |
 | `user_interests` | recommendation interests |
 | `destinations` | searchable/recommendable real attractions and schools |
@@ -24,6 +24,23 @@
 | `diary_search_tokens` | lightweight inverted index tokens for title/body |
 | `restaurants` | food locations |
 | `foods` | food items |
+
+## User Role Strategy
+
+The target auth model keeps one account table and one login endpoint:
+
+```text
+users.role = user | admin
+```
+
+Normal users can browse, rate, favorite, publish diaries, and use recommendations. Admin users can also access `/api/v1/admin/*` for data dashboard, map import, content editing, and diary moderation.
+
+The deterministic seed should include:
+
+```text
+user01: role=user
+admin01: role=admin
+```
 
 ## Map Edge Strategy Fields
 

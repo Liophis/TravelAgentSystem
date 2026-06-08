@@ -34,5 +34,5 @@ Expected:
 
 ## Remaining Limits
 
-- Admin auth is not separated from demo user auth.
+- Admin auth is not separated from demo user auth yet; the role-aware plan is documented in `docs/stage_31_admin_user_auth_plan.md`.
 - Deletes are hard deletes for course demonstration; production would usually use soft delete and audit logs.
