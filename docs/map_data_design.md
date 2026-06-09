@@ -61,5 +61,11 @@ Old overlays are cleared before redraw to avoid duplicate markers and stale rout
 - If Nominatim place lookup fails, importer falls back to configured center point and radius.
 - Summer Palace raw payloads belong under `data/external/summer-palace/`, not the BUPT directories.
 - Summer Palace saved OSMnx payload contains 236 nodes, 630 raw road edges, 228 building/scenic polygons, and 79 facilities/POIs. `bash scripts/restore_summer_palace_map.sh` runs Stage 41 cleanup, leaving 626 visible valid road edges.
+- Summer Palace user-facing POIs should prefer AMap Place Around data when available:
+  - download raw POIs with `bash scripts/download_summer_palace_pois.sh`;
+  - restore/import them with `bash scripts/restore_summer_palace_map.sh`;
+  - store them as `dataset=scenic_navigation`.
+- If the general scenic/service AMap payload is absent, `restore_summer_palace_map.sh` temporarily falls back to the saved real AMap restaurant payload, which still produces verifiable restaurant/cafe/fast-food service facilities.
+- Low-value imported OSM points such as `bench` are deleted during navigation cleanup and must not be used as proof of facility coverage.
 
 Raw reference files must be validated and imported into the database before API handlers use them.

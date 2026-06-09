@@ -9,7 +9,9 @@ from app.services.reference_campus_import_service import BUPT_NAVIGATION_BLOCKLI
 
 
 GENERIC_BUILDING_NAMES = {"", "OSM building", "building", "yes", "nan", "none"}
-GENERIC_POI_NAMES = {"", "poi", "nan", "none"}
+GENERIC_POI_NAMES = {"", "poi", "nan", "none", "bench", "长椅", "座椅"}
+MEANINGLESS_FACILITY_NAMES = {"bench", "长椅", "座椅"}
+MEANINGLESS_FACILITY_CATEGORY_CODES = {"bench"}
 FACILITY_NAME_NORMALIZATION = {
     "toilets": "洗手间",
     "toilet": "洗手间",
@@ -35,6 +37,7 @@ def clean_navigation_scene_data(
     resolved_scene_key = normalize_scene_key(scene_key)
     removed_facilities = _remove_blocked_facilities(session, resolved_scene_key)
     normalized_facilities = _normalize_facility_names(session, resolved_scene_key)
+    removed_meaningless_facilities = _remove_meaningless_facilities(session, resolved_scene_key)
     invalid_edges = _remove_invalid_edges(session, resolved_scene_key)
     orphan_nodes = _remove_orphan_import_nodes(session, resolved_scene_key)
     session.commit()
@@ -42,6 +45,7 @@ def clean_navigation_scene_data(
         "scene_key": resolved_scene_key,
         "removed_blocked_facilities": removed_facilities,
         "normalized_facilities": normalized_facilities,
+        "removed_meaningless_facilities": removed_meaningless_facilities,
         "removed_invalid_edges": invalid_edges,
         "removed_orphan_import_nodes": orphan_nodes,
         "algorithm_trace": {
@@ -60,6 +64,7 @@ def clean_all_navigation_scenes(session: Session) -> dict[str, Any]:
         "scenes": summaries,
         "total_removed_blocked_facilities": sum(item["removed_blocked_facilities"] for item in summaries),
         "total_normalized_facilities": sum(item["normalized_facilities"] for item in summaries),
+        "total_removed_meaningless_facilities": sum(item["removed_meaningless_facilities"] for item in summaries),
         "total_removed_invalid_edges": sum(item["removed_invalid_edges"] for item in summaries),
         "total_removed_orphan_import_nodes": sum(item["removed_orphan_import_nodes"] for item in summaries),
     }
@@ -98,6 +103,20 @@ def _normalize_facility_names(session: Session, scene_key: str) -> int:
             changed += 1
     session.flush()
     return changed
+
+
+def _remove_meaningless_facilities(session: Session, scene_key: str) -> int:
+    ids = []
+    for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key)).all():
+        name = (facility.name or "").strip().casefold()
+        category_code = facility.category.code.casefold() if facility.category else ""
+        if name in MEANINGLESS_FACILITY_NAMES or category_code in MEANINGLESS_FACILITY_CATEGORY_CODES:
+            ids.append(facility.id)
+    if not ids:
+        return 0
+    session.execute(delete(Facility).where(Facility.id.in_(ids)))
+    session.flush()
+    return len(ids)
 
 
 def _normalized_facility_name(facility: Facility) -> str | None:

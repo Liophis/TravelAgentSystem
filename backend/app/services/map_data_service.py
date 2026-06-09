@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key, scene_center
 from app.models import Building, Facility, FacilityCategory, MapEdge, MapNode
+from app.services.navigation_data_cleaning_service import is_generic_poi_name
 
 
 DEMO_BUILDING_PREFIX = "Campus-density seed building polygon"
@@ -213,6 +214,8 @@ def _load_facilities(session: Session, include_demo: bool, scene_key: str) -> li
     facilities = []
     for facility in session.scalars(select(Facility).where(Facility.scene_key == scene_key).order_by(Facility.id)).all():
         if not include_demo and _is_demo_facility(facility):
+            continue
+        if not include_demo and is_generic_poi_name(facility.name):
             continue
         facilities.append(
             {

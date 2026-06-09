@@ -28,7 +28,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--reset-dataset", action="store_true")
     parser.add_argument(
         "--dataset",
-        choices=["nearby_facilities", "campus_navigation"],
+        choices=["nearby_facilities", "campus_navigation", "scenic_navigation"],
         default="nearby_facilities",
         help="Logical POI dataset written into facility descriptions.",
     )

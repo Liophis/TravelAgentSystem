@@ -31,7 +31,7 @@
 - [x] `facilities` count >= 120.
 - [x] Facility categories count >= 10.
 - [x] `bash scripts/check_data_requirements.sh` verifies course data-volume requirements.
-- [x] Current cleaned data has 207 destinations; BUPT 246 roads/56 buildings/55 facilities/16 facility categories; Summer Palace 626 roads/228 buildings/79 facilities/10 facility categories.
+- [x] Current cleaned data has 207 destinations; BUPT 246 roads/56 buildings/55 facilities/16 facility categories; Summer Palace 626 roads/228 buildings/240 facilities/12 facility categories.
 - [x] `GET /api/v1/map/stats` reads the local database and returns map scale counts.
 - [x] OSM import pipeline can import an OSM-shaped payload into map tables.
 - [x] Reference campus source directory is documented for WGS84 JSON/GeoJSON and topology files.

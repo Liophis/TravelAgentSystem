@@ -71,13 +71,19 @@ def test_scenic_cleaning_hides_generic_endpoint_names_and_keeps_routes() -> None
         normalized_facility = session.scalar(
             select(Facility).where(Facility.scene_key == SUMMER_PALACE_SCENE_KEY, Facility.name == "洗手间")
         )
+        bench_facility = session.scalar(
+            select(Facility).where(Facility.scene_key == SUMMER_PALACE_SCENE_KEY, Facility.name == "bench")
+        )
 
     names = {item["name"] for item in places}
     assert "OSM building" not in names
     assert "poi" not in names
+    assert "bench" not in names
     assert summary["normalized_facilities"] == 2
+    assert summary["removed_meaningless_facilities"] == 1
     assert summary["removed_invalid_edges"] == 1
     assert normalized_facility is not None
+    assert bench_facility is None
     assert route["distance"] > 0
 
 
@@ -86,6 +92,11 @@ def _add_dirty_scenic_scene(session: Session) -> None:
     if category is None:
         category = FacilityCategory(code="toilets", name="洗手间")
         session.add(category)
+        session.flush()
+    bench_category = session.scalar(select(FacilityCategory).where(FacilityCategory.code == "bench"))
+    if bench_category is None:
+        bench_category = FacilityCategory(code="bench", name="座椅")
+        session.add(bench_category)
         session.flush()
     node_a = MapNode(
         scene_key=SUMMER_PALACE_SCENE_KEY,
@@ -162,6 +173,15 @@ def _add_dirty_scenic_scene(session: Session) -> None:
                 scene_key=SUMMER_PALACE_SCENE_KEY,
                 name="poi",
                 category_id=category.id,
+                nearest_node_id=node_a.id,
+                lng=node_a.lng,
+                lat=node_a.lat,
+                description="Imported from OpenStreetMap.",
+            ),
+            Facility(
+                scene_key=SUMMER_PALACE_SCENE_KEY,
+                name="bench",
+                category_id=bench_category.id,
                 nearest_node_id=node_a.id,
                 lng=node_a.lng,
                 lat=node_a.lat,

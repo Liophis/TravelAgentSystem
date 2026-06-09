@@ -5,6 +5,8 @@ cd "$(dirname "$0")/.."
 
 PYTHON_CMD=${BACKEND_PYTHON_CMD:-python}
 OSM_PAYLOAD="data/external/summer-palace/osm/osmnx_summer_palace_payload.json"
+AMAP_POI_RAW="data/external/summer-palace/amap_gcj02/summer_palace_pois_raw.json"
+AMAP_FOOD_RAW="data/external/summer-palace/amap_gcj02/food_pois_raw.json"
 
 if [ ! -f "$OSM_PAYLOAD" ]; then
   echo "[summer-palace-map] missing offline OSM payload: $OSM_PAYLOAD"
@@ -19,6 +21,36 @@ PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_osm_campus.py \
 
 echo "[summer-palace-map] cleaning Summer Palace navigation data"
 PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/clean_navigation_data.py --scene-key summer_palace
+
+if [ -f "$AMAP_POI_RAW" ]; then
+  echo "[summer-palace-map] importing Summer Palace AMap scenic POIs"
+  PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_amap_pois.py \
+    --scene-key summer_palace \
+    --center-lng 116.2755 \
+    --center-lat 39.9996 \
+    --radius 2500 \
+    --dataset scenic_navigation \
+    --reset-dataset \
+    --load-raw "$AMAP_POI_RAW"
+
+  echo "[summer-palace-map] cleaning merged Summer Palace POIs"
+  PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/clean_navigation_data.py --scene-key summer_palace
+elif [ -f "$AMAP_FOOD_RAW" ]; then
+  echo "[summer-palace-map] importing Summer Palace AMap restaurant POIs as scenic service facilities"
+  PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_amap_pois.py \
+    --scene-key summer_palace \
+    --center-lng 116.2755 \
+    --center-lat 39.9996 \
+    --radius 3000 \
+    --dataset scenic_navigation \
+    --reset-dataset \
+    --load-raw "$AMAP_FOOD_RAW"
+
+  echo "[summer-palace-map] cleaning merged Summer Palace POIs"
+  PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/clean_navigation_data.py --scene-key summer_palace
+else
+  echo "[summer-palace-map] skipping AMap scenic POI import; raw payload not found: $AMAP_POI_RAW or $AMAP_FOOD_RAW"
+fi
 
 PYTHONPATH=backend ${PYTHON_CMD} - <<'PY'
 from sqlalchemy.orm import Session
