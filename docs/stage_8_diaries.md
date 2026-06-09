@@ -35,6 +35,7 @@ For the current course-requirement alignment, also see `docs/stage_22_diary_medi
 - Added route and navigation entries for `/diaries` and `/diaries/create`.
 - Seed diaries now describe scenic attraction destinations and are stored through compressed text fields.
 - Diary browse/query and publish/AIGC are split into two pages to avoid a crowded combined workflow.
+- `/diaries` uses a card-style result list plus reader panel instead of a dense table-first layout.
 - Updated harness docs and tests.
 
 ## API Contracts

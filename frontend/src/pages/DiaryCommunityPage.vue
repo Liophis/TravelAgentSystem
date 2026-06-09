@@ -11,10 +11,17 @@
       </div>
     </div>
 
-    <el-row :gutter="16">
+    <el-row :gutter="18" class="community-layout">
       <el-col :xs="24" :lg="8">
-        <el-card shadow="never">
-          <template #header>查询条件</template>
+        <el-card shadow="never" class="browse-panel">
+          <template #header>
+            <div class="panel-header">
+              <div>
+                <strong>社区游记</strong>
+                <small>{{ diaries.length }} 条结果</small>
+              </div>
+            </div>
+          </template>
           <el-form label-position="top">
             <el-form-item label="关键词">
               <el-input v-model="keyword" clearable placeholder="目的地、标题或正文" @keyup.enter="loadDiaries" />
@@ -23,30 +30,52 @@
               <el-segmented v-model="searchMode" :options="searchModeOptions" />
             </el-form-item>
           </el-form>
-          <el-button type="primary" :loading="loading" @click="loadDiaries">查询</el-button>
-        </el-card>
+          <div class="search-actions">
+            <el-button type="primary" :loading="loading" @click="loadDiaries">查询</el-button>
+            <el-button @click="resetSearch">全部游记</el-button>
+          </div>
 
-        <el-card shadow="never" class="result-card">
-          <template #header>游记列表</template>
-          <el-table :data="diaries" v-loading="loading" size="small" @row-click="selectDiary">
-            <el-table-column prop="title" label="标题" min-width="180" />
-            <el-table-column prop="views" label="浏览" width="76" />
-            <el-table-column prop="rating_avg" label="评分" width="76" />
-          </el-table>
+          <el-divider />
+
+          <div v-loading="loading" class="diary-list">
+            <button
+              v-for="diary in diaries"
+              :key="diary.id"
+              class="diary-list-item"
+              :class="{ active: selected?.id === diary.id }"
+              type="button"
+              @click="selectDiary(diary)"
+            >
+              <span class="diary-title">{{ diary.title }}</span>
+              <span class="diary-summary">{{ summarizeDiary(diary) }}</span>
+              <span class="diary-meta">
+                <span>{{ diary.views }} 浏览</span>
+                <span>{{ formatRating(diary.rating_avg) }} 分</span>
+                <span>{{ diary.rating_count }} 评</span>
+              </span>
+            </button>
+            <el-empty v-if="!loading && diaries.length === 0" description="没有匹配的游记" />
+          </div>
         </el-card>
       </el-col>
 
       <el-col :xs="24" :lg="16">
-        <el-card v-if="selected" shadow="never">
-          <template #header>
-            <div class="card-header">
-              <span>{{ selected.title }}</span>
-              <div class="inline-actions">
-                <el-button link type="primary" @click="$router.push('/diaries/create')">去创作页生成 AIGC</el-button>
-                <el-button link type="primary" @click="viewSelected">浏览 +1</el-button>
+        <el-card v-if="selected" shadow="never" class="reader-panel">
+          <div class="reader-hero">
+            <div>
+              <el-tag effect="plain" type="success">目的地游记</el-tag>
+              <h2>{{ selected.title }}</h2>
+              <div class="reader-stats">
+                <span>{{ selected.views }} 浏览</span>
+                <span>{{ formatRating(selected.rating_avg) }} 分</span>
+                <span>{{ selected.rating_count }} 人评分</span>
               </div>
             </div>
-          </template>
+            <div class="inline-actions">
+              <el-button @click="$router.push('/diaries/create')">发布 / AIGC</el-button>
+              <el-button type="primary" @click="viewSelected">浏览 +1</el-button>
+            </div>
+          </div>
 
           <p class="diary-body">{{ selected.body }}</p>
 
@@ -59,8 +88,11 @@
           </div>
 
           <aside v-if="compression" class="compression-panel">
-            <h3>压缩存储</h3>
-            <div class="metric-grid">
+            <div class="compression-title">
+              <h3>压缩存储</h3>
+              <span>正文读取时自动解压</span>
+            </div>
+            <div class="metric-grid compact">
               <div class="metric"><span>算法</span><strong>{{ compression.algorithm }}</strong></div>
               <div class="metric"><span>原始大小</span><strong>{{ compression.original_size }} B</strong></div>
               <div class="metric"><span>压缩大小</span><strong>{{ compression.compressed_size }} B</strong></div>
@@ -68,21 +100,36 @@
             </div>
           </aside>
 
-          <div class="diary-actions">
-            <el-rate v-model="rating" />
-            <el-button type="primary" @click="rateSelected">评分</el-button>
-          </div>
+          <section class="interaction-panel">
+            <div class="diary-actions">
+              <div>
+                <strong>给这篇游记评分</strong>
+                <p>评分会参与游记推荐排序。</p>
+              </div>
+              <div class="rating-actions">
+                <el-rate v-model="rating" />
+                <el-button type="primary" @click="rateSelected">提交评分</el-button>
+              </div>
+            </div>
 
-          <el-divider />
-          <el-input v-model="comment" type="textarea" :rows="3" placeholder="评论" />
-          <el-button class="comment-button" @click="commentSelected">评论</el-button>
-          <div v-for="item in selected.comments ?? []" :key="item.id" class="comment-item">
-            {{ item.content }}
-          </div>
+            <el-divider />
+
+            <div class="comment-editor">
+              <el-input v-model="comment" type="textarea" :rows="3" placeholder="写下你的补充、建议或体验" />
+              <el-button type="primary" class="comment-button" @click="commentSelected">发布评论</el-button>
+            </div>
+            <div class="comment-list">
+              <div v-for="item in selected.comments ?? []" :key="item.id" class="comment-item">
+                {{ item.content }}
+              </div>
+            </div>
+          </section>
         </el-card>
 
-        <el-card v-else shadow="never">
-          <el-empty description="请选择一篇游记" />
+        <el-card v-else shadow="never" class="reader-panel empty-reader">
+          <el-empty description="请选择一篇游记">
+            <el-button type="primary" @click="$router.push('/diaries/create')">发布第一篇游记</el-button>
+          </el-empty>
         </el-card>
       </el-col>
     </el-row>
@@ -166,6 +213,12 @@ async function commentSelected() {
   comment.value = "";
 }
 
+async function resetSearch() {
+  keyword.value = "";
+  searchMode.value = "fulltext";
+  await loadDiaries();
+}
+
 async function selectFirstIfNeeded(items: DiaryItem[]) {
   if (items.length === 0) {
     selected.value = null;
@@ -197,29 +250,151 @@ function mergeSelectedSummary(updated: DiaryItem) {
   );
 }
 
+function summarizeDiary(diary: DiaryItem) {
+  const source = diary.summary || diary.body || "暂无摘要";
+  return source.length > 78 ? `${source.slice(0, 78)}...` : source;
+}
+
+function formatRating(value: number | null | undefined) {
+  return Number(value ?? 0).toFixed(1);
+}
+
 onMounted(() => {
   void loadDiaries();
 });
 </script>
 
 <style scoped>
-.card-header,
+.community-layout {
+  align-items: stretch;
+}
+
+.browse-panel,
+.reader-panel {
+  min-height: calc(100vh - 190px);
+}
+
+.panel-header,
+.reader-hero,
 .diary-actions,
-.inline-actions {
+.inline-actions,
+.compression-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
 
-.diary-body {
+.panel-header strong {
+  display: block;
+  color: #101828;
+  font-size: 16px;
+}
+
+.panel-header small,
+.compression-title span,
+.reader-stats {
+  color: #667085;
+  font-size: 13px;
+}
+
+.search-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.diary-list {
+  display: grid;
+  gap: 10px;
+  max-height: calc(100vh - 470px);
+  min-height: 320px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.diary-list-item {
+  display: grid;
+  width: 100%;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+.diary-list-item:hover,
+.diary-list-item.active {
+  border-color: #87d0c6;
+  background: #f4fbfa;
+  box-shadow: 0 10px 26px rgba(16, 24, 40, 0.08);
+}
+
+.diary-title {
+  color: #101828;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.diary-summary {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.diary-meta,
+.reader-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.diary-meta span,
+.reader-stats span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f2f4f7;
   color: #475467;
-  line-height: 1.7;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reader-hero {
+  align-items: flex-start;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.reader-hero h2 {
+  max-width: 880px;
+  margin: 12px 0 10px;
+  color: #101828;
+  font-size: 24px;
+  line-height: 1.35;
+}
+
+.diary-body {
+  margin: 22px 0;
+  color: #475467;
+  font-size: 15px;
+  line-height: 1.85;
   white-space: pre-wrap;
 }
 
 .compression-panel {
-  margin: 16px 0;
+  margin: 18px 0;
   padding: 14px 16px;
   border: 1px solid #edf1f5;
   border-radius: 8px;
@@ -227,7 +402,7 @@ onMounted(() => {
 }
 
 .compression-panel h3 {
-  margin: 0 0 12px;
+  margin: 0;
   color: #101828;
   font-size: 15px;
 }
@@ -236,10 +411,11 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+  margin-top: 12px;
 }
 
 .metric {
-  min-height: 72px;
+  min-height: 68px;
   padding: 12px;
   border: 1px solid #edf1f5;
   border-radius: 8px;
@@ -260,12 +436,48 @@ onMounted(() => {
   overflow-wrap: anywhere;
 }
 
+.interaction-panel {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+  background: #fcfcfd;
+}
+
+.diary-actions strong {
+  color: #101828;
+}
+
+.diary-actions p {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.rating-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.comment-editor {
+  display: grid;
+  gap: 10px;
+}
+
 .comment-button {
-  margin-top: 8px;
+  justify-self: end;
+}
+
+.comment-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .comment-item {
-  margin-top: 10px;
   padding: 10px;
   border: 1px solid #edf1f5;
   border-radius: 8px;
@@ -275,7 +487,7 @@ onMounted(() => {
 .media-list {
   display: grid;
   gap: 8px;
-  margin: 12px 0;
+  margin: 12px 0 18px;
 }
 
 .media-item {
@@ -303,18 +515,39 @@ onMounted(() => {
   font-size: 11px;
 }
 
+.empty-reader {
+  display: grid;
+  place-items: center;
+}
+
 @media (max-width: 1200px) {
+  .browse-panel,
+  .reader-panel {
+    min-height: auto;
+  }
+
+  .diary-list {
+    max-height: none;
+  }
+
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .card-header,
+  .reader-hero,
   .diary-actions,
-  .inline-actions {
+  .inline-actions,
+  .compression-title,
+  .rating-actions {
     align-items: flex-start;
     flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .reader-hero h2 {
+    font-size: 20px;
   }
 
   .metric-grid,
