@@ -46,7 +46,10 @@ Place search:
 GET /api/v1/search/places?keyword=厕所&limit=5
 GET /api/v1/search/places?keyword=厕所&scope=campus&limit=5
 GET /api/v1/search/places?keyword=大学&scope=destinations&limit=5
+GET /api/v1/search/places?scope=scenic&scene_key=summer_palace&limit=200
 ```
+
+`limit` is intentionally capped at 200, not 100, because scenic route endpoint selectors need to expose the cleaned Summer Palace candidate set without hiding valid internal places.
 
 Recommendations:
 

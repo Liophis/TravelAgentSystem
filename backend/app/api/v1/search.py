@@ -13,7 +13,7 @@ def search_places(
     category: str | None = Query(default=None),
     scope: str = Query(default="all", pattern="^(all|destinations|campus|scenic)$"),
     scene_key: str | None = Query(default=None),
-    limit: int = Query(default=20, ge=1, le=100),
+    limit: int = Query(default=20, ge=1, le=200),
     db: Session = Depends(get_db),
 ) -> dict:
     return search_places_from_db(

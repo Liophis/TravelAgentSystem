@@ -42,6 +42,7 @@ Base path: `/api/v1`.
   - `scope=destinations`: nationwide attraction/school destinations
   - `scope=campus`: BUPT Shahe campus buildings/facilities/semantic named topology nodes only; generic road/intersection nodes are excluded
   - Stage 35 target `scope=scenic&scene_key=summer_palace`: Summer Palace scenic buildings/facilities/semantic nodes
+  - `limit` accepts `1..200`; route endpoint selectors use this expanded limit so dense scenes such as Summer Palace are not truncated to the old 100-candidate ceiling
 - `GET /recommendations`
 
 Destination recommendation/search is for tourist attractions and schools/campuses. Campus navigation must use `scope=campus` so route endpoints do not come from the nationwide destination pool.

@@ -18,6 +18,7 @@ Required by the assignment:
 - Increased RoutePlannerPage candidate retention from 80 to 200 route endpoints.
   - BUPT currently exposes 74 selectable internal places.
   - Summer Palace currently exposes 130 selectable internal places.
+  - `GET /api/v1/search/places` now accepts `limit=200` so the frontend selector contract matches the retained candidate count.
 - Added data requirement check CLI:
 
 ```bash

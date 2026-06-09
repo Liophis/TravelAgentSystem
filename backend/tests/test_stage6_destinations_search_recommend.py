@@ -1,3 +1,5 @@
+import inspect
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -136,3 +138,9 @@ def test_stage6_api_handlers_use_seeded_database() -> None:
     assert len(destinations["items"]) == 3
     assert places["items"][0]["source"] == "facility"
     assert len(recommendations["items"]) == 3
+
+
+def test_place_search_api_accepts_expanded_route_candidate_limit() -> None:
+    limit_param = inspect.signature(search_places).parameters["limit"]
+
+    assert any(getattr(metadata, "le", None) == 200 for metadata in limit_param.default.metadata)
