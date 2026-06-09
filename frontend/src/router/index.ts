@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import AdminDashboardPage from "../pages/AdminDashboardPage.vue";
+import DiaryCreateAigcPage from "../pages/DiaryCreateAigcPage.vue";
 import DiaryCommunityPage from "../pages/DiaryCommunityPage.vue";
 import FoodRecommendPage from "../pages/FoodRecommendPage.vue";
 import HomePage from "../pages/HomePage.vue";
@@ -24,8 +25,9 @@ const router = createRouter({
     { path: "/indoor", name: "indoor-navigation", component: IndoorNavigationPage },
     { path: "/facilities", name: "nearby-facilities", component: NearbyFacilitiesPage },
     { path: "/diaries", name: "diaries", component: DiaryCommunityPage },
+    { path: "/diaries/create", name: "diary-create-aigc", component: DiaryCreateAigcPage },
     { path: "/foods", name: "foods", component: FoodRecommendPage },
-    { path: "/aigc", redirect: "/diaries" },
+    { path: "/aigc", redirect: "/diaries/create" },
     { path: "/admin", name: "admin", component: AdminDashboardPage, meta: { requiresAdmin: true } },
   ],
 });

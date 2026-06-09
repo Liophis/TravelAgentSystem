@@ -144,7 +144,8 @@
 - [ ] Hand-written Huffman compression exists if the teacher explicitly requires a custom compression algorithm.
 - [x] AIGC flow accepts scenic/school image or video URLs from diary media.
 - [x] AIGC flow returns storyboard scenes and a simulated tourism animation/video link.
-- [x] DiaryCommunityPage separates diary detail and AIGC generation into tabs to avoid a crowded three-column layout.
+- [x] `/diaries` is a dedicated browse/search/detail page.
+- [x] `/diaries/create` is a dedicated publish/AIGC creation page.
 
 ## Food
 
@@ -174,7 +175,7 @@
 - [x] Agent response includes `result`, `agent_trace.steps[]`, and `algorithm_trace`.
 - [x] Agent trace shows at least 4 deterministic tool steps with timing and status.
 - [x] Media URLs affect the Agent media-analysis and storyboard output.
-- [x] DiaryCommunityPage displays both generated artifact and Agent execution trace.
+- [x] DiaryCreateAigcPage displays both generated artifact and Agent execution trace.
 - [x] Legacy `diary-draft` and `storyboard` endpoints remain backward-compatible.
 
 ## Admin

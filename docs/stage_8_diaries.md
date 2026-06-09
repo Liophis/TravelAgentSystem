@@ -30,10 +30,11 @@ For the current course-requirement alignment, also see `docs/stage_22_diary_medi
   - `GET /api/v1/diaries/search`
   - `GET /api/v1/diaries/recommend`
   - `GET /api/v1/diaries/{id}/compression`
-- Added `frontend/src/pages/DiaryCommunityPage.vue`.
-- Added route and navigation entry for the diary community page.
+- Added `frontend/src/pages/DiaryCommunityPage.vue` for browse/search/detail/rating/comment.
+- Added `frontend/src/pages/DiaryCreateAigcPage.vue` for publishing diaries and running the AIGC Agent.
+- Added route and navigation entries for `/diaries` and `/diaries/create`.
 - Seed diaries now describe scenic attraction destinations and are stored through compressed text fields.
-- DiaryCommunityPage uses a left list/editor plus right detail/AIGC tabs to avoid a crowded three-column layout.
+- Diary browse/query and publish/AIGC are split into two pages to avoid a crowded combined workflow.
 - Updated harness docs and tests.
 
 ## API Contracts

@@ -52,13 +52,20 @@ const navItems = [
   { path: "/routes", label: "路线规划", kicker: "04", description: "北邮沙河与颐和园内部导航" },
   { path: "/indoor", label: "室内导航", kicker: "05", description: "楼宇内跨楼层路线规划" },
   { path: "/facilities", label: "附近设施", kicker: "06", description: "按真实道路距离查找设施" },
-  { path: "/diaries", label: "游记与 AIGC", kicker: "07", description: "游记管理、交流和 Agent 动画生成" },
-  { path: "/foods", label: "美食推荐", kicker: "08", description: "美食检索、推荐和路线预览" },
-  { path: "/admin", label: "管理后台", kicker: "09", description: "数据看板与内容管理", adminOnly: true },
+  { path: "/diaries", label: "游记社区", kicker: "07", description: "游记列表、查询、浏览、评分和评论" },
+  { path: "/diaries/create", label: "发布与 AIGC", kicker: "08", description: "发布游记并生成 Agent 分镜和模拟视频" },
+  { path: "/foods", label: "美食推荐", kicker: "09", description: "美食检索、推荐和路线预览" },
+  { path: "/admin", label: "管理后台", kicker: "10", description: "数据看板与内容管理", adminOnly: true },
 ];
 
 const visibleNavItems = computed(() => navItems.filter((item) => !item.adminOnly || isAdmin()));
-const currentNavItem = computed(() => visibleNavItems.value.find((item) => item.path === route.path));
+const currentNavItem = computed(
+  () =>
+    visibleNavItems.value
+      .slice()
+      .sort((left, right) => right.path.length - left.path.length)
+      .find((item) => route.path === item.path || route.path.startsWith(`${item.path}/`)),
+);
 
 function roleLabel(role: string) {
   return role === "admin" ? "管理员" : "普通用户";
