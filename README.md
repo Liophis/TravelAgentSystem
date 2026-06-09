@@ -2,7 +2,7 @@
 
 景点/学校推荐 + 多场景内部导航平台 MVP。
 
-当前仓库处于 **Stage 38 Indoor Navigation Upgrade** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC Agent 和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层、北邮沙河参考校园拓扑导入、双 POI 数据集、游记管理/交流的讲义要求对齐、管理员/普通用户角色登录与后台权限保护、AIGC 可解释轻量 Agent 工作流、北京颐和园内部导航场景、讲义要求下的美食 Top-K 推荐/模糊查询/路线距离排序、颐和园周边真实高德餐饮 POI 导入、中国科学技术馆主展厅 B1-5F 室内导航示意图，以及应用级登录入口/服务总览页信息架构调整。
+当前仓库处于 **Stage 38 Indoor Navigation Upgrade** 阶段：已建立 FastAPI / Vue / AMap / Docker Compose 骨架，加入 SQLAlchemy 核心表模型、确定性 seed/reset 数据，并把校园地图浏览、北邮沙河校区内部路线规划、室内导航、附近设施、景点/学校目的地搜索、目的地推荐、OSM/高德数据导入、游记社区、美食推荐、AIGC Agent 和后台数据看板接入数据库数据。近期阶段补齐了高德坐标漂移修正、用户兴趣编辑、高德 Web Service 真实 POI 导入、设施数据清洗、地点选择路线输入、游记媒体/索引检索/兴趣推荐、用户注册登录/收藏评分/行为日志闭环、按目的地范围过滤的美食推荐、后台内容管理、真实优先地图图层、北邮沙河参考校园拓扑导入、双 POI 数据集、游记管理/交流的讲义要求对齐、管理员/普通用户角色登录与后台权限保护、AIGC 可解释轻量 Agent 工作流、北京颐和园内部导航场景、讲义要求下的美食 Top-K 推荐/模糊查询/路线距离排序、颐和园周边真实高德餐饮 POI 导入、中国科学技术馆主展厅 B1-5F 室内导航示意图、应用级登录入口/服务总览页信息架构调整，以及景区游记 seed 与游记/AIGC 标签页排版。
 
 Scope clarification:
 
@@ -267,10 +267,10 @@ curl 'http://127.0.0.1:8000/api/v1/diaries?limit=5'
 curl 'http://127.0.0.1:8000/api/v1/foods/recommend?destination_id=1&limit=5'
 curl -X POST http://127.0.0.1:8000/api/v1/aigc/diary-draft \
   -H 'Content-Type: application/json' \
-  -d '{"topic":"沙河校区路线","keywords":["食堂","图书馆"],"tone":"自然"}'
+  -d '{"topic":"颐和园半日游记","keywords":["昆明湖","佛香阁"],"tone":"自然"}'
 curl -X POST http://127.0.0.1:8000/api/v1/aigc/agent/run \
   -H 'Content-Type: application/json' \
-  -d '{"task":"diary_animation","text":"从校门到图书馆的校园游览","destination_name":"北京邮电大学沙河校区","media_urls":["/media/demo/campus-photo.jpg"],"scene_count":4}'
+  -d '{"task":"diary_animation","text":"从东宫门进入颐和园，沿昆明湖步道游览，再到佛香阁附近拍摄湖面和古建。","destination_name":"颐和园","media_urls":["/media/demo/scenic-photo.jpg"],"scene_count":4}'
 curl -H "Authorization: Bearer $ADMIN_TOKEN" 'http://127.0.0.1:8000/api/v1/admin/stats'
 curl -X PATCH http://127.0.0.1:8000/api/v1/admin/destinations/1 \
   -H 'Content-Type: application/json' \

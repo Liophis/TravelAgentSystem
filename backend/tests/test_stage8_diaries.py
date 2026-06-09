@@ -53,7 +53,7 @@ def test_diary_search_recommend_view_rating_and_comment() -> None:
 
     with Session(engine) as session:
         seed_demo_data(session)
-        search_payload = search_diaries_from_db(session, keyword="Stage 2", limit=5)
+        search_payload = search_diaries_from_db(session, keyword="目的地", limit=5)
         viewed = view_diary(1, session)
         rated = rate_diary(1, DiaryRatingRequest(user_id=1, value=5), session)
         comment = add_diary_comment(1, DiaryCommentRequest(user_id=1, content="很有帮助"), session)

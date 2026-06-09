@@ -124,6 +124,7 @@
 ## Diary Community
 
 - [x] User can publish diary with title, body, and destination.
+- [x] Seed diaries are scenic attraction travel diaries, not campus-only placeholder text.
 - [x] User can record travel content with text plus image/video URL metadata.
 - [ ] User can upload local image/video binary files through the browser when this is required for the demo.
 - [x] All users' diaries are browsable in one community list.
@@ -143,6 +144,7 @@
 - [ ] Hand-written Huffman compression exists if the teacher explicitly requires a custom compression algorithm.
 - [x] AIGC flow accepts scenic/school image or video URLs from diary media.
 - [x] AIGC flow returns storyboard scenes and a simulated tourism animation/video link.
+- [x] DiaryCommunityPage separates diary detail and AIGC generation into tabs to avoid a crowded three-column layout.
 
 ## Food
 

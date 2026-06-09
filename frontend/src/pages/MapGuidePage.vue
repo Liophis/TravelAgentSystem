@@ -64,7 +64,7 @@
         </el-card>
         <el-card v-else shadow="never" class="stats-card">
           <div class="stat"><span>POI</span><strong>{{ destinationMarkers.length }}</strong></div>
-          <div class="stat"><span>景区</span><strong>{{ destinationTypeCount.attraction }}</strong></div>
+          <div class="stat"><span>景区</span><strong>{{ destinationTypeCount.scenic }}</strong></div>
           <div class="stat"><span>学校</span><strong>{{ destinationTypeCount.school }}</strong></div>
           <div class="stat"><span>排序</span><strong>{{ destinationSortLabel }}</strong></div>
           <el-segmented v-model="destinationSort" :options="destinationSortOptions" @change="loadDestinationPois" />
@@ -147,7 +147,7 @@ const destinationSortOptions = [
   { label: "评分", value: "rating" },
   { label: "名称", value: "name" },
 ];
-const destinationCategoryOptions = ["attraction", "school"];
+const destinationCategoryOptions = ["scenic", "school"];
 const currentScene = computed(() => scenes.find((scene) => scene.key === selectedSceneKey.value) ?? scenes[0]);
 const sceneSegmentOptions = scenes.map((scene) => ({ label: scene.label, value: scene.key }));
 const categories = computed(() => payload.value?.facility_categories ?? []);
@@ -169,7 +169,7 @@ const destinationMarkers = computed<FacilityItem[]>(() =>
   })),
 );
 const destinationTypeCount = computed(() => ({
-  attraction: destinations.value.filter((destination) => destination.category === "attraction").length,
+  scenic: destinations.value.filter((destination) => destination.category !== "school").length,
   school: destinations.value.filter((destination) => destination.category === "school").length,
 }));
 const destinationSortLabel = computed(() => {

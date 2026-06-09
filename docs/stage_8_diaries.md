@@ -32,6 +32,8 @@ For the current course-requirement alignment, also see `docs/stage_22_diary_medi
   - `GET /api/v1/diaries/{id}/compression`
 - Added `frontend/src/pages/DiaryCommunityPage.vue`.
 - Added route and navigation entry for the diary community page.
+- Seed diaries now describe scenic attraction destinations and are stored through compressed text fields.
+- DiaryCommunityPage uses a left list/editor plus right detail/AIGC tabs to avoid a crowded three-column layout.
 - Updated harness docs and tests.
 
 ## API Contracts
@@ -41,13 +43,13 @@ Create diary:
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/diaries \
   -H 'Content-Type: application/json' \
-  -d '{"user_id":1,"destination_id":1,"title":"沙河校区游记","body":"一次路线清晰的校园游览。"}'
+  -d '{"user_id":1,"destination_id":1,"title":"颐和园旅行日记","body":"沿着湖边步道游览，记录景点、餐饮和休息点。"}'
 ```
 
 Search:
 
 ```bash
-curl 'http://127.0.0.1:8000/api/v1/diaries/search?keyword=沙河&limit=10'
+curl 'http://127.0.0.1:8000/api/v1/diaries/search?keyword=目的地&limit=10'
 ```
 
 Recommend:

@@ -357,15 +357,15 @@ with Session(engine) as session:
     require("admin food count", stats_payload["tables"]["foods"])
     print(f"[smoke] admin: tables={stats_payload['tables']}")
 
-draft = generate_diary_draft({"topic": "沙河校区路线", "keywords": ["食堂", "图书馆"], "tone": "自然"})
+draft = generate_diary_draft({"topic": "颐和园半日游记", "keywords": ["昆明湖", "佛香阁"], "tone": "自然"})
 storyboard = generate_storyboard({"text": draft["draft"], "scene_count": 3})
 require("aigc scenes", len(storyboard["scenes"]), 3)
 agent = run_aigc_agent(
     {
         "task": "diary_animation",
         "text": draft["draft"],
-        "destination_name": "北京邮电大学沙河校区",
-        "media_urls": ["/media/demo/campus-photo.jpg"],
+        "destination_name": "颐和园",
+        "media_urls": ["/media/demo/scenic-photo.jpg"],
         "scene_count": 3,
     }
 )

@@ -33,6 +33,7 @@ from app.models import (
     UserProfile,
     UserRating,
 )
+from app.algorithms.compression import compress_text
 from app.algorithms.route_planning import approximate_distance_meters
 from app.services.diary_service import rebuild_diary_search_index
 from app.services.user_service import ADMIN_ROLE, NORMAL_USER_ROLE, hash_password
@@ -255,14 +256,9 @@ def seed_demo_data(session: Session) -> dict[str, int]:
             )
         )
 
+    diary_destinations = _diary_destination_pool(destinations)
     diaries = [
-        Diary(
-            user_id=normal_users[index % len(normal_users)].id,
-            destination_id=destinations[index].id,
-            title=f"沙河校区游记 {index + 1}",
-            body="这里是 Stage 2 的游记种子文本，用于后续全文检索和压缩功能。",
-            views=index * 3,
-        )
+        _build_seed_diary(normal_users[index % len(normal_users)].id, diary_destinations[index], index)
         for index in range(20)
     ]
     session.add_all(diaries)
@@ -275,7 +271,7 @@ def seed_demo_data(session: Session) -> dict[str, int]:
                 diary_id=diaries[index].id,
                 media_type="image",
                 url=f"/media/seed/diary-{index + 1}.jpg",
-                caption="沙河校区游记示例图片",
+                caption="目的地游记示例图片",
             )
             for index in range(3)
         ]
@@ -365,7 +361,9 @@ def ensure_incremental_demo_data(session: Session) -> None:
                 )
             )
 
-    for diary in diaries:
+    diary_destinations = _diary_destination_pool(destinations)
+    for index, diary in enumerate(diaries):
+        _refresh_seed_diary_if_needed(diary, diary_destinations[index % len(diary_destinations)], index)
         rebuild_diary_search_index(session, diary)
 
     if diaries and session.scalar(select(DiaryMedia).limit(1)) is None:
@@ -375,7 +373,7 @@ def ensure_incremental_demo_data(session: Session) -> None:
                     diary_id=diaries[index].id,
                     media_type="image",
                     url=f"/media/seed/diary-{index + 1}.jpg",
-                    caption="沙河校区游记示例图片",
+                    caption="目的地游记示例图片",
                 )
                 for index in range(min(3, len(diaries)))
             ]
@@ -701,6 +699,59 @@ def count_seeded_data(session: Session) -> dict[str, int]:
         "diary_media": DiaryMedia,
     }
     return {name: len(session.scalars(select(model)).all()) for name, model in models.items()}
+
+
+def _build_seed_diary(user_id: int, destination: Destination, index: int) -> Diary:
+    title, body = _seed_diary_title_body(destination, index)
+    compressed_body, original_size, compressed_size = compress_text(body)
+    return Diary(
+        user_id=user_id,
+        destination_id=destination.id,
+        title=title,
+        body="",
+        compressed_body=compressed_body,
+        original_size=original_size,
+        compressed_size=compressed_size,
+        views=index * 3,
+    )
+
+
+def _diary_destination_pool(destinations: list[Destination]) -> list[Destination]:
+    scenic_destinations = [destination for destination in destinations if destination.category != "school"]
+    return scenic_destinations or destinations
+
+
+def _refresh_seed_diary_if_needed(diary: Diary, destination: Destination, index: int) -> None:
+    if not diary.title.startswith("沙河校区游记") and "Stage 2" not in diary.body:
+        return
+    title, body = _seed_diary_title_body(destination, index)
+    compressed_body, original_size, compressed_size = compress_text(body)
+    diary.destination_id = destination.id
+    diary.title = title
+    diary.body = ""
+    diary.compressed_body = compressed_body
+    diary.original_size = original_size
+    diary.compressed_size = compressed_size
+
+
+def _seed_diary_title_body(destination: Destination, index: int) -> tuple[str, str]:
+    category_label = "高校" if destination.category == "school" else "景区"
+    focus_points = [
+        "入口动线、核心景观点和休息设施",
+        "游客热度、评价口碑和周边餐饮",
+        "展馆路线、拍照点和服务设施",
+        "步行距离、游览节奏和夜景体验",
+    ]
+    focus = focus_points[index % len(focus_points)]
+    title = f"{destination.name}旅行日记：{focus}"
+    body = (
+        f"这次把{destination.name}作为{category_label}目的地来记录。"
+        f"出发前我先查看了目的地热度、评分和相关游记，实际到达后重点观察了{focus}。"
+        f"游览过程中，路线安排以少走回头路为目标，先到达标志性区域，再补充参观周边空间。"
+        f"如果同行者对历史文化、校园氛围或自然景观感兴趣，{destination.name}都适合作为半日到一日行程。"
+        f"这篇日记用于演示目的地相关游记检索、热度排序、评分交流、正文全文搜索以及压缩存储。"
+    )
+    return title, body
 
 
 def main() -> None:
