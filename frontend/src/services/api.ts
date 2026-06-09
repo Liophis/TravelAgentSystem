@@ -582,8 +582,8 @@ async function parseResponse<T>(response: Response): Promise<T> {
 async function readErrorBody(response: Response): Promise<string> {
   const text = await response.text();
   try {
-    const payload = JSON.parse(text) as { detail?: string };
-    return payload.detail ?? text;
+    const payload = JSON.parse(text) as Record<string, unknown>;
+    return formatApiErrorPayload(payload) || text;
   } catch {
     return text;
   }
@@ -592,4 +592,35 @@ async function readErrorBody(response: Response): Promise<string> {
 function notifyApiError(error: unknown) {
   const message = error instanceof Error ? error.message : "请求失败，请稍后重试。";
   ElMessage.error(message);
+}
+
+function formatApiErrorPayload(payload: Record<string, unknown>) {
+  const detail = payload.detail ?? payload.message ?? payload.error;
+  return formatApiErrorDetail(detail);
+}
+
+function formatApiErrorDetail(detail: unknown): string {
+  if (detail == null) {
+    return "";
+  }
+  if (typeof detail === "string") {
+    return detail;
+  }
+  if (Array.isArray(detail)) {
+    return detail.map(formatApiErrorDetail).filter(Boolean).join("; ");
+  }
+  if (typeof detail === "object") {
+    const record = detail as Record<string, unknown>;
+    const message = record.msg ?? record.message ?? record.error;
+    if (typeof message === "string") {
+      const loc = Array.isArray(record.loc) ? record.loc.join(".") : "";
+      return loc ? `${loc}: ${message}` : message;
+    }
+    try {
+      return JSON.stringify(record);
+    } catch {
+      return "请求失败，请检查输入。";
+    }
+  }
+  return String(detail);
 }
