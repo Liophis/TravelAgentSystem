@@ -47,7 +47,7 @@ For campus/scenic-grade navigation, imported topology should come from real refe
 All graph loading filters by `scene_key`, with `bupt_shahe` as default. Current reset-safe scenes:
 
 - `bupt_shahe`: 106 reference topology nodes, 246 reference edges, plus visible OSM buildings/facilities.
-- `summer_palace`: 236 OSM nodes, 630 OSM edges, 228 OSM building/scenic polygons, and 79 OSM POIs.
+- `summer_palace`: 236 OSM nodes, 630 raw OSM edges, 626 valid visible edges after Stage 41 cleanup, 228 OSM building/scenic polygons, and 79 OSM POIs.
 
 If a place ID is provided, the service resolves it first:
 

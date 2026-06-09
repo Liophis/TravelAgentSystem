@@ -34,8 +34,9 @@
 - [x] OSM import pipeline can import an OSM-shaped payload into map tables.
 - [x] Reference campus source directory is documented for WGS84 JSON/GeoJSON and topology files.
 - [x] Reference campus import script validates and imports `data/reference/bupt-shahe/` files into map tables.
-- [x] Reference campus import has been run locally and produced 106 nodes, 246 road edges, and 35 BUPT Shahe reference facilities.
+- [x] Reference campus import has been run locally and produced 106 nodes, 246 road edges, and 32 cleaned BUPT Shahe reference facilities.
 - [x] `bash scripts/reset_dev_db.sh` restores visible BUPT Shahe campus navigation roads, buildings, and facilities after reset.
+- [x] `bash scripts/reset_dev_db.sh` runs navigation data cleaning for BUPT and Summer Palace restore paths.
 - [x] Admin map import/status API reports current map table counts.
 
 ## Users
@@ -70,6 +71,7 @@
 - [x] RoutePlannerPage is labeled as 北京邮电大学沙河校区内部场所导航, not cross-city tourism routing.
 - [x] `GET /api/v1/search/places?scope=campus` returns only BUPT Shahe campus buildings/facilities/semantic named topology nodes and excludes nationwide attraction/school destinations.
 - [x] Campus route endpoint search excludes generic road/intersection nodes such as `校园路口` and `道路节点`.
+- [x] Campus route endpoint search excludes generic OSM buildings and blocked non-campus POIs such as `防御塔景区` and `观景区`.
 - [x] Map page displays roads, buildings, and facilities.
 - [x] Map page can switch to nationwide attraction/school POI markers.
 - [x] Attraction/school POI map supports category filter, keyword search, and hot/rating/name sort.
@@ -108,6 +110,7 @@
 - [x] Summer Palace has at least 200 route edges, 20 buildings/scenic structures, and 50 facilities/POIs if source data allows.
 - [x] Summer Palace scene restores from saved real OSMnx payload after `bash scripts/reset_dev_db.sh`.
 - [x] Summer Palace supports route planning, multi-point planning, and nearby facility lookup by graph distance.
+- [x] Summer Palace route endpoint search hides generic `OSM building` / `poi` names and normalizes generic facility labels such as `toilets` to `洗手间`.
 
 ## Indoor Navigation
 

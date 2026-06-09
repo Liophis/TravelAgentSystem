@@ -155,6 +155,8 @@ buildings/scenic structures: 228
 facilities/POIs: 79
 ```
 
+Stage 41 navigation data cleanup removes 4 invalid road edges from the imported graph, so the visible valid road count after restore is 626.
+
 Reset-safe restore:
 
 ```bash

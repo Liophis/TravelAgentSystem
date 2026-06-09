@@ -17,6 +17,9 @@ PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_osm_campus.py \
   --scene-key summer_palace \
   --load-payload "$OSM_PAYLOAD"
 
+echo "[summer-palace-map] cleaning Summer Palace navigation data"
+PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/clean_navigation_data.py --scene-key summer_palace
+
 PYTHONPATH=backend ${PYTHON_CMD} - <<'PY'
 from sqlalchemy.orm import Session
 

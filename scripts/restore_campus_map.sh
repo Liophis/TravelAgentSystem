@@ -29,6 +29,9 @@ PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/import_osm_campus.py \
   --features-only \
   --load-payload "$OSM_PAYLOAD"
 
+echo "[campus-map] cleaning BUPT navigation data"
+PYTHONPATH=backend ${PYTHON_CMD} backend/scripts/clean_navigation_data.py --scene-key bupt_shahe
+
 PYTHONPATH=backend ${PYTHON_CMD} - <<'PY'
 from sqlalchemy.orm import Session
 

@@ -60,6 +60,6 @@ Old overlays are cleared before redraw to avoid duplicate markers and stale rout
 - Download-only source capture: `import_osm_campus.py --download-only --save-payload ...` and `import_amap_pois.py --download-only --save-raw ...`.
 - If Nominatim place lookup fails, importer falls back to configured center point and radius.
 - Summer Palace raw payloads belong under `data/external/summer-palace/`, not the BUPT directories.
-- Summer Palace saved OSMnx payload currently restores 236 nodes, 630 road edges, 228 building/scenic polygons, and 79 facilities/POIs through `bash scripts/restore_summer_palace_map.sh`.
+- Summer Palace saved OSMnx payload contains 236 nodes, 630 raw road edges, 228 building/scenic polygons, and 79 facilities/POIs. `bash scripts/restore_summer_palace_map.sh` runs Stage 41 cleanup, leaving 626 visible valid road edges.
 
 Raw reference files must be validated and imported into the database before API handlers use them.

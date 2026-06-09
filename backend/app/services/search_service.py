@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.core.campus_scope import is_in_bupt_shahe_bounds
 from app.core.scenes import DEFAULT_SCENE_KEY, normalize_scene_key, scene_display_name
 from app.models import Building, Destination, Facility, MapNode
+from app.services.navigation_data_cleaning_service import is_generic_building_name, is_generic_poi_name
 
 
 def search_places_from_db(
@@ -116,6 +117,8 @@ def _search_buildings(
     buildings = session.scalars(select(Building).where(Building.scene_key == scene_key).order_by(Building.id)).all()
     results = []
     for building in buildings:
+        if is_generic_building_name(building.name):
+            continue
         if category and building.category != category:
             continue
         center = _building_center(building.polygon)
@@ -152,6 +155,8 @@ def _search_facilities(
     ).all()
     results = []
     for facility in facilities:
+        if is_generic_poi_name(facility.name):
+            continue
         if category and facility.category.code != category:
             continue
         if campus_only and scene_key == DEFAULT_SCENE_KEY and not is_in_bupt_shahe_bounds(facility.lng, facility.lat):

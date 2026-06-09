@@ -13,6 +13,7 @@ from app.models import Facility, FacilityCategory, MapEdge, MapNode
 REFERENCE_NODE_PREFIX = "ref-bupt-shahe:"
 REFERENCE_FACILITY_PREFIX = "Imported from BUPT Shahe reference campus data."
 DEFAULT_SOURCE_DIR = Path("data/reference/bupt-shahe")
+BUPT_NAVIGATION_BLOCKLIST = {"防御塔景区", "观景区"}
 
 
 class ReferenceCampusImportError(RuntimeError):
@@ -300,7 +301,8 @@ def _facility_items_from_scene(scene: dict[str, Any], external_to_node: dict[str
     for node in scene.get("nodes", []):
         node_type = str(node.get("nodeType") or "")
         tags = [str(tag) for tag in node.get("tags") or []]
-        if node_type == "path_node" or "nav_only" in tags:
+        name = str(node.get("name") or node.get("id") or "").strip()
+        if node_type == "path_node" or "nav_only" in tags or name in BUPT_NAVIGATION_BLOCKLIST:
             continue
         external_id = _node_external_id(str(node.get("id")))
         nearest_node = external_to_node.get(external_id)
@@ -308,7 +310,7 @@ def _facility_items_from_scene(scene: dict[str, Any], external_to_node: dict[str
             continue
         items.append(
             {
-                "name": str(node.get("name") or node.get("id")),
+                "name": name,
                 "lng": float(node["x"]),
                 "lat": float(node["y"]),
                 "category": _facility_category(str(node.get("name") or ""), node_type, tags),
@@ -334,6 +336,8 @@ def _facility_items_from_geojson(
         kind = properties.get("kind")
         node_type = str(properties.get("nodeType") or "")
         name = str(properties.get("name") or properties.get("key") or "").strip()
+        if name in BUPT_NAVIGATION_BLOCKLIST:
+            continue
         if kind != "poi" and name != "西门":
             continue
         coordinates = geometry.get("coordinates") or []
