@@ -71,6 +71,8 @@
 - [x] `GET /api/v1/search/places?scope=campus` returns only BUPT Shahe campus buildings/facilities/semantic named topology nodes and excludes nationwide attraction/school destinations.
 - [x] Campus route endpoint search excludes generic road/intersection nodes such as `校园路口` and `道路节点`.
 - [x] Map page displays roads, buildings, and facilities.
+- [x] Map page can switch to nationwide attraction/school POI markers.
+- [x] Attraction/school POI map supports category filter, keyword search, and hot/rating/name sort.
 - [x] Map page scaffold uses AMap JS API for rendering.
 - [x] Backend map data and route topology boundary is documented as OSMnx/OpenStreetMap, not AMap routing.
 - [x] AMap default center is `[116.28333, 40.15608]` for 北京邮电大学沙河校区.
