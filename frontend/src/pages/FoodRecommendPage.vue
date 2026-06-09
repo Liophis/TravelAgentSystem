@@ -62,41 +62,75 @@
           <div class="stat"><span>来源</span><strong>{{ sourceLabel }}</strong></div>
           <div class="stat"><span>路线</span><strong>{{ routePath.length > 0 ? "已绘制" : "未选择" }}</strong></div>
         </el-card>
+
+        <el-card shadow="never" class="result-card">
+          <template #header>特色店铺</template>
+          <div class="restaurant-list">
+            <article v-for="restaurant in featuredRestaurants" :key="restaurant.id" class="restaurant-card">
+              <div class="food-cover small" :class="cuisineClass(restaurant.cuisines[0] ?? restaurant.category)">
+                <span>{{ cuisineShortLabel(restaurant.cuisines[0] ?? restaurant.category) }}</span>
+              </div>
+              <div>
+                <h3>{{ restaurant.name }}</h3>
+                <p>{{ restaurant.address || restaurant.category || "目的地周边餐厅" }}</p>
+                <div class="tag-row">
+                  <el-tag v-for="item in restaurant.cuisines.slice(0, 3)" :key="item" size="small" effect="plain">
+                    {{ item }}
+                  </el-tag>
+                  <el-tag v-if="restaurant.source === 'amap'" size="small" type="success" effect="plain">高德</el-tag>
+                </div>
+              </div>
+            </article>
+          </div>
+        </el-card>
       </el-col>
 
       <el-col :xs="24" :lg="10">
-        <el-card shadow="never">
-          <el-table :data="foods" v-loading="loading" size="small">
-            <el-table-column prop="restaurant_name" label="餐厅/美食点" min-width="148" />
-            <el-table-column prop="name" label="推荐项" width="96" />
-            <el-table-column prop="cuisine" label="菜系" width="96" />
-            <el-table-column prop="restaurant_address" label="地址" min-width="150" show-overflow-tooltip />
-            <el-table-column prop="score" label="得分" width="82">
-              <template #default="{ row }">{{ row.score ? row.score.toFixed(3) : "-" }}</template>
-            </el-table-column>
-            <el-table-column prop="rating" label="评分" width="76" />
-            <el-table-column prop="heat" label="热度" width="76" />
-            <el-table-column label="来源" width="76">
-              <template #default="{ row }">
-                <el-tag size="small" :type="row.restaurant_source === 'amap' ? 'success' : 'info'">
-                  {{ row.restaurant_source === "amap" ? "高德" : "Seed" }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            <el-table-column prop="distance" label="距离" width="88">
-              <template #default="{ row }">{{ row.distance ? `${row.distance}m` : "-" }}</template>
-            </el-table-column>
-            <el-table-column prop="price" label="价格" width="76">
-              <template #default="{ row }">¥{{ row.price }}</template>
-            </el-table-column>
-            <el-table-column label="路线" width="76">
-              <template #default="{ row }">
-                <el-button link type="primary" :disabled="!row.routePath" @click="routePath = row.routePath ?? []">
-                  绘制
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+        <el-card shadow="never" class="food-results-card">
+          <template #header>
+            <div class="panel-header">
+              <div>
+                <strong>推荐结果</strong>
+                <small>{{ selectedDestination?.name ?? "全部目的地" }} · {{ sortLabel(lastTrace?.sort ?? sort) }}</small>
+              </div>
+              <el-tag effect="plain">{{ foods.length }} 项</el-tag>
+            </div>
+          </template>
+          <div v-loading="loading" class="food-grid">
+            <article v-for="food in foods" :key="food.id" class="food-card">
+              <div class="food-cover" :class="cuisineClass(food.cuisine)">
+                <span>{{ cuisineShortLabel(food.cuisine) }}</span>
+              </div>
+              <div class="food-content">
+                <div class="food-heading">
+                  <div>
+                    <h2>{{ food.restaurant_name }}</h2>
+                    <p>{{ food.name }}</p>
+                  </div>
+                  <strong>¥{{ food.price }}</strong>
+                </div>
+                <div class="tag-row">
+                  <el-tag size="small" effect="plain">{{ food.cuisine }}</el-tag>
+                  <el-tag size="small" :type="food.restaurant_source === 'amap' ? 'success' : 'info'" effect="plain">
+                    {{ food.restaurant_source === "amap" ? "高德真实 POI" : "Seed" }}
+                  </el-tag>
+                </div>
+                <p class="food-address">{{ food.restaurant_address || food.reason || "暂无地址说明" }}</p>
+                <div class="food-metrics">
+                  <span>评分 {{ food.rating }}</span>
+                  <span>热度 {{ food.heat }}</span>
+                  <span>得分 {{ food.score ? food.score.toFixed(3) : "-" }}</span>
+                  <span>{{ food.distance ? `${food.distance}m` : "距离待计算" }}</span>
+                </div>
+                <div class="food-actions">
+                  <el-button size="small" :disabled="!food.routePath" @click="routePath = food.routePath ?? []">
+                    绘制路线
+                  </el-button>
+                </div>
+              </div>
+            </article>
+            <el-empty v-if="!loading && foods.length === 0" description="没有匹配的美食结果" />
+          </div>
         </el-card>
       </el-col>
 
@@ -156,6 +190,7 @@ const sourceLabel = computed(() => {
   if (foods.value.some((food) => food.restaurant_source === "amap")) return "真实 POI";
   return "离线兜底";
 });
+const featuredRestaurants = computed(() => restaurants.value.slice(0, 6));
 const sortOptions = [
   { label: "综合", value: "composite" },
   { label: "匹配", value: "match" },
@@ -269,6 +304,21 @@ function sortLabel(value: string) {
   }[value] ?? value;
 }
 
+function cuisineClass(value?: string | null) {
+  const text = value ?? "";
+  if (/咖啡|茶|饮|甜/.test(text)) return "cuisine-drink";
+  if (/火锅|烧烤|烤|串/.test(text)) return "cuisine-grill";
+  if (/面|粉|饺|包/.test(text)) return "cuisine-noodle";
+  if (/西|披萨|汉堡|快餐/.test(text)) return "cuisine-western";
+  if (/地方|川|湘|鲁|粤|京|江浙/.test(text)) return "cuisine-local";
+  return "cuisine-chinese";
+}
+
+function cuisineShortLabel(value?: string | null) {
+  const text = (value || "美食").replace(/\s+/g, "");
+  return text.length > 4 ? text.slice(0, 4) : text;
+}
+
 function buildBaseParams() {
   const params = new URLSearchParams({
     current_lng: String(currentLng.value),
@@ -306,11 +356,208 @@ onMounted(async () => {
 .button-row {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.panel-header,
+.food-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-header strong {
+  display: block;
+  color: #101828;
+  font-size: 16px;
+}
+
+.panel-header small {
+  display: block;
+  margin-top: 4px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.restaurant-list {
+  display: grid;
+  gap: 12px;
+}
+
+.restaurant-card {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.restaurant-card h3,
+.food-heading h2 {
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.restaurant-card p,
+.food-heading p,
+.food-address {
+  margin: 5px 0 0;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.food-results-card {
+  min-height: calc(100vh - 190px);
+}
+
+.food-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.food-card {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+  background: #fff;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.food-card:hover {
+  border-color: #87d0c6;
+  box-shadow: 0 12px 28px rgba(16, 24, 40, 0.08);
+  transform: translateY(-1px);
+}
+
+.food-cover {
+  display: grid;
+  place-items: center;
+  min-height: 130px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.food-cover::before {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.34), transparent 24%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 46%);
+  content: "";
+}
+
+.food-cover span {
+  z-index: 1;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(16, 24, 40, 0.28);
+  font-size: 16px;
+  text-align: center;
+}
+
+.food-cover.small {
+  min-height: 76px;
+}
+
+.food-cover.small span {
+  font-size: 13px;
+}
+
+.cuisine-chinese {
+  background: linear-gradient(135deg, #b8323a, #f59e0b);
+}
+
+.cuisine-local {
+  background: linear-gradient(135deg, #0f766e, #84cc16);
+}
+
+.cuisine-drink {
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+}
+
+.cuisine-grill {
+  background: linear-gradient(135deg, #991b1b, #ea580c);
+}
+
+.cuisine-noodle {
+  background: linear-gradient(135deg, #a16207, #facc15);
+}
+
+.cuisine-western {
+  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+}
+
+.food-content {
+  display: grid;
+  gap: 10px;
+}
+
+.food-heading strong {
+  color: #b8323a;
+  font-size: 18px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.food-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.food-metrics span {
+  min-height: 34px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f9fafb;
+  color: #475467;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.food-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .trace-line {
   margin: 0 0 8px;
   color: #475467;
   line-height: 1.6;
+}
+
+@media (max-width: 1200px) {
+  .food-results-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .food-card,
+  .restaurant-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .food-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 </style>
