@@ -11,9 +11,10 @@
       </div>
     </div>
 
-    <el-row :gutter="16">
-      <el-col :xs="24" :lg="7">
-        <el-card shadow="never">
+    <el-row :gutter="18" class="food-top-layout">
+      <el-col :xs="24" :lg="8">
+        <el-card shadow="never" class="filter-card">
+          <template #header>筛选与排序</template>
           <el-form label-position="top">
             <el-form-item label="关键词">
               <el-input v-model="keyword" clearable placeholder="餐厅、菜系、地址或窗口" @keyup.enter="searchFoods" />
@@ -52,18 +53,30 @@
             <el-button type="primary" plain @click="searchFoods">模糊搜索</el-button>
             <el-button @click="loadNearby">附近 Top-10</el-button>
           </div>
+          <div class="summary-grid">
+            <div><span>餐厅</span><strong>{{ restaurants.length }}</strong></div>
+            <div><span>结果</span><strong>{{ foods.length }}</strong></div>
+            <div><span>候选</span><strong>{{ lastTrace?.candidate_count ?? totalCandidates }}</strong></div>
+            <div><span>排序</span><strong>{{ sortLabel(lastTrace?.sort ?? sort) }}</strong></div>
+            <div><span>来源</span><strong>{{ sourceLabel }}</strong></div>
+            <div><span>路线</span><strong>{{ routePath.length > 0 ? "已绘制" : "未选择" }}</strong></div>
+          </div>
         </el-card>
+      </el-col>
 
-        <el-card shadow="never" class="result-card">
-          <div class="stat"><span>餐厅</span><strong>{{ restaurants.length }}</strong></div>
-          <div class="stat"><span>结果</span><strong>{{ foods.length }}</strong></div>
-          <div class="stat"><span>候选</span><strong>{{ lastTrace?.candidate_count ?? totalCandidates }}</strong></div>
-          <div class="stat"><span>排序</span><strong>{{ sortLabel(lastTrace?.sort ?? sort) }}</strong></div>
-          <div class="stat"><span>来源</span><strong>{{ sourceLabel }}</strong></div>
-          <div class="stat"><span>路线</span><strong>{{ routePath.length > 0 ? "已绘制" : "未选择" }}</strong></div>
+      <el-col :xs="24" :lg="16">
+        <AMapView :facilities="foodMarkers" :route-path="routePath" />
+        <el-card v-if="lastTrace" shadow="never" class="result-card">
+          <template #header>算法记录</template>
+          <p class="trace-line">{{ lastTrace.algorithm }}</p>
+          <p class="trace-line">{{ lastTrace.ranking }}</p>
         </el-card>
+      </el-col>
+    </el-row>
 
-        <el-card shadow="never" class="result-card">
+    <el-row :gutter="18" class="food-bottom-layout">
+      <el-col :xs="24" :lg="8">
+        <el-card shadow="never">
           <template #header>特色店铺</template>
           <div class="restaurant-list">
             <article v-for="restaurant in featuredRestaurants" :key="restaurant.id" class="restaurant-card">
@@ -85,7 +98,7 @@
         </el-card>
       </el-col>
 
-      <el-col :xs="24" :lg="10">
+      <el-col :xs="24" :lg="16">
         <el-card shadow="never" class="food-results-card">
           <template #header>
             <div class="panel-header">
@@ -131,15 +144,6 @@
             </article>
             <el-empty v-if="!loading && foods.length === 0" description="没有匹配的美食结果" />
           </div>
-        </el-card>
-      </el-col>
-
-      <el-col :xs="24" :lg="7">
-        <AMapView :facilities="foodMarkers" :route-path="routePath" />
-        <el-card v-if="lastTrace" shadow="never" class="result-card">
-          <template #header>算法记录</template>
-          <p class="trace-line">{{ lastTrace.algorithm }}</p>
-          <p class="trace-line">{{ lastTrace.ranking }}</p>
         </el-card>
       </el-col>
     </el-row>
@@ -353,10 +357,48 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.food-top-layout,
+.food-bottom-layout {
+  align-items: start;
+}
+
+.food-bottom-layout {
+  margin-top: 2px;
+}
+
 .button-row {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.summary-grid div {
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid #edf1f5;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.summary-grid span {
+  display: block;
+  color: #667085;
+  font-size: 12px;
+}
+
+.summary-grid strong {
+  display: block;
+  margin-top: 8px;
+  color: #101828;
+  font-size: 18px;
+  overflow-wrap: anywhere;
 }
 
 .panel-header,
@@ -410,18 +452,19 @@ onMounted(async () => {
 }
 
 .food-results-card {
-  min-height: calc(100vh - 190px);
+  min-height: 520px;
 }
 
 .food-grid {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
 }
 
 .food-card {
   display: grid;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
   padding: 14px;
   border: 1px solid #edf1f5;
   border-radius: 8px;
@@ -441,13 +484,16 @@ onMounted(async () => {
 .food-cover {
   display: grid;
   place-items: center;
-  min-height: 130px;
+  min-height: 170px;
   border-radius: 8px;
   color: #fff;
   font-weight: 900;
   letter-spacing: 0;
   overflow: hidden;
   position: relative;
+  background-image: url("/images/food-cuisine-collage.png");
+  background-repeat: no-repeat;
+  background-size: 300% 200%;
 }
 
 .food-cover::before {
@@ -459,11 +505,21 @@ onMounted(async () => {
   content: "";
 }
 
+.food-cover::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 35%, rgba(16, 24, 40, 0.48));
+  content: "";
+}
+
 .food-cover span {
+  align-self: end;
+  justify-self: start;
   z-index: 1;
+  margin: 0 0 12px 12px;
   padding: 8px 10px;
   border-radius: 999px;
-  background: rgba(16, 24, 40, 0.28);
+  background: rgba(16, 24, 40, 0.62);
   font-size: 16px;
   text-align: center;
 }
@@ -477,27 +533,27 @@ onMounted(async () => {
 }
 
 .cuisine-chinese {
-  background: linear-gradient(135deg, #b8323a, #f59e0b);
+  background-position: 0 0;
 }
 
 .cuisine-local {
-  background: linear-gradient(135deg, #0f766e, #84cc16);
+  background-position: 50% 0;
 }
 
 .cuisine-drink {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  background-position: 100% 0;
 }
 
 .cuisine-grill {
-  background: linear-gradient(135deg, #991b1b, #ea580c);
+  background-position: 0 100%;
 }
 
 .cuisine-noodle {
-  background: linear-gradient(135deg, #a16207, #facc15);
+  background-position: 50% 100%;
 }
 
 .cuisine-western {
-  background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+  background-position: 100% 100%;
 }
 
 .food-content {
@@ -548,16 +604,24 @@ onMounted(async () => {
   .food-results-card {
     min-height: auto;
   }
+
+  .food-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @media (max-width: 720px) {
-  .food-card,
   .restaurant-card {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .summary-grid,
   .food-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .food-cover {
+    min-height: 150px;
   }
 }
 </style>

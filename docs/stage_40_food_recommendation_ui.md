@@ -13,7 +13,7 @@ Make the food recommendation page easier to demo and closer to a real discovery 
 
 - Replaced the result table in `FoodRecommendPage` with food recommendation cards.
 - Each food card shows:
-  - cuisine cover visual;
+  - cuisine cover image cropped from a project-local food collage asset;
   - restaurant name;
   - recommended food item;
   - cuisine tag;
@@ -27,9 +27,15 @@ Make the food recommendation page easier to demo and closer to a real discovery 
   - source tag for AMap rows.
 - Kept filters, destination scope, cuisine filtering, fuzzy search, nearby Top-10, map markers, and algorithm trace.
 
-## Data Note
+## Asset Note
 
-The current API does not expose restaurant or food `image_url`. Stage 40 therefore uses deterministic cuisine cover visuals based on real cuisine/category fields. Do not treat these as real restaurant photos. When backend data includes verified `image_url`, the card cover area should render the real image first and fall back to cuisine cover visuals.
+The current API does not expose restaurant or food `image_url`. Stage 40 therefore uses a project-local generated food collage:
+
+```text
+frontend/public/images/food-cuisine-collage.png
+```
+
+Cards crop this image by cuisine/category. Do not treat these as real restaurant photos. When backend data includes verified `image_url`, the card cover area should render the real image first and fall back to the cuisine collage.
 
 ## Verification
 
@@ -43,6 +49,6 @@ npm run build
 
 - [x] Food recommendations are readable as cards, not only a table.
 - [x] Restaurant specialty cuisines are visible.
-- [x] Food cards provide visual cuisine covers.
+- [x] Food cards provide project-local cuisine cover images.
 - [x] Route drawing and map markers remain available.
 - [x] Algorithm trace remains available.

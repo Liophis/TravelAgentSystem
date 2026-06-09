@@ -151,7 +151,7 @@
 ## Food
 
 - [x] Food list shows restaurant/window, cuisine, price, rating, heat.
-- [x] Food page shows recommendations as visual cards with cuisine cover visuals.
+- [x] Food page shows recommendations as visual cards with project-local cuisine cover images.
 - [x] Food page shows restaurant specialty cuisine tags.
 - [x] Cuisine filter works.
 - [x] Fuzzy search handles close spelling.
