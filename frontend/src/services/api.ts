@@ -367,7 +367,10 @@ export interface FoodListPayload {
   destination_id?: number | null;
   sort?: string;
   radius?: number;
+  center?: { lng: number; lat: number };
+  source?: string;
   algorithm_trace?: Record<string, string>;
+  error?: string;
 }
 
 export interface AigcDraftPayload {

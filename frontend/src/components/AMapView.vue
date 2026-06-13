@@ -27,6 +27,7 @@ const props = withDefaults(
     routePath?: Coordinate[];
     center?: Coordinate;
     origin?: { lng: number; lat: number; name?: string } | null;
+    selectedPoint?: Coordinate | null; // 新增：当前选中的点
   }>(),
   {
     facilities: () => [],
@@ -35,10 +36,11 @@ const props = withDefaults(
     routePath: () => [],
     center: () => [116.28333, 40.15608],
     origin: null,
+    selectedPoint: null,
   },
 );
 const emit = defineEmits<{
-  (event: "map-click", coordinate: Coordinate): void;
+  (event: "map-click", coordinate: Coordinate, gcjCoordinate: Coordinate): void;
   (event: "facility-click", facility: FacilityItem): void;
 }>();
 
@@ -130,6 +132,20 @@ function drawOverlays() {
     overlays.push(originMarker);
   }
 
+  // 绘制用户选中的点
+  if (props.selectedPoint) {
+    const pointPosition = wgs84ToGcj02(props.selectedPoint);
+    const selectedMarker = new AMap.Marker({
+      position: pointPosition,
+      title: "选中的位置",
+      content: `<div class="selected-dot"></div>`,
+      offset: new AMap.Pixel(-10, -10),
+      zIndex: 130,
+      animation: "AMAP_ANIMATION_DROP",
+    });
+    overlays.push(selectedMarker);
+  }
+
   let routePolyline: any = null;
   if (props.routePath.length >= 2) {
     routePolyline = new AMap.Polyline({
@@ -168,7 +184,11 @@ onMounted(async () => {
     map.addControl(new AMap.ToolBar({ position: "RB" }));
     map.on("click", (event: any) => {
       const lngLat = event.lnglat;
-      emit("map-click", gcj02ToWgs84([lngLat.getLng(), lngLat.getLat()]));
+      const gcjLng = lngLat.getLng();
+      const gcjLat = lngLat.getLat();
+      const wgs84Coord = gcj02ToWgs84([gcjLng, gcjLat]);
+      // 同时发送 WGS84（给后端）和 GCJ02（给高德逆地理编码）
+      emit("map-click", wgs84Coord, [gcjLng, gcjLat]);
     });
     drawOverlays();
   } catch (error) {
@@ -184,7 +204,7 @@ onBeforeUnmount(() => {
 });
 
 watch(
-  () => [props.facilities, props.buildings, props.roadPaths, props.routePath, props.center, props.origin],
+  () => [props.facilities, props.buildings, props.roadPaths, props.routePath, props.center, props.origin, props.selectedPoint],
   () => drawOverlays(),
   { deep: true },
 );
@@ -271,5 +291,27 @@ watch(
   border-radius: 50%;
   background: #dc2626;
   box-shadow: 0 2px 8px rgba(127, 29, 29, 0.35);
+}
+
+:global(.selected-dot) {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  background: #2563eb;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
 }
 </style>

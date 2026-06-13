@@ -73,11 +73,23 @@ def search_foods_from_db(
     current_lng: float | None = None,
     current_lat: float | None = None,
 ) -> dict[str, Any]:
+    """
+    美食搜索 - 支持基于坐标或目的地的搜索
+    """
     keyword = q.casefold().strip()
     destination = _load_destination(session, destination_id)
     current = _resolve_current(current_lng, current_lat, destination)
+
+    # 修改：当提供了坐标但不提供destination_id时，搜索所有餐厅
+    if current_lng is not None and current_lat is not None and destination_id is None:
+        foods = _load_foods(session)
+        if cuisine:
+            foods = [f for f in foods if f.cuisine == cuisine]
+    else:
+        foods = _filter_foods(_load_foods(session), cuisine, None, destination)
+
     scored = []
-    for food in _filter_foods(_load_foods(session), cuisine, None, destination):
+    for food in foods:
         rank = _food_match_rank(food, keyword)
         if rank is None:
             continue
@@ -97,11 +109,12 @@ def search_foods_from_db(
         "cuisine": cuisine,
         "destination_id": destination_id,
         "sort": resolved_sort,
+        "center": {"lng": current[0], "lat": current[1]},
         "algorithm_trace": {
             "stage": "stage-9-food-aigc-admin",
             "algorithm": "contains plus lightweight Levenshtein fuzzy search",
             "ranking": "hand-written Top-K heap by match/heat/rating/distance key, no full result sort",
-            "scope": "destination-linked or nearby restaurants" if destination is not None else "all restaurants",
+            "scope": "coordinate-based" if (current_lng and current_lat and not destination_id) else ("destination-linked or nearby restaurants" if destination is not None else "all restaurants"),
             "sort": resolved_sort,
             "candidate_count": str(len(scored)),
             "matched": str(len(scored)),
@@ -121,11 +134,22 @@ def recommend_foods_from_db(
     limit: int,
     sort: str = "composite",
 ) -> dict[str, Any]:
+    """
+    美食推荐 - 支持基于坐标或目的地的推荐
+    """
     resolved_sort = _normalize_food_sort(sort, allow_match=False)
     destination = _load_destination(session, destination_id)
-    foods = _filter_foods(_load_foods(session), cuisine, None, destination)
-    interests = _load_user_interests(session, user_id)
     current = _resolve_current(current_lng, current_lat, destination)
+
+    # 修改：当提供了坐标但不提供destination_id时，搜索所有餐厅
+    if current_lng is not None and current_lat is not None and destination_id is None:
+        foods = _load_foods(session)
+        if cuisine:
+            foods = [f for f in foods if f.cuisine == cuisine]
+    else:
+        foods = _filter_foods(_load_foods(session), cuisine, None, destination)
+
+    interests = _load_user_interests(session, user_id)
     max_food_heat = max((food.heat for food in foods), default=1)
     max_restaurant_heat = max((food.restaurant.heat for food in foods), default=1)
 
@@ -145,13 +169,13 @@ def recommend_foods_from_db(
         "destination_id": destination_id,
         "user_id": user_id,
         "sort": resolved_sort,
+        "center": {"lng": current[0], "lat": current[1]},
         "algorithm_trace": {
             "stage": "stage-24-destination-scoped-food",
             "algorithm": "rating + food heat + restaurant heat + cuisine interest + distance + price scoring",
             "ranking": "hand-written Top-K heap by selected hot/rating/distance/composite key, no full candidate sort",
             "distance_metric": "graph route distance for distance sort; current/destination approximate distance for composite score",
-            "scope": "destination-linked or nearby restaurants" if destination is not None else "all restaurants",
-            "scope_radius_meters": str(DESTINATION_FOOD_SCOPE_METERS),
+            "scope": "coordinate-based" if (current_lng and current_lat and not destination_id) else ("destination-linked or nearby restaurants" if destination is not None else "all restaurants"),
             "sort": resolved_sort,
             "candidate_count": str(len(foods)),
             "returned": str(len(items)),
@@ -170,10 +194,29 @@ def nearby_foods_from_db(
     radius: int,
     limit: int,
 ) -> dict[str, Any]:
+    """
+    附近美食推荐 - 支持基于坐标或目的地的推荐
+    优先级：
+    1. 如果有坐标，以坐标为中心搜索radius范围内的餐厅
+    2. 如果有destination_id，以目的地为中心搜索
+    3. 如果都没有，使用默认位置
+    """
     destination = _load_destination(session, destination_id)
     current = _resolve_current(current_lng, current_lat, destination)
+
+    # 修改：当提供了坐标但不提供destination_id时，
+    # 搜索所有餐厅，按距离筛选
+    if current_lng is not None and current_lat is not None and destination_id is None:
+        # 基于坐标的搜索 - 不过滤目的地，只看距离
+        foods = _load_foods(session)
+        if cuisine:
+            foods = [f for f in foods if f.cuisine == cuisine]
+    else:
+        # 基于目的地的搜索 - 原有的过滤逻辑
+        foods = _filter_foods(_load_foods(session), cuisine, None, destination)
+
     enriched = []
-    for food in _filter_foods(_load_foods(session), cuisine, None, destination):
+    for food in foods:
         route = _route_to_restaurant(session, current, food.restaurant)
         if route["distance"] > radius:
             continue
@@ -188,10 +231,11 @@ def nearby_foods_from_db(
         "radius": radius,
         "cuisine": cuisine,
         "destination_id": destination_id,
+        "center": {"lng": current[0], "lat": current[1]},
         "algorithm_trace": {
             "stage": "stage-24-destination-scoped-food",
             "distance": "route planner graph distance with straight-line fallback",
-            "scope": "destination-linked or nearby restaurants" if destination is not None else "all restaurants",
+            "scope": "coordinate-based" if (current_lng and current_lat and not destination_id) else ("destination-linked or nearby restaurants" if destination is not None else "all restaurants"),
             "ranking": "Top-K heap by route distance",
             "returned": str(len(items)),
             "data_source": _food_data_source_trace(items),

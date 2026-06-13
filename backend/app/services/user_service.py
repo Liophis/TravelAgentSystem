@@ -4,7 +4,7 @@ import hmac
 import json
 import secrets
 from collections import Counter
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from sqlalchemy import delete, func, select
@@ -306,7 +306,7 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 
 def create_access_token(user_id: int, role: str = NORMAL_USER_ROLE) -> str:
-    expires_at = datetime.now(UTC) + timedelta(minutes=settings.access_token_expire_minutes)
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=settings.access_token_expire_minutes)
     payload = {
         "sub": user_id,
         "role": _normalize_role(role),
@@ -330,7 +330,7 @@ def verify_access_token_payload(token: str) -> dict[str, Any] | None:
         payload = json.loads(_base64url_decode(payload_token).decode("utf-8"))
     except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
         return None
-    if int(payload.get("exp", 0)) < int(datetime.now(UTC).timestamp()):
+    if int(payload.get("exp", 0)) < int(datetime.now(timezone.utc).timestamp()):
         return None
     if "role" not in payload:
         payload["role"] = NORMAL_USER_ROLE

@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -20,7 +20,7 @@ class Diary(Base):
     views: Mapped[int] = mapped_column(Integer, default=0)
     rating_sum: Mapped[int] = mapped_column(Integer, default=0)
     rating_count: Mapped[int] = mapped_column(Integer, default=0)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     comments: Mapped[list["DiaryComment"]] = relationship(back_populates="diary")
     ratings: Mapped[list["DiaryRating"]] = relationship(back_populates="diary")
@@ -34,7 +34,7 @@ class DiaryComment(Base):
     diary_id: Mapped[int] = mapped_column(ForeignKey("diaries.id"), index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     content: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     diary: Mapped[Diary] = relationship(back_populates="comments")
 
@@ -46,7 +46,7 @@ class DiaryRating(Base):
     diary_id: Mapped[int] = mapped_column(ForeignKey("diaries.id"), index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     value: Mapped[int] = mapped_column(Integer)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     diary: Mapped[Diary] = relationship(back_populates="ratings")
 
@@ -59,7 +59,7 @@ class DiaryMedia(Base):
     media_type: Mapped[str] = mapped_column(String(32), index=True)
     url: Mapped[str] = mapped_column(String(512))
     caption: Mapped[str | None] = mapped_column(String(160), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     diary: Mapped[Diary] = relationship(back_populates="media")
 

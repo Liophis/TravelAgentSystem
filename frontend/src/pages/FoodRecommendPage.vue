@@ -77,14 +77,66 @@
           <div class="map-workspace-header">
             <div>
               <h2>餐厅位置与路线预览</h2>
-              <p>推荐结果使用目的地范围、菜系、热度、评分和距离综合计算。</p>
+              <p v-if="selectedDestinationId">
+                基于目的地：{{ selectedDestination?.name }} 的推荐
+              </p>
+              <p v-else-if="selectedLocationName">
+                基于位置：{{ selectedLocationName }} 的附近推荐
+                <small v-if="foods.length > 0 && foods[0]?.restaurant_source === 'amap_realtime'">
+                  (实时 nationwide 数据)
+                </small>
+                <small>（点击地图可更改位置）</small>
+              </p>
+              <p v-else>
+                基于地图选点的附近推荐
+                <small>（点击地图选择位置，支持全国）</small>
+              </p>
             </div>
             <div class="workspace-actions">
               <span class="data-chip">{{ foodMarkers.length }} 餐厅</span>
               <span class="data-chip">{{ routePath.length > 0 ? "已绘制路线" : "待选路线" }}</span>
             </div>
           </div>
-          <AMapView :facilities="foodMarkers" :route-path="routePath" />
+          <AMapView
+            v-if="foods.length > 0 || loading"
+            :facilities="foodMarkers"
+            :route-path="routePath"
+            :selected-point="selectedDestinationId ? null : [currentLng, currentLat]"
+            @map-click="onMapClick"
+          />
+
+          <!-- 空结果提示 -->
+          <div v-else-if="!loading && foods.length === 0 && !selectedDestinationId" class="no-result-notice">
+            <el-empty description="当前位置附近暂无餐厅数据">
+              <template #default>
+                <p class="no-result-tip">
+                  该位置附近未找到餐厅，请尝试：<br />
+                  1. 扩大搜索半径<br />
+                  2. 选择其他城市的位置（支持全国实时搜索）<br />
+                  3. 点击下方的北京目的地查看示例数据
+                </p>
+                <el-button type="primary" @click="goToBeijing">
+                  切换到北邮沙河校区
+                </el-button>
+              </template>
+            </el-empty>
+          </div>
+
+          <AMapView
+            v-else
+            :facilities="foodMarkers"
+            :route-path="routePath"
+            :selected-point="selectedDestinationId ? null : [currentLng, currentLat]"
+            @map-click="onMapClick"
+          />
+          <div class="map-mode-toggle">
+            <el-radio-group v-model="selectedDestinationId" @change="onDestinationChange">
+              <el-radio-button :label="null">📍 地图选点模式</el-radio-button>
+              <el-radio-button v-for="d in destinationOptions.slice(0, 5)" :key="d.id" :label="d.id">
+                {{ d.name.slice(0, 8) }}
+              </el-radio-button>
+            </el-radio-group>
+          </div>
         </div>
         <el-card v-if="lastTrace" shadow="never" class="result-card">
           <template #header>算法记录</template>
@@ -174,6 +226,7 @@
 import { computed, onMounted, ref } from "vue";
 
 import AMapView from "../components/AMapView.vue";
+import { reverseGeocode } from "../utils/amap";
 import {
   apiGet,
   type Coordinate,
@@ -201,6 +254,7 @@ const lastTrace = ref<Record<string, string> | null>(null);
 const totalCandidates = ref(0);
 const currentLng = ref(116.28333);
 const currentLat = ref(40.15608);
+const selectedLocationName = ref(""); // 新增：选中的地点名称
 
 const cuisineOptions = computed(() =>
   cuisines.value.length > 0
@@ -281,6 +335,96 @@ async function loadRecommendations() {
   }
 }
 
+async function onMapClick(coordinate: Coordinate, gcjCoordinate: Coordinate) {
+  // 清除目的地选择，使用坐标模式
+  selectedDestinationId.value = null;
+  currentLng.value = coordinate[0];
+  currentLat.value = coordinate[1];
+
+  // 显示加载状态
+  selectedLocationName.value = "正在获取位置信息...";
+
+  try {
+    // 使用 GCJ02 坐标进行逆地理编码（高德 API 需要 GCJ02）
+    const addressInfo = await reverseGeocode(gcjCoordinate[0], gcjCoordinate[1]);
+    if (addressInfo) {
+      // 优先显示 formattedAddress，如果太长则截取
+      const address = addressInfo.formattedAddress || addressInfo.address;
+      selectedLocationName.value = address.length > 30 ? address.slice(0, 30) + "..." : address;
+    } else {
+      selectedLocationName.value = "未知位置";
+    }
+  } catch (error) {
+    console.error("获取地址失败:", error);
+    selectedLocationName.value = "位置获取失败";
+  }
+
+  // 调用实时API获取全国美食
+  await loadRealtimeRecommendations();
+}
+
+async function loadRealtimeRecommendations() {
+  loading.value = true;
+  try {
+    const params = new URLSearchParams({
+      current_lng: String(currentLng.value),
+      current_lat: String(currentLat.value),
+      radius: String(radius.value),
+      limit: "20",
+    });
+    if (cuisine.value) {
+      params.set("cuisine", cuisine.value);
+    }
+
+    const payload = await apiGet<FoodListPayload>(`/api/v1/foods/realtime?${params}`);
+
+    if (payload.error) {
+      console.error("实时搜索失败:", payload.error);
+      foods.value = [];
+      totalCandidates.value = 0;
+    } else {
+      foods.value = payload.items;
+      totalCandidates.value = payload.total;
+
+      // 如果有菜品，使用第一个菜品的坐标来更新位置名称
+      if (payload.items.length > 0 && !selectedLocationName.value.includes("市")) {
+        const firstItem = payload.items[0];
+        if (firstItem.restaurant_address) {
+          const cityMatch = firstItem.restaurant_address.match(/^([^省]+省)?([^市]+市)?/);
+          if (cityMatch) {
+            const location = cityMatch[2] || cityMatch[1] || "当前位置";
+            selectedLocationName.value = location + "附近";
+          }
+        }
+      }
+    }
+
+    lastTrace.value = payload.algorithm_trace ?? null;
+    routePath.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+function onDestinationChange() {
+  if (selectedDestinationId.value) {
+    selectedLocationName.value = ""; // 清除地图选点的位置名称
+    useDestinationCenter();
+  }
+  reloadScopedFood();
+}
+
+function goToBeijing() {
+  // 切换到北邮沙河校区
+  const bupt = destinationOptions.value.find((item) => item.name.includes("北京邮电大学沙河校区"));
+  if (bupt) {
+    selectedDestinationId.value = bupt.id;
+    selectedLocationName.value = "";
+    useDestinationCenter();
+    reloadScopedFood();
+  }
+}
+
 async function searchFoods() {
   if (!keyword.value.trim()) {
     await loadRecommendations();
@@ -348,6 +492,7 @@ function buildBaseParams() {
     current_lng: String(currentLng.value),
     current_lat: String(currentLat.value),
   });
+  // 只有在选择了目的地时才传递 destination_id
   if (selectedDestinationId.value) {
     params.set("destination_id", String(selectedDestinationId.value));
   }
@@ -619,6 +764,37 @@ onMounted(async () => {
   margin: 0 0 8px;
   color: #475467;
   line-height: 1.6;
+}
+
+.map-mode-toggle {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.map-mode-toggle :deep(.el-radio-group) {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.no-result-notice {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px dashed #d0d5dd;
+}
+
+.no-result-tip {
+  color: #667085;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 16px 0;
+  text-align: center;
 }
 
 @media (max-width: 1200px) {
