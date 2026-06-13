@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
+from app.services.amap_poi_service import search_foods_at_location, AmapPoiError
 from app.services.food_service import (
     list_food_items_from_db,
     list_restaurants_from_db,
@@ -107,3 +108,43 @@ def nearby_foods(
         radius=radius,
         limit=limit,
     )
+
+
+@router.get("/realtime")
+async def realtime_foods(
+    current_lng: float = Query(..., description="当前经度"),
+    current_lat: float = Query(..., description="当前纬度"),
+    cuisine: str | None = Query(default=None, description="菜系筛选"),
+    radius: int = Query(default=3000, ge=1, le=50000, description="搜索半径(米)"),
+    limit: int = Query(default=20, ge=1, le=50, description="返回数量"),
+) -> dict:
+    """
+    实时全国美食搜索 - 使用高德地图API
+
+    支持全国任意位置的美食搜索，不依赖本地数据库
+    """
+    try:
+        result = await search_foods_at_location(
+            lng=current_lng,
+            lat=current_lat,
+            cuisine=cuisine,
+            radius=radius,
+            limit=limit,
+        )
+        return result
+    except AmapPoiError as e:
+        return {
+            "items": [],
+            "total": 0,
+            "error": str(e),
+            "center": {"lng": current_lng, "lat": current_lat},
+            "source": "error",
+        }
+    except Exception as e:
+        return {
+            "items": [],
+            "total": 0,
+            "error": f"搜索失败: {str(e)}",
+            "center": {"lng": current_lng, "lat": current_lat},
+            "source": "error",
+        }

@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -15,7 +15,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255))
     role: Mapped[str] = mapped_column(String(32), default="user", index=True)
     is_active: Mapped[bool] = mapped_column(default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     profile: Mapped["UserProfile"] = relationship(back_populates="user", uselist=False)
     interests: Mapped[list["UserInterest"]] = relationship(back_populates="user")
@@ -62,7 +62,7 @@ class UserFavorite(Base):
     target_type: Mapped[str] = mapped_column(String(32), index=True)
     target_id: Mapped[int] = mapped_column(Integer, index=True)
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user: Mapped[User] = relationship(back_populates="favorites")
 
@@ -78,11 +78,11 @@ class UserRating(Base):
     target_type: Mapped[str] = mapped_column(String(32), index=True)
     target_id: Mapped[int] = mapped_column(Integer, index=True)
     rating: Mapped[float] = mapped_column(Float)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     user: Mapped[User] = relationship(back_populates="ratings")
@@ -97,6 +97,6 @@ class UserBehaviorLog(Base):
     target_id: Mapped[int] = mapped_column(Integer, index=True)
     action: Mapped[str] = mapped_column(String(32), index=True)
     metadata_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(UTC))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     user: Mapped[User] = relationship(back_populates="behavior_logs")

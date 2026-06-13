@@ -1,6 +1,6 @@
 import json
 from collections import Counter
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from typing import Any, Callable
 
 from sqlalchemy import delete, select
@@ -29,7 +29,7 @@ def extract_user_profile_with_llm_from_db(
     provider_error: str | None = None
     fallback_used = False
     raw_model_text = ""
-    started_at = datetime.now(UTC)
+    started_at = datetime.now(timezone.utc)
     call = llm_call or chat_completion_text
 
     try:
@@ -46,7 +46,7 @@ def extract_user_profile_with_llm_from_db(
         analysis = _fallback_analysis(evidence)
 
     normalized = _normalize_analysis(analysis, evidence)
-    elapsed_ms = int((datetime.now(UTC) - started_at).total_seconds() * 1000)
+    elapsed_ms = int((datetime.now(timezone.utc) - started_at).total_seconds() * 1000)
     trace = {
         "stage": "stage-43-llm-user-profile",
         "algorithm": "LLM JSON extraction with deterministic tag aggregation fallback",
@@ -69,7 +69,7 @@ def extract_user_profile_with_llm_from_db(
     profile.llm_profile_weights_json = json.dumps(normalized["weights"], ensure_ascii=False, sort_keys=True)
     profile.llm_profile_evidence_json = json.dumps(normalized["evidence"], ensure_ascii=False)
     profile.llm_profile_trace_json = json.dumps(trace, ensure_ascii=False, sort_keys=True)
-    profile.llm_profile_updated_at = datetime.now(UTC)
+    profile.llm_profile_updated_at = datetime.now(timezone.utc)
     _replace_user_interests(session, user.id, normalized["tags"])
     session.commit()
 
@@ -316,7 +316,7 @@ def _build_analysis_payload(
         "weights": normalized["weights"],
         "summary": normalized["summary"],
         "evidence": normalized["evidence"],
-        "updated_at": normalized.get("updated_at") or datetime.now(UTC).isoformat(),
+        "updated_at": normalized.get("updated_at") or datetime.now(timezone.utc).isoformat(),
         "updated_profile": updated_profile,
         "algorithm_trace": trace,
     }
