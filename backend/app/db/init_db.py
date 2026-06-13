@@ -33,6 +33,19 @@ def ensure_compatible_schema(engine: Engine) -> None:
             user_columns = {column["name"] for column in inspector.get_columns("users")}
             if "role" not in user_columns:
                 connection.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR(32) NOT NULL DEFAULT 'user'"))
+        if "user_profiles" in table_names:
+            profile_columns = {column["name"] for column in inspector.get_columns("user_profiles")}
+            profile_column_defs = {
+                "llm_profile_summary": "TEXT",
+                "llm_profile_tags_json": "TEXT",
+                "llm_profile_weights_json": "TEXT",
+                "llm_profile_evidence_json": "TEXT",
+                "llm_profile_trace_json": "TEXT",
+                "llm_profile_updated_at": "DATETIME",
+            }
+            for column_name, column_type in profile_column_defs.items():
+                if column_name not in profile_columns:
+                    connection.execute(text(f"ALTER TABLE user_profiles ADD COLUMN {column_name} {column_type}"))
         if "restaurants" in table_names:
             restaurant_columns = {column["name"] for column in inspector.get_columns("restaurants")}
             if "destination_id" not in restaurant_columns:

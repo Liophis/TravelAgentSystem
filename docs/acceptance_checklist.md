@@ -52,6 +52,9 @@
 - [x] Profile shows nickname, avatar, interests, favorites.
 - [x] Profile shows nickname and interests.
 - [x] User can edit interests from the frontend.
+- [x] User can run LLM-assisted interest extraction from profile behavior data.
+- [x] Missing LLM configuration falls back to deterministic local profile extraction.
+- [x] Extracted LLM/fallback tags are written to `user_interests` and affect recommendation output.
 - [x] User can select preferred destinations/schools before recommendation.
 - [x] Interest changes affect recommendation output.
 - [x] Behavior logs are recorded after browsing/rating/favorite actions.
@@ -66,6 +69,14 @@
 - [x] Recommendation response includes score and reason.
 - [x] Recommendation candidate pool is destination records, not raw campus buildings or facilities.
 - [x] User interests can represent preferred attraction and school categories before recommendation.
+
+## Demo Experience
+
+- [x] Home page acts as a data dashboard with data scale, algorithm cards, and demo scene links.
+- [x] Defense demo page exists at `/demo`.
+- [x] Defense demo page shows core API `algorithm_trace` values in readable panels.
+- [x] Defense demo page renders an ECharts relationship graph for destination, route, facility, diary, food, and user-profile entities.
+- [x] A lightweight explanation panel summarizes why each module is relevant to the course requirements.
 
 ## Map And Routing
 

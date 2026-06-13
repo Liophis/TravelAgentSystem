@@ -31,6 +31,12 @@ class UserProfile(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
     nickname: Mapped[str] = mapped_column(String(64))
     avatar_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    llm_profile_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    llm_profile_tags_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    llm_profile_weights_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    llm_profile_evidence_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    llm_profile_trace_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    llm_profile_updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
     user: Mapped[User] = relationship(back_populates="profile")
 

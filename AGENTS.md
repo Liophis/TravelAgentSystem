@@ -83,6 +83,9 @@ data/external/      downloaded third-party OSM/AMap source payloads before clean
 
 - AIGC animation remains a deterministic local simulation unless a real external model provider is explicitly configured.
 - Do not present mock video links as real generated videos.
+- LLM user profile extraction may call an OpenAI-compatible provider only when `LLM_API_KEY` is configured.
+- Missing or failed LLM calls must fall back to deterministic local tag aggregation and must not break tests or demo startup.
+- LLM-extracted tags are allowed to update `user_interests`; deterministic course algorithms remain the source of recommendation/routing/search behavior.
 - The AIGC Agent is exposed as `POST /api/v1/aigc/agent/run`.
 - Agent responses must include `agent_trace.steps[]` with tool name, status, timing, input summary, and output summary.
 - Keep `POST /api/v1/aigc/diary-draft` and `POST /api/v1/aigc/storyboard` backward-compatible.

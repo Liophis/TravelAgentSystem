@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import AdminDashboardPage from "../pages/AdminDashboardPage.vue";
 import DiaryCreateAigcPage from "../pages/DiaryCreateAigcPage.vue";
 import DiaryCommunityPage from "../pages/DiaryCommunityPage.vue";
+import DefenseDemoPage from "../pages/DefenseDemoPage.vue";
 import FoodRecommendPage from "../pages/FoodRecommendPage.vue";
 import HomePage from "../pages/HomePage.vue";
 import IndoorNavigationPage from "../pages/IndoorNavigationPage.vue";
@@ -18,6 +19,7 @@ const router = createRouter({
   routes: [
     { path: "/login", name: "login", component: LoginPage },
     { path: "/", name: "home", component: HomePage },
+    { path: "/demo", name: "defense-demo", component: DefenseDemoPage },
     { path: "/destinations", redirect: "/map" },
     { path: "/profile", name: "profile", component: UserPreferencePage },
     { path: "/map", name: "map-guide", component: MapGuidePage },

@@ -19,6 +19,10 @@ from app.services.user_service import (
     register_user_from_db,
     update_user_interests_from_db,
 )
+from app.services.user_profile_llm_service import (
+    extract_user_profile_with_llm_from_db,
+    get_user_profile_analysis_from_db,
+)
 
 router = APIRouter()
 
@@ -116,6 +120,22 @@ def get_user_profile(user_id: int, db: Session = Depends(get_db)) -> dict:
     if profile is None:
         raise HTTPException(status_code=404, detail="User not found.")
     return profile
+
+
+@router.post("/{user_id}/profile/llm-extract")
+def extract_user_profile_with_llm(user_id: int, db: Session = Depends(get_db)) -> dict:
+    profile = extract_user_profile_with_llm_from_db(db, user_id)
+    if profile is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return profile
+
+
+@router.get("/{user_id}/profile/analysis")
+def get_user_profile_analysis(user_id: int, db: Session = Depends(get_db)) -> dict:
+    analysis = get_user_profile_analysis_from_db(db, user_id)
+    if analysis is None:
+        raise HTTPException(status_code=404, detail="User not found.")
+    return analysis
 
 
 @router.put("/{user_id}/interests")

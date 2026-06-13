@@ -29,6 +29,10 @@ class Settings(BaseSettings):
     osm_fallback_lng: float = Field(default=116.28333, alias="OSM_FALLBACK_LNG")
     osm_fallback_dist: int = Field(default=1500, alias="OSM_FALLBACK_DIST")
     amap_web_api_key: str | None = Field(default=None, alias="AMAP_WEB_API_KEY")
+    llm_api_key: str | None = Field(default=None, alias="LLM_API_KEY")
+    llm_base_url: str = Field(default="https://api.openai.com/v1", alias="LLM_BASE_URL")
+    llm_model: str = Field(default="gpt-4o-mini", alias="LLM_MODEL")
+    llm_timeout_seconds: float = Field(default=20, alias="LLM_TIMEOUT_SECONDS")
 
     model_config = SettingsConfigDict(
         env_file=(".env", ".env.local"),

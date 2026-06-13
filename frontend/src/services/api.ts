@@ -215,6 +215,17 @@ export interface UserProfilePayload extends UserProfileItem {
   algorithm_trace: Record<string, string>;
 }
 
+export interface UserProfileAnalysisPayload {
+  user_id: number;
+  tags: string[];
+  weights: Record<string, number>;
+  summary: string;
+  evidence: string[];
+  updated_at?: string | null;
+  updated_profile: UserProfilePayload | null;
+  algorithm_trace: Record<string, string>;
+}
+
 export interface AuthPayload {
   access_token: string;
   token_type: string;

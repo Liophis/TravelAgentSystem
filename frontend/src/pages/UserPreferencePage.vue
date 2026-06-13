@@ -5,7 +5,10 @@
         <h1>个人中心</h1>
         <p>维护当前登录账号的兴趣、收藏、评分和浏览行为，并查看推荐结果如何变化。</p>
       </div>
-      <el-button type="primary" :loading="saving" @click="saveInterests">保存兴趣</el-button>
+      <div class="heading-actions">
+        <el-button :loading="aiLoading" @click="extractAIProfile">AI 分析兴趣</el-button>
+        <el-button type="primary" :loading="saving" @click="saveInterests">保存兴趣</el-button>
+      </div>
     </div>
 
     <el-row :gutter="16">
@@ -63,6 +66,27 @@
             {{ item.target_name ?? `${item.target_type}#${item.target_id}` }}
           </el-tag>
         </el-card>
+
+        <el-card shadow="never" class="result-card ai-profile-card">
+          <template #header>
+            <div class="card-header">
+              <span>AI 画像分析</span>
+              <el-tag effect="plain" :type="profileAnalysis?.algorithm_trace?.fallback_used === 'true' ? 'warning' : 'success'">
+                {{ profileAnalysis?.algorithm_trace?.fallback_used === "true" ? "本地兜底" : "LLM / 已就绪" }}
+              </el-tag>
+            </div>
+          </template>
+          <p class="ai-summary">{{ profileAnalysis?.summary ?? "尚未生成画像，可根据收藏、评分和浏览行为提取兴趣。" }}</p>
+          <div v-if="profileAnalysis?.tags?.length" class="tag-cloud">
+            <el-tag v-for="tag in profileAnalysis.tags" :key="tag" effect="plain">
+              {{ tag }} · {{ formatWeight(profileAnalysis.weights[tag]) }}
+            </el-tag>
+          </div>
+          <ul v-if="profileAnalysis?.evidence?.length" class="evidence-list">
+            <li v-for="item in profileAnalysis.evidence" :key="item">{{ item }}</li>
+          </ul>
+          <AlgorithmTracePanel :trace="profileAnalysis?.algorithm_trace" title="画像算法记录" compact />
+        </el-card>
       </el-col>
 
       <el-col :span="15">
@@ -93,17 +117,19 @@
 import { computed, onMounted, ref } from "vue";
 import { ElMessage } from "element-plus";
 
+import AlgorithmTracePanel from "../components/AlgorithmTracePanel.vue";
 import {
   apiGet,
   apiPost,
   apiPut,
   type DestinationItem,
   type RecommendationPayload,
+  type UserProfileAnalysisPayload,
   type UserProfileItem,
   type UserListPayload,
   type UserProfilePayload,
 } from "../services/api";
-import { authState } from "../services/auth";
+import { authState, updateAuthUser } from "../services/auth";
 
 const users = ref<UserProfileItem[]>([]);
 const profile = ref<UserProfilePayload | null>(null);
@@ -111,7 +137,9 @@ const userId = ref<number | null>(null);
 const availableInterests = ref<string[]>([]);
 const selectedInterests = ref<string[]>([]);
 const recommendations = ref<DestinationItem[]>([]);
+const profileAnalysis = ref<UserProfileAnalysisPayload | null>(null);
 const saving = ref(false);
+const aiLoading = ref(false);
 const loadingRecommendations = ref(false);
 const strategy = ref("behavior");
 const targetDestinationId = ref(1);
@@ -138,7 +166,13 @@ async function loadProfile() {
   profile.value = payload;
   selectedInterests.value = [...payload.interests];
   availableInterests.value = payload.available_interests;
+  await loadProfileAnalysis();
   await loadRecommendations();
+}
+
+async function loadProfileAnalysis() {
+  if (!userId.value) return;
+  profileAnalysis.value = await apiGet<UserProfileAnalysisPayload>(`/api/v1/users/${userId.value}/profile/analysis`);
 }
 
 async function saveInterests() {
@@ -153,6 +187,27 @@ async function saveInterests() {
     await loadRecommendations();
   } finally {
     saving.value = false;
+  }
+}
+
+async function extractAIProfile() {
+  if (!userId.value) return;
+  aiLoading.value = true;
+  try {
+    const payload = await apiPost<UserProfileAnalysisPayload>(`/api/v1/users/${userId.value}/profile/llm-extract`, {});
+    profileAnalysis.value = payload;
+    if (payload.updated_profile) {
+      profile.value = payload.updated_profile;
+      selectedInterests.value = [...payload.updated_profile.interests];
+      availableInterests.value = payload.updated_profile.available_interests;
+      if (authState.user?.id === payload.updated_profile.id) {
+        updateAuthUser(payload.updated_profile);
+      }
+    }
+    await loadRecommendations();
+    ElMessage.success("AI 画像已更新，并写入推荐兴趣权重");
+  } finally {
+    aiLoading.value = false;
   }
 }
 
@@ -203,6 +258,10 @@ async function loadRecommendations() {
   }
 }
 
+function formatWeight(value: number | undefined) {
+  return `${Math.round((value ?? 0) * 100)}%`;
+}
+
 onMounted(async () => {
   await loadUsers();
   await loadProfile();
@@ -231,5 +290,27 @@ onMounted(async () => {
 
 .tag-item {
   margin: 0 6px 6px 0;
+}
+
+.ai-summary {
+  margin: 0 0 12px;
+  color: #475467;
+  line-height: 1.65;
+}
+
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.evidence-list {
+  display: grid;
+  gap: 7px;
+  margin: 0 0 14px;
+  padding-left: 18px;
+  color: #667085;
+  line-height: 1.5;
 }
 </style>
